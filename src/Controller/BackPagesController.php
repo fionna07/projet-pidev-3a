@@ -15,4 +15,11 @@ class BackPagesController extends AbstractController
             'controller_name' => 'BackPagesController',
         ]);
     }
+    #[Route('/back/offre', name: 'app_back_offre')]
+    public function offreBack(): Response
+    {
+        return $this->render('offre_emploi/indexBack.html.twig', [
+            'controller_name' => 'BackPagesController',
+        ]);
+    }
 }

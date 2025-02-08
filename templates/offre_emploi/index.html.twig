@@ -1,8 +1,32 @@
-
 {% extends 'base.html.twig' %}
 
-{% block title %}  {% endblock %}
+{% block title %}Liste des Offres d'Emploi{% endblock %}
 
 {% block body %}
-   
-{% endblock %}
+    <h1 classtext-center my-4">Liste des Offres d'Emploi</h1>
+
+ <div classcontainer">
+        <div classrow">
+            {% for offre in offres %}
+                <div classcol-md-4 mb-4">
+                    <div classcard">
+                        <div classcard-body">
+                            <h5 classcard-title">{{ offre.titre }}</h5>
+                           <p classcard-text">
+                                <strong :</strong {{ offre.description|slice(0, 100) ~ '...' }}<br>
+                               <strongLocalisation :</strong {{ offre.localisation }}<br>
+                               <strongNombre de postes :</strong {{ offre.nombrePostes }}<br>
+                               <strongalaire :</strong {{ offre.salaire }} €<br>
+                               <strong de début :</strong {{ offre.dateDebut|date('d/m/Y') }}<br>
+                               <strong de fin estimée :</strong {{ offre.dateFinEstimee|date('d/m/Y') }}
+                            </p>
+                           <a href class="btn btn-primary">Voir plus</a>
+                       </div>
+ </div>
+ </div>
+ {% else %}
+                <p classtext-center">Aucune offre d'emploi disponible pour le moment.</p>
+           {%  endfor %}
+        </div>
+ </div>
+  {% endblock %}

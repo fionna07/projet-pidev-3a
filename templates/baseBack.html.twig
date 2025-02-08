@@ -14,8 +14,6 @@
         <!-- Ou si vous utilisez un fichier PNG -->
         <link rel="icon" href="{{asset('Back/img/favicon.png')}}" type="image/png">
 
-        <title>WeFarm</title>
-
         <!-- Polices personnalisées pour ce template-->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
@@ -26,7 +24,6 @@
 
         <!-- Styles personnalisés pour ce template-->
         <link href="{{asset('Back/css/sb-admin-2.min.css')}}" rel="stylesheet">
-
         {% endblock %}
 
         {% block javascripts %}
@@ -52,14 +49,13 @@
         <!-- jQuery -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-
         <!-- Bootstrap JS (incluant Popper.js pour les dropdowns) -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
 
-                {% block importmap %}{{ importmap('app') }}{% endblock %}
-            {% endblock %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
         </head>
         
         {% block body %} {% endblock %}
@@ -68,7 +64,7 @@
 
         <!-- Page Wrapper -->
         <div id="wrapper">
-
+            {% block sidebar %}
             <!-- Sidebar -->
             <ul class="navbar-nav bg-gradient-success sidebar sidebar-dark accordion" id="accordionSidebar">
 
@@ -102,52 +98,52 @@
                 </div>
 
                 <!-- Nav Item - Gestion des utilisateurs -->
-    <li class="nav-item">
-        <a class="nav-link" href="utilisateurs.html">
-            <i class="fas fa-fw fa-users"></i>
-            <span>Utilisateurs</span>
-        </a>
-    </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="utilisateurs.html">
+                        <i class="fas fa-fw fa-users"></i>
+                        <span>Utilisateurs</span>
+                    </a>
+                </li>
 
-    <!-- Nav Item - Gestion des ventes -->
-    <li class="nav-item">
-        <a class="nav-link" href="ventes.html">
-            <i class="fas fa-fw fa-shopping-cart"></i>
-            <span>Ventes</span>
-        </a>
-    </li>
+                <!-- Nav Item - Gestion des ventes -->
+                <li class="nav-item">
+                    <a class="nav-link" href="ventes.html">
+                        <i class="fas fa-fw fa-shopping-cart"></i>
+                        <span>Ventes</span>
+                    </a>
+                </li>
 
-    <!-- Nav Item - Gestion des équipements -->
-    <li class="nav-item">
-        <a class="nav-link" href="equipements.html">
-            <i class="fas fa-fw fa-tools"></i>
-            <span>Équipements</span>
-        </a>
-    </li>
+                <!-- Nav Item - Gestion des équipements -->
+                <li class="nav-item">
+                    <a class="nav-link" href="equipements.html">
+                        <i class="fas fa-fw fa-tools"></i>
+                        <span>Équipements</span>
+                    </a>
+                </li>
 
-    <!-- Nav Item - Gestion des offres d'emploi -->
-    <li class="nav-item">
-        <a class="nav-link" href="emplois.html">
-            <i class="fas fa-fw fa-briefcase"></i>
-            <span>Offres d'emploi</span>
-        </a>
-    </li>
+                <!-- Nav Item - Gestion des offres d'emploi -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{path('app_back_offre')}}">
+                        <i class="fas fa-fw fa-briefcase"></i>
+                        <span>Offres d'emploi</span>
+                    </a>
+                </li>
 
-    <!-- Nav Item - Gestion des événements -->
-    <li class="nav-item">
-        <a class="nav-link" href="evenements.html">
-            <i class="fas fa-fw fa-calendar-alt"></i>
-            <span>Événements</span>
-        </a>
-    </li>
+                <!-- Nav Item - Gestion des événements -->
+                <li class="nav-item">
+                    <a class="nav-link" href="evenements.html">
+                        <i class="fas fa-fw fa-calendar-alt"></i>
+                        <span>Événements</span>
+                    </a>
+                </li>
 
-    <!-- Nav Item - Gestion des terrains -->
-    <li class="nav-item">
-        <a class="nav-link" href="terrains.html">
-            <i class="fas fa-fw fa-seedling"></i>
-            <span>Terrains</span>
-        </a>
-    </li>
+                <!-- Nav Item - Gestion des terrains -->
+                <li class="nav-item">
+                    <a class="nav-link" href="terrains.html">
+                        <i class="fas fa-fw fa-seedling"></i>
+                        <span>Terrains</span>
+                    </a>
+                </li>
 
                 <!-- Divider -->
                 <hr class="sidebar-divider">
@@ -182,6 +178,7 @@
                 </div>
 
             </ul>
+            {% endblock %}
             <!-- End of Sidebar -->
 
 
@@ -192,6 +189,7 @@
                 <div id="content">
 
                     <!-- Topbar -->
+                    {% block navbar %}
                     <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                         <!-- Sidebar Toggle (Topbar) -->
@@ -371,9 +369,11 @@
                         </ul>
 
                     </nav>
+                    {% endblock %}
                     <!-- End of Topbar -->
 
                     <!-- Begin Page Content -->
+                    {% block content %}
                     <div class="container-fluid">
 
                         <!-- Page Heading -->
@@ -595,10 +595,10 @@
         </div>
     </div>
 
-                                
+                 {% endblock %}
                 <!-- End of Main Content -->
-
                 <!-- Footer -->
+                {% block footer %}
                 <footer class="sticky-footer bg-white">
                     <div class="container my-auto">
                         <div class="copyright text-center my-auto">
@@ -606,6 +606,7 @@
                         </div>
                     </div>
                 </footer>
+                {% endblock %}
                 <!-- End of Footer -->
 
             </div>
