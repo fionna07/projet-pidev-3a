@@ -37,4 +37,11 @@ class FrontPagesController extends AbstractController
             'controller_name' => 'FrontController',
         ]);
     }
+    #[Route('offre/emploi', name: 'app_offreEmploi')]
+    public function offreEmploi(): Response
+    {
+        return $this->render('offre_emploi/index.html.twig', [
+            'controller_name' => 'FrontController',
+        ]);
+    }
 }
