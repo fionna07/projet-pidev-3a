@@ -5,7 +5,65 @@
 {% block body %}
     <h1>Ajouter offre d'emploi</h1>
 
- {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button="submit" class="btn btn-success">Enregistrer</button    {{ form_end(form) }}
+ {# Affichage des messages flash (succès ou erreur) #}
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div classalert alert-{{ type }}">
+                {{ message }}
+            </div>
+ {% endfor %}
+    {% endfor %}
+
+    {# Début du formulaire #}
+    {{ form_start(form, { 'attr': { 'novalidate': 'novalidate' } }) }}
+
+    <div classform-group">
+        {{ form_label(form.titre, 'Titre de l\'offre') }}
+        {{ form_widget(form.titre, { 'attr': { 'class': 'form-control', 'placeholder': 'Entrez le titre de l\'offre' } }) }}
+        {{ form_errors(form.titre) }}
+    </div>
+
+ <div classform-group">
+        {{ form_label(form.description, 'Description') }}
+        {{ form_widget(form.description, { 'attr': { 'class': 'form-control', 'placeholder': 'Entrez une description' } }) }}
+        {{ form_errors(form.description) }}
+    </div>
+
+ <div classform-group">
+        {{ form_label(form.nombrePostes, 'Nombre de postes') }}
+        {{ form_widget(form.nombrePostes, { 'attr': { 'class': 'form-control', 'placeholder': 'Entrez le nombre de postes' } }) }}
+        {{ form_errors(form.nombrePostes) }}
+    </div>
+
+ <div classform-group">
+        {{ form_label(form.dateDebut, 'Date de début') }}
+        {{ form_widget(form.dateDebut, { 'attr': { 'class': 'form-control', 'placeholder': 'Sélectionnez la date de début' } }) }}
+        {{ form_errors(form.dateDebut) }}
+    </div>
+
+ <div classform-group">
+        {{ form_label(form.dateFinEstimee, 'Date de fin estimée') }}
+        {{ form_widget(form.dateFinEstimee, { 'attr': { 'class': 'form-control', 'placeholder': 'Sélectionnez la date de fin estimée' } }) }}
+        {{ form_errors(form.dateFinEstimee) }}
+    </div>
+
+ <div classform-group">
+        {{ form_label(form.localisation, 'Localisation') }}
+        {{ form_widget(form.localisation, { 'attr': { 'class': 'form-control', 'placeholder': 'Entrez la localisation' } }) }}
+        {{ form_errors(form.localisation) }}
+    </div>
+
+ <div classform-group">
+        {{ form_label(form.competencesRequises, 'Compétences requises') }}
+        {{ form_widget(form.competencesRequises, { 'attr': { 'class': 'form-control', 'placeholder': 'Entrez les compétences' } }) }}
+        {{ form_errors(form.competencesRequises) }}
+    </div>
+
+ <div classform-group">
+        {{ form_label(form.salaire, 'Salaire') }}
+        {{ form_widget(form.salaire, { 'attr': { 'class': 'form-control', 'placeholder': 'Entrez le salaire' } }) }}
+        {{ form_errors(form.salaire) }}
+    </div>
+
+ <button="submit" class="btn btn-success">Ajouter</button    {{ form_end(form) }}
 {% endblock %}

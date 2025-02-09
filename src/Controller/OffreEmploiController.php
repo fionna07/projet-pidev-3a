@@ -9,46 +9,77 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\OffreEmploi;
 use App\Form\OffreEmploiType;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\OffreEmploiRepository;
 
 class OffreEmploiController extends AbstractController
 {
     #[Route('/offre/emploi', name: 'app_offre_emploi')]
-    public function index(OffreEmploiRepository $offreEmploiRepository): Response
+    public function index(): Response
     {
-        // Récupérer toutes les offres d'emploi depuis le repository
-        $offres = $offreEmploiRepository->findAllOffres();
-
-        // Renvoyer les données à la vue
         return $this->render('offre_emploi/index.html.twig', [
-            'offres' => $offres,
+            'controller_name' => OffreEmploi,
         ]);
     }
-    #[Route('/offre/emploi/ajouter', name: 'app_offre_emploi_ajouter')]
-    public function ajouter(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $offreEmploi = new OffreEmploi();
-
-        // Créez le formulaire
-        $form = $this->createForm(OffreEmploiType::class, $offreEmploi);
-
-        // Gérer la soumission du formulaire
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Définir les valeurs par défaut
-            $offreEmploi->setStatus('actif');
-            $offreEmploi->setDatePublication(new \DateTime());
-
-            // Sauvegarder dans la base de données
-            $entityManager->persist($offreEmploi);
-            $entityManager->flush();
-
-            // Rediriger vers une autre page
-            return $this->redirectToRoute('app_offre_emploi');
+   
+    #[Route("/offre/edit/{id}", name: "offre_edit", methods: ["POST"])]
+    public function edit(
+        int $id,
+        Request $request,
+        OffreEmploiRepository $offreEmploiRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        // Récupération de l'offre d'emploi
+        $offre = $offreEmploiRepository->find($id);
+        if (!$offre) {
+            throw $this->createNotFoundException("L'offre avec l'ID $id n'existe pas.");
         }
 
-        return $this->render('offre_emploi/ajouter.html.twig', [
-            'form' => $form->createView(),
-        ]);
+        // Mise à jour des champs
+        $offre->setTitre($request->request->get('titre'));
+        $offre->setDescription($request->request->get('description'));
+        $offre->setNombrePostes((int) $request->request->get('nombrePostes'));
+        $offre->setDatePublication(new \DateTime($request->request->get('datePublication')));
+        $offre->setDateDebut(new \DateTime($request->request->get('dateDebut')));
+
+        // Vérifier si date de fin est renseignée
+        if ($request->request->get('dateFinEstimee')) {
+            $offre->setDateFinEstimee(new \DateTime($request->request->get('dateFinEstimee')));
+        }
+
+        $offre->setCompetencesRequises($request->request->get('competencesRequises'));
+        $offre->setSalaire((float) $request->request->get('salaire'));
+        $offre->setLocalisation($request->request->get('localisation'));
+
+        // Mise à jour du statut (Actif ou Inactif)
+        $offre->setStatut($request->request->get('statut'));
+
+        // Sauvegarde
+        $entityManager->persist($offre);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_offre_emploi');
     }
+
+    #[Route("/offre/{id}/supprimer", name: "offre_supprimer", methods: ["POST"])]
+    public function supprimerOffre(
+        int $id, 
+        OffreEmploiRepository $offreEmploiRepository, 
+        EntityManagerInterface $entityManager
+    ): Response {
+        // Récupération de l'offre d'emploi
+        $offre = $offreEmploiRepository->find($id);
+        if (!$offre) {
+            throw $this->createNotFoundException("L'offre avec l'ID $id n'existe pas.");
+        }
+
+        // Suppression de l'offre
+        $entityManager->remove($offre);
+        $entityManager->flush();
+
+        // Rediriger vers la liste des offres après suppression
+        return $this->redirectToRoute('app_offre_emploi');
+    }
+    
+
     
 }

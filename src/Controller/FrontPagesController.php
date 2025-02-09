@@ -5,6 +5,10 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\OffreEmploiRepository;
+use Symfony\Component\HttpFoundation\Request;
+
+
 
 class FrontPagesController extends AbstractController
 {
@@ -38,10 +42,12 @@ class FrontPagesController extends AbstractController
         ]);
     }
     #[Route('offre/emploi', name: 'app_offreEmploi')]
-    public function offreEmploi(): Response
+     public function offreEmploi(OffreEmploiRepository $offreEmploiRepository): Response
     {
+        $offres = $offreEmploiRepository->findAll();
         return $this->render('offre_emploi/index.html.twig', [
-            'controller_name' => 'FrontController',
+            'offres' => $offres,
         ]);
     }
+    
 }
