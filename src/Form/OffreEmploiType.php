@@ -38,13 +38,9 @@ class OffreEmploiType extends AbstractType
             ->add('localisation', TextType::class, [
                 'label' => 'Localisation',
             ])
-            ->add('competencesRequises', CollectionType::class, [
-                'entry_type' => TextType::class,
-                'entry_options' => ['label' => 'Compétence'],
-                'allow_add' => true,
-                'allow_delete' => true,
-                'by_reference' => false,
-                'label' => 'Compétences requises',
+            ->add('competencesRequises', TextType::class, [
+                'label' => 'Compétences requises (séparées par des virgules)',
+                'attr' => ['placeholder' => 'Ex: Plantation de blé, Entretien des cultures,...'],
             ])
             ->add('salaire', null, [
                 'label' => 'Salaire',

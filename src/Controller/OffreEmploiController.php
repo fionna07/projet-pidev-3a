@@ -38,10 +38,11 @@ class OffreEmploiController extends AbstractController
         $offre->setTitre($request->request->get('titre'));
         $offre->setDescription($request->request->get('description'));
         $offre->setNombrePostes((int) $request->request->get('nombrePostes'));
-        $offre->setDatePublication(new \DateTime($request->request->get('datePublication')));
-        $offre->setDateDebut(new \DateTime($request->request->get('dateDebut')));
 
-        // Vérifier si date de fin est renseignée
+        // Vérifier si les dates de début et de fin sont renseignées
+        if ($request->request->get('dateDebut')) {
+            $offre->setDateDebut(new \DateTime($request->request->get('dateDebut')));
+        }
         if ($request->request->get('dateFinEstimee')) {
             $offre->setDateFinEstimee(new \DateTime($request->request->get('dateFinEstimee')));
         }
@@ -51,7 +52,7 @@ class OffreEmploiController extends AbstractController
         $offre->setLocalisation($request->request->get('localisation'));
 
         // Mise à jour du statut (Actif ou Inactif)
-        $offre->setStatut($request->request->get('statut'));
+        $offre->setStatus($request->request->get('status'));
 
         // Sauvegarde
         $entityManager->persist($offre);
@@ -79,6 +80,7 @@ class OffreEmploiController extends AbstractController
         // Rediriger vers la liste des offres après suppression
         return $this->redirectToRoute('app_offre_emploi');
     }
+    
     
 
     

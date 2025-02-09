@@ -8,33 +8,76 @@
     
     <!-- Bouton Ajouter Offre -->
     <div class="d-flex justify-content-end mb-3">
-        <a href="{{path('offre_ajouter')}}" class="btn btn-primary">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOffreModal">
             <i class="fas fa-plus"></i> Ajouter une Offre
-        </a>
+        </button>
     </div>
     
+    <!-- Modal d'ajout -->
+    <div class="modal fade" id="addOffreModal" tabindex="-1" aria-labelledby="addOffreModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="addOffreModalLabel">Ajouter une Offre</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Formulaire d'ajout -->
+                    {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
+                    {{ form_row(form.titre, {'attr': {'class': 'form-control mb-3'}}) }}
+                    {{ form_row(form.description, {'attr': {'class': 'form-control mb-3'}}) }}
+                    {{ form_row(form.nombrePostes, {'attr': {'class': 'form-control mb-3'}}) }}
+                    {{ form_row(form.dateDebut, {'attr': {'class': 'form-control mb-3'}}) }}
+                    {{ form_row(form.dateFinEstimee, {'attr': {'class': 'form-control mb-3'}}) }}
+                    {{ form_row(form.localisation, {'attr': {'class': 'form-control mb-3'}}) }}
+                    {{ form_row(form.competencesRequises, {'attr': {'class': 'form-control mb-3'}}) }}
+                    {{ form_row(form.salaire, {'attr': {'class': 'form-control mb-3'}}) }}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des offres -->
     <div class="row">
         {% for offre in offres %}
             <div class="col-md-4 mb-4">
                 <div class="card position-relative shadow-sm">
-                    <!-- Date de publication -->
-                    <div class="position-absolute top-0 start-0 m-2 text-muted small" style="margin-bottom: 10px;">
-					Publié le: {{ offre.datePublication|date('d/m/Y') }}
-					</div>
+                      <!-- Date de publication -->
+                        <div class="position-absolute top-0 start-0 m-2 text-muted small" style="margin-bottom: 10px;">
+                            {% set now = date() %}
+                            {% set diff = now.diff(offre.datePublication) %}
+                            {% set days = diff.days %}
+
+                            Publié :
+                            {% if days == 0 %}
+                                Aujourd'hui
+                            {% elseif days == 1 %}
+                                Hier
+                            {% elseif days <= 7 %}
+                                Il y a {{ days }} jours
+                            {% else %}
+                                {{ offre.datePublication|date('d/m/Y') }}
+                            {% endif %}
+                        </div>
 
                     
                     <!-- Statut -->
                     <div class="position-absolute top-0 end-0 m-2">
 					{% if offre.status == 'actif' %}
-						<span class="badge bg-success rounded-circle d-inline-block" style="width: 15px; height: 15px; margin: 5px;"></span>
+						<span class="badge bg-success rounded-circle d-inline-block" style="width: 15px; height: 15px; margin: 4px;"></span>
 					{% else %}
-						<span class="badge bg-danger rounded-circle d-inline-block" style="width: 15px; height: 15px; margin: 5px;"></span>
+						<span class="badge bg-danger rounded-circle d-inline-block" style="width: 15px; height: 15px; margin: 4px;"></span>
 					{% endif %}
 					</div>
 
                     
-                    <div class="card-body" style="padding-top: 20px;">
-					<h5 class="card-title fw-bold">{{ offre.titre }}</h5>
+                    <div class="card-body" style="padding-top: 30px;">
+                    <h5 class="card-title fw-bold">{{ offre.titre|capitalize }}</h5>
 
                         <!-- Dates -->
                         <p class="mb-1"><strong>Date de début:</strong> {{ offre.dateDebut|date('d/m/Y') }}</p>
@@ -42,34 +85,35 @@
                         
                         <!-- Compétences requises -->
                         <p><strong>Compétences Requises:</strong></p>
-                        <div class="mt-2">
-						<p><strong>Compétences Requises:</strong></p>
-						<div class="d-flex flex-wrap gap-2">
-							{% for competence in offre.competencesRequises|split(',') %}
-								<span class="badge bg-secondary text-white px-3 py-2 rounded-pill">{{ competence|trim }}</span>
-							{% endfor %}
-						</div>
-						</div>
-
+                        <div class="mt-1">
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for competence in offre.competencesRequises|split(',') %}
+                                    <span class="badge" style="background-color: #f5f5dc; color: black; padding: 0.25rem 0.75rem; border-radius: 50px;">{{ competence|trim }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
                         
                         <!-- Salaire -->
-                        <p class="mt-2"><strong>Salaire:</strong> {{ offre.salaire }} TND</p>
+                        <p class="mt-4"><strong>Salaire:</strong> {{ offre.salaire }} TND</p>
                     </div>
                     
                     <!-- Actions -->
                     <div class="card-footer d-flex justify-content-between">
-                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#offreModal{{ offre.id }}">
-					<i class="fas fa-eye"></i> Détails
-					</button>
+                    <!-- Bouton Détails (Beige Clair) -->
+                    <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#offreModal{{ offre.id }}">
+                        <i class="fas fa-eye"></i> Détails
+                    </button>
 
-                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editOffreModal{{ offre.id }}">
-					<i class="fas fa-edit"></i> Modifier
-					</button>
+                    <!-- Bouton Modifier (Vert Clair) -->
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editOffreModal{{ offre.id }}">
+                        <i class="fas fa-edit"></i> Modifier
+                    </button>
 
-                        <form method="post" action="{{ path('offre_supprimer', {'id': offre.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">
-						<button class="btn btn-danger btn-sm">
-							<i class="fas fa-trash"></i> Supprimer
-						</button>
+                    <!-- Bouton Supprimer (Rouge Clair) -->
+                    <form method="post" action="{{ path('offre_supprimer', {'id': offre.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">
+                        <button class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i> Supprimer
+                    </button>
 					</form>
 
                     </div>
@@ -87,8 +131,24 @@
 					<h5 class="modal-title fw-bold" id="offreModalLabel{{ offre.id }}">{{ offre.titre }}</h5>
 				</div>
 				<div class="modal-body">
-					<p class="text-muted small">Publié le {{ offre.datePublication|date('d/m/Y H:i') }}</p> <!-- Date avec heure -->
+                    <!-- Date de publication -->
+                    <div class="position-absolute top-0 start-0 m-2 text-muted small" style="margin-bottom: 10px;">
+                        {% set now = date() %}
+                        {% set diff = now.diff(offre.datePublication) %}
+                        {% set days = diff.days %}
 
+                        Publié :
+                        {% if days == 0 %}
+                                Aujourd'hui
+                        {% elseif days == 1 %}
+                                Hier
+                        {% elseif days <= 7 %}
+                                Il y a {{ days }} jours
+                        {% else %}
+                                {{ offre.datePublication|date('d/m/Y') }}
+                        {% endif %}
+                        </div>
+                        <br> <!-- Saut de ligne pour espacer -->
 					<p><strong>Description :</strong></p>
 					<p>{{ offre.description }}</p>
 
@@ -98,20 +158,23 @@
 
 					<p><strong>Date de fin estimée :</strong> {{ offre.dateFinEstimee|date('d/m/Y') }}</p> <!-- Date sans heure -->
 
-					<p><strong>Compétences Requises :</strong></p>
-					<div class="d-flex flex-wrap gap-2">
-						{% for competence in offre.competencesRequises|split(',') %}
-							<span class="badge bg-secondary text-white px-3 py-2 rounded-pill">{{ competence|trim }}</span>
-						{% endfor %}
-					</div>
+                    <p><strong>Compétences Requises:</strong></p>
+                    <div class="mt-2">
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for competence in offre.competencesRequises|split(',') %}
+                                <span class="badge" style="background-color: #f5f5dc; color: black; padding: 0.25rem 0.75rem; border-radius: 50px;">{{ competence|trim }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
 
-					<p class="mt-2"><strong>Salaire :</strong> {{ offre.salaire }} TND</p>
+					<p class="mt-4"><strong>Salaire :</strong> {{ offre.salaire }} TND</p>
 
 					<p><strong>Localisation :</strong> {{ offre.localisation }}</p>
 				</div>
 			</div>
 		</div>
 	</div>
+    <!-- Modal Modification -->
 	<div class="modal fade" id="editOffreModal{{ offre.id }}" tabindex="-1" aria-labelledby="editOffreModalLabel{{ offre.id }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -138,16 +201,10 @@
                         <input type="number" class="form-control" id="nombrePostes{{ offre.id }}" name="nombrePostes" value="{{ offre.nombrePostes }}" required>
                     </div>
 
-                    <!-- Date de publication -->
-                    <div class="mb-3">
-                        <label for="datePublication{{ offre.id }}" class="form-label">Date de Publication</label>
-                        <input type="datetime-local" class="form-control" id="datePublication{{ offre.id }}" name="datePublication" value="{{ offre.datePublication|date('Y-m-d\TH:i') }}" required>
-                    </div>
-
                     <!-- Date de début -->
                     <div class="mb-3">
                         <label for="dateDebut{{ offre.id }}" class="form-label">Date de Début</label>
-                        <input type="datetime-local" class="form-control" id="dateDebut{{ offre.id }}" name="dateDebut" value="{{ offre.dateDebut|date('Y-m-d\TH:i') }}" required>
+                        <input type="datetime" class="form-control" id="dateDebut{{ offre.id }}" name="dateDebut" value="{{ offre.dateDebut|date('Y-m-d') }}" required>
                     </div>
 
                     <!-- Date de fin estimée -->
@@ -174,6 +231,15 @@
                         <input type="text" class="form-control" id="localisation{{ offre.id }}" name="localisation" value="{{ offre.localisation }}" required>
                     </div>
 
+                    <!-- Statut -->
+                    <div class="mb-3">
+                        <label for="status{{ offre.id }}" class="form-label">Statut</label>
+                        <select class="form-control" id="status{{ offre.id }}" name="status" required>
+                            <option value="actif" {% if offre.status == 'actif' %}selected{% endif %}>Actif</option>
+                            <option value="inactif" {% if offre.status == 'inactif' %}selected{% endif %}>Inactif</option>
+                        </select>
+                    </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                         <button type="submit" class="btn btn-primary">Enregistrer</button>
@@ -182,7 +248,7 @@
             </div>
         </div>
     </div>
-	</div>
+</div>
 
 	{% endfor %}
 
