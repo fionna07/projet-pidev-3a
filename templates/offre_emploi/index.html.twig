@@ -22,22 +22,64 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Formulaire d'ajout -->
-                    {{ form_start(form, {'attr': {'class': 'form-horizontal'}}) }}
-                    {{ form_row(form.titre, {'attr': {'class': 'form-control mb-3'}}) }}
-                    {{ form_row(form.description, {'attr': {'class': 'form-control mb-3'}}) }}
-                    {{ form_row(form.nombrePostes, {'attr': {'class': 'form-control mb-3'}}) }}
-                    {{ form_row(form.dateDebut, {'attr': {'class': 'form-control mb-3'}}) }}
-                    {{ form_row(form.dateFinEstimee, {'attr': {'class': 'form-control mb-3'}}) }}
-                    {{ form_row(form.localisation, {'attr': {'class': 'form-control mb-3'}}) }}
-                    {{ form_row(form.competencesRequises, {'attr': {'class': 'form-control mb-3'}}) }}
-                    {{ form_row(form.salaire, {'attr': {'class': 'form-control mb-3'}}) }}
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-primary">Ajouter</button>
-                    </div>
-                    {{ form_end(form) }}
-                </div>
+    <!-- Formulaire d'ajout -->
+    {{ form_start(form, {'attr': {'class': 'form-horizontal', 'novalidate': 'novalidate'}}) }}
+
+    <div class="mb-3">
+        {{ form_label(form.titre) }}
+        {{ form_widget(form.titre, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.titre) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.description) }}
+        {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.description) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.nombrePostes) }}
+        {{ form_widget(form.nombrePostes, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.nombrePostes) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.dateDebut) }}
+        {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.dateDebut) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.dateFinEstimee) }}
+        {{ form_widget(form.dateFinEstimee, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.dateFinEstimee) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.localisation) }}
+        {{ form_widget(form.localisation, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.localisation) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.competencesRequises) }}
+        {{ form_widget(form.competencesRequises, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.competencesRequises) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.salaire) }}
+        {{ form_widget(form.salaire, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.salaire) }}
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+    </div>
+
+    {{ form_end(form) }}
+</div>
             </div>
         </div>
     </div>
@@ -228,8 +270,35 @@
                     <!-- Localisation -->
                     <div class="mb-3">
                         <label for="localisation{{ offre.id }}" class="form-label">Localisation</label>
-                        <input type="text" class="form-control" id="localisation{{ offre.id }}" name="localisation" value="{{ offre.localisation }}" required>
+                        <select class="form-control" id="localisation{{ offre.id }}" name="localisation" required>
+                            <option value="" disabled selected>Choisir un gouvernorat</option>
+                            <option value="Ariana" {% if offre.localisation == 'Ariana' %}selected{% endif %}>Ariana</option>
+                            <option value="Béja" {% if offre.localisation == 'Béja' %}selected{% endif %}>Béja</option>
+                            <option value="Ben Arous" {% if offre.localisation == 'Ben Arous' %}selected{% endif %}>Ben Arous</option>
+                            <option value="Bizerte" {% if offre.localisation == 'Bizerte' %}selected{% endif %}>Bizerte</option>
+                            <option value="Gabès" {% if offre.localisation == 'Gabès' %}selected{% endif %}>Gabès</option>
+                            <option value="Gafsa" {% if offre.localisation == 'Gafsa' %}selected{% endif %}>Gafsa</option>
+                            <option value="Jendouba" {% if offre.localisation == 'Jendouba' %}selected{% endif %}>Jendouba</option>
+                            <option value="Kairouan" {% if offre.localisation == 'Kairouan' %}selected{% endif %}>Kairouan</option>
+                            <option value="Kasserine" {% if offre.localisation == 'Kasserine' %}selected{% endif %}>Kasserine</option>
+                            <option value="Kébili" {% if offre.localisation == 'Kébili' %}selected{% endif %}>Kébili</option>
+                            <option value="Kef" {% if offre.localisation == 'Kef' %}selected{% endif %}>Kef</option>
+                            <option value="Mahdia" {% if offre.localisation == 'Mahdia' %}selected{% endif %}>Mahdia</option>
+                            <option value="Manouba" {% if offre.localisation == 'Manouba' %}selected{% endif %}>Manouba</option>
+                            <option value="Médenine" {% if offre.localisation == 'Médenine' %}selected{% endif %}>Médenine</option>
+                            <option value="Monastir" {% if offre.localisation == 'Monastir' %}selected{% endif %}>Monastir</option>
+                            <option value="Nabeul" {% if offre.localisation == 'Nabeul' %}selected{% endif %}>Nabeul</option>
+                            <option value="Sfax" {% if offre.localisation == 'Sfax' %}selected{% endif %}>Sfax</option>
+                            <option value="Sidi Bouzid" {% if offre.localisation == 'Sidi Bouzid' %}selected{% endif %}>Sidi Bouzid</option>
+                            <option value="Siliana" {% if offre.localisation == 'Siliana' %}selected{% endif %}>Siliana</option>
+                            <option value="Sousse" {% if offre.localisation == 'Sousse' %}selected{% endif %}>Sousse</option>
+                            <option value="Tataouine" {% if offre.localisation == 'Tataouine' %}selected{% endif %}>Tataouine</option>
+                            <option value="Tozeur" {% if offre.localisation == 'Tozeur' %}selected{% endif %}>Tozeur</option>
+                            <option value="Tunis" {% if offre.localisation == 'Tunis' %}selected{% endif %}>Tunis</option>
+                            <option value="Zaghouan" {% if offre.localisation == 'Zaghouan' %}selected{% endif %}>Zaghouan</option>
+                        </select>
                     </div>
+
 
                     <!-- Statut -->
                     <div class="mb-3">
