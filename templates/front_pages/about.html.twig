@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+<body>
+        <!-- Header Start -->
+        <div class="container-xxl py-5 bg-dark page-header mb-5">
+            <div class="container my-5 pt-5 pb-4">
+                <h1 class="display-3 text-white mb-3 animated slideInDown">À propos de nous</h1>
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb text-uppercase">
+                    <li class="breadcrumb-item"><a href="{{path('app_front')}}">Accueil</a></li>
+                    <li class="breadcrumb-item text-white active">
+                      <a href="{{path('app_about')}}" aria-current="page">À propos</a>
+                    </li>
+                </ol>
+                </nav>
+            </div>
+        </div>
+        <!-- Header End -->
+
+        <!-- Nos Qualités Start -->
+        <div class="container-xxl py-5">
+            <div class="container">
+              <div class="row g-5 align-items-center">
+                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.1s">
+                  <div class="row g-0 text-center">
+                    <div class="col-6">
+                      <i class="fa fa-users fa-5x text-primary mb-4"></i>
+                      <h5 class="mb-3">Travail d'Équipe</h5>
+                      <p>Nous croyons en la force du travail collaboratif pour atteindre des objectifs communs.</p>
+                    </div>
+                    <div class="col-6">
+                      <i class="fa fa-bullhorn fa-5x text-primary mb-4"></i>
+                      <h5 class="mb-3">Communication Claire</h5>
+                      <p>La communication efficace est essentielle pour garantir que chacun soit bien informé.</p>
+                    </div>
+                    <div class="col-6">
+                      <i class="fa fa-lightbulb fa-5x text-primary mb-4"></i>
+                      <h5 class="mb-3">Innovation</h5>
+                      <p>Nous encourageons la pensée créative et l'innovation pour améliorer constamment nos services.</p>
+                    </div>
+                    <div class="col-6">
+                      <i class="fa fa-trophy fa-5x text-primary mb-4"></i>
+                      <h5 class="mb-3">Réussite</h5>
+                      <p>Notre objectif est de garantir la réussite de chaque projet en mettant l'accent sur l'efficacité.</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
+                  <h1 class="mb-4">Nous croyons en la collaboration et la réussite</h1>
+                  <p class="mb-4">
+                    Nous mettons l'accent sur le travail d'équipe, la communication, l'innovation et la réussite. Nous pensons que la combinaison de ces qualités est essentielle pour mener à bien des projets ambitieux et apporter des changements positifs dans le secteur de l'agriculture durable et intelligente.
+                  </p>
+                  <p>
+                    <i class="fa fa-check text-primary me-3"></i>Travail collaboratif pour atteindre des objectifs communs
+                  </p>
+                  <p>
+                    <i class="fa fa-check text-primary me-3"></i>Communication claire et transparente
+                  </p>
+                  <p>
+                    <i class="fa fa-check text-primary me-3"></i>Favoriser l'innovation pour de nouvelles solutions
+                  </p>
+                  <p>
+                    <i class="fa fa-check text-primary me-3"></i>Atteindre la réussite avec une approche axée sur l'efficacité
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Nos Qualités End -->
+          
+</body>
+
+{% endblock %}
