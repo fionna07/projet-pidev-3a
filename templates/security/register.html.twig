@@ -1,0 +1,186 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<body class="bg-light d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-lg rounded-lg p-4">
+                    <div class="card-header text-center">
+                        <h5 class="fw-bold">Créer un compte</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                        <div class="text-center mb-3">
+                            {{ form_row(registrationForm.image, {'attr': {'class': 'form-control'}, 'label': 'Photo de profil'}) }}
+                            <div class="text-danger">
+                                {{ form_errors(registrationForm.image) }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.firstName, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'label': 'Prénom'}) }}
+                                <div class="text-danger">
+                                    {{ form_errors(registrationForm.firstName) }}
+                                </div>
+                            </div>
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.lastName, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'label': 'Nom'}) }}
+                                <div class="text-danger">
+                                    {{ form_errors(registrationForm.lastName) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3 mt-3">
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.adresse, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'label': 'Adresse'}) }}
+                                <div class="text-danger">
+                                    {{ form_errors(registrationForm.adresse) }}
+                                </div>
+                            </div>
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.numTel, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'label': 'Numéro de téléphone'}) }}
+                                <div class="text-danger">
+                                    {{ form_errors(registrationForm.numTel) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3 mt-3">
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.dateNaissance, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'label': 'Date de naissance'}) }}
+                                <div class="text-danger">
+                                    {{ form_errors(registrationForm.dateNaissance) }}
+                                </div>
+                            </div>
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.email, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'label': 'Email'}) }}
+                                <div class="text-danger">
+                                    {{ form_errors(registrationForm.email) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3 mt-3">
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.plainPassword, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'label': 'Mot de passe'}) }}
+                                <div class="text-danger">
+                                    {{ form_errors(registrationForm.plainPassword) }}
+                                </div>
+                            </div>
+                            <div class="form-group w-50">
+                                <label for="confirm_password" class="form-label small">Confirmer le mot de passe</label>
+                                <input type="password" id="confirm_password" name="confirm_password" class="form-control shadow-sm rounded-pill" placeholder="Confirmez votre mot de passe" required>
+                                <div class="text-danger" id="password_error"></div>
+                            </div>
+                        </div>
+
+                        <!-- Rôles -->
+                   <div class="form-group mt-3">
+    <label class="form-label">Choisissez un rôle :</label>
+    <div class="d-flex gap-3 flex-wrap">
+        {% for role in registrationForm.roles %}
+            <div class="form-check">
+                {{ form_widget(role, {'attr': {'class': 'form-check-input d-none'}}) }}
+                <label class="form-check-label d-flex align-items-center justify-content-center rounded-pill px-3 py-2 border shadow-sm bg-light text-dark role-label"
+                    style="cursor: pointer; min-width: 150px; border: 1px solid #ccc;"
+                    for="{{ role.vars.id }}">
+                    {% if role.vars.label == 'Admin' %}
+                        <i class="fas fa-user-shield me-2"></i> 
+                    {% elseif role.vars.label == 'Utilisateur' %}
+                        <i class="fas fa-user me-2"></i> 
+                    {% elseif role.vars.label == 'Artiste' %}
+                        <i class="fas fa-paint-brush me-2"></i> 
+                    {% elseif role.vars.label == 'Gestionnaire' %}
+                        <i class="fas fa-cogs me-2"></i> 
+                    {% endif %}
+                    {{ role.vars.label }}
+                </label>
+            </div>
+        {% endfor %}
+    </div>
+    <!-- Affichage de l'erreur si aucun rôle n'est choisi -->
+    <div class="text-danger">
+        {{ form_errors(registrationForm.roles) }}
+    </div>
+</div>
+
+                        <div class="d-flex justify-content-end align-items-center mt-3">
+                            {{ form_widget(registrationForm.agreeTerms) }}
+                            <label for="registration_form_agreeTerms" class="form-label ms-2">J'accepte les termes</label>
+                            <div class="text-danger">
+                                {{ form_errors(registrationForm.agreeTerms) }}
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm mt-4">
+                            <i class="fas fa-user-plus me-2"></i> S'inscrire
+                        </button>
+
+                        {{ form_end(registrationForm) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vérification des mots de passe avant soumission -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const password = document.getElementById("registration_form_plainPassword");
+            const confirmPassword = document.getElementById("confirm_password");
+            const form = document.querySelector("form");
+            const passwordError = document.getElementById("password_error");
+
+            form.addEventListener("submit", function (event) {
+                if (password.value !== confirmPassword.value) {
+                    event.preventDefault();
+                    passwordError.textContent = "Les mots de passe ne correspondent pas.";
+                }
+            });
+        });
+    </script>
+<!-- Inclusion du script -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const roleLabels = document.querySelectorAll(".role-label");
+    const roleInputs = document.querySelectorAll(".role-input");
+
+    function updateRoleSelection() {
+        roleLabels.forEach(label => {
+            const input = document.getElementById(label.getAttribute("for"));
+            if (input.checked) {
+                label.classList.add("bg-primary", "text-white");
+                label.classList.remove("bg-light", "text-dark");
+            } else {
+                label.classList.remove("bg-primary", "text-white");
+                label.classList.add("bg-light", "text-dark");
+            }
+        });
+    }
+
+    roleLabels.forEach(label => {
+        label.addEventListener("click", function () {
+            // Sélectionner l'input correspondant
+            const input = document.getElementById(this.getAttribute("for"));
+            if (input) {
+                input.checked = true;
+                updateRoleSelection(); // Met à jour les styles après sélection
+            }
+        });
+    });
+
+    // Écouter les changements d'état des inputs cachés (au cas où le formulaire est réinitialisé)
+    roleInputs.forEach(input => {
+        input.addEventListener("change", updateRoleSelection);
+    });
+
+    // Vérifier l'état initial au chargement de la page
+    updateRoleSelection();
+});
+</script>
+</body>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ UserDetail.firstName }} {{ UserDetail.lastName }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <div class="row">
+            <!-- 📌 Partie Gauche : Photo de Profil + Statut -->
+            <div class="col-md-4 text-center">
+                {# Vérifie si l'utilisateur a une image #}
+                {% if UserDetail.image %}
+                    <img src="{{ asset(UserDetail.image) }}" alt="Photo de profil"
+                         class="rounded-circle border shadow-lg mb-3" width="180" height="180">
+                {% else %}
+                    <img src="{{ asset('uploads/default-profile.png') }}" alt="Photo par défaut"
+                         class="rounded-circle border shadow-lg mb-3" width="180" height="180">
+                {% endif %}
+
+                <!-- ✅ Statut du compte -->
+                <div class="mt-2">
+                    {% if UserDetail.status %}
+                        <span class="badge bg-success"><i class="fas fa-check-circle"></i> Actif</span>
+                    {% else %}
+                        <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Inactif</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- 📌 Partie Droite : Informations Utilisateur -->
+            <div class="col-md-8">
+                <h2>{{ UserDetail.firstName }} {{ UserDetail.lastName }}</h2>
+                <p class="text-muted">{{ UserDetail.email }}</p>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Date de naissance :</strong> {{ UserDetail.dateNaissance|date('d/m/Y') }}</p>
+                        <p><strong>Adresse :</strong> {{ UserDetail.adresse }}</p>
+                         <p><strong>Téléphone :</strong> {{ UserDetail.numTel }}</p>
+                    </div>
+                   
+                </div>
+
+                <!-- 📌 Boutons d'actions -->
+                <div class="text-end mt-4">
+                     <!-- Bouton pour ouvrir le modal -->
+                    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="fas fa-edit"></i> Modifier
+                    </button>
+                    <a href="{{ path('app_disable_account') }}" class="btn btn-warning me-2">
+                        <i class="fas fa-pause-circle"></i> Désactiver
+                    </a>
+                    <a href="{{ path('app_delete_account') }}" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODAL : Modification du profil -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">Modifier mon profil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{ form_start(form) }}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.firstName) }}
+                        {{ form_row(form.lastName) }}
+                        {{ form_row(form.email) }}
+                        {{ form_row(form.dateNaissance) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.adresse) }}
+                        {{ form_row(form.numTel) }}
+
+                        <!-- Image avec aperçu avant upload -->
+                        <label class="form-label">Image de profil</label>
+                        <input type="file" class="form-control" id="imageUpload" name="image">
+                        <img id="imagePreview" src="{{ asset('images/' ~ UserDetail.image) }}" class="img-thumbnail mt-2" style="width: 120px; height: 120px;">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success mt-3">Sauvegarder</button>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script pour afficher l'aperçu de l'image
+    document.getElementById('imageUpload').addEventListener('change', function(event) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('imagePreview').src = e.target.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    });
+</script>
+{% endblock %}
+
