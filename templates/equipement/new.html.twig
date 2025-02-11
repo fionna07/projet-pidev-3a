@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Equipement{% endblock %}
+{% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('css/styleform.css') }}">
+{% endblock %}
+
+{% block body %}
+    {{ include('equipement/_form.html.twig') }}
+{% endblock %}
