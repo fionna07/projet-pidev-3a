@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Evenement index{% endblock %}
+
+{% block body %}
+    <h1>Evenement index</h1>
+
+    <div class="row">
+        {% for evenement in evenements %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ evenement.titre }}</h5>
+                        <p class="card-text">{{ evenement.description }}</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>Date de début:</strong> {{ evenement.dateDebut ? evenement.dateDebut|date('Y-m-d H:i:s') : '' }}</li>
+                            <li class="list-group-item"><strong>Type de visite:</strong> {{ evenement.typeVisite }}</li>
+                            <li class="list-group-item"><strong>Localisation:</strong> {{ evenement.localisation }}</li>
+                            <li class="list-group-item"><strong>Prix:</strong> {{ evenement.prix }}</li>
+                        </ul>
+                        <div class="card-body">
+                            <a href="{{ path('app_events_show', {'id': evenement.id}) }}" class="btn btn-primary">Voir</a>
+                            <a href="{{ path('app_events_edit', {'id': evenement.id}) }}" class="btn btn-secondary">Modifier</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <p>Aucun événement trouvé.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <a href="{{ path('app_events_new') }}" class="btn btn-success mt-3">Créer un nouvel événement</a>
+{% endblock %}

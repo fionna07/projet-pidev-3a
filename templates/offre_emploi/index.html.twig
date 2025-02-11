@@ -1,32 +1,64 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Liste des Offres d'Emploi{% endblock %}
-
+{% extends "base.html.twig" %}
+{% block title %}Listes des offres d'emploi{% endblock %}
 {% block body %}
-    <h1 classtext-center my-4">Liste des Offres d'Emploi</h1>
+	<div class="layout-wrapper layout-content-navbar layout-without-menu">
+		<img src="../nav/img/front-pages/backgrounds/cta-bg-light.png" class="position-absolute top-0 start-50 translate-middle-x object-fit-contain w-100 h-100" style="height: 121% !important;"/>
+		<div class="layout-container">
+			<div class="layout-page">
+				<div class="content-wrapper">
+					<div class="container-xxl flex-grow-1 container-p-y">
+						<div class="card mb-4" style="padding: 9px;">
+							<h5 class="card-header">Offres d'emploi</h5>
+							<div class="row">
+								{% for offre in offres %}
+									<div class="col-md-6 col-xl-4 mb-4">
+										<div class="card h-100">
+											<div class="card-body">
+												<h4 class="mb-2 pb-1">{{offre.titre}}</h4>
+												<p class="small">{{ offre.description }}</p>
+												<div class="row mb-3 g-3">
+													<div class="col-6">
+														<div class="d-flex">
+															<div class="avatar flex-shrink-0 me-2">
+																<span class="avatar-initial rounded bg-label-primary">
+																	<i class="bx bx-calendar-exclamation bx-sm"></i>
+																</span>
+															</div>
+															<div>
+                             
+																<small>Date de début</small>
+															</div>
+														</div>
+													</div>
+													<div class="col-6">
+														<div class="d-flex">
+															<div class="avatar flex-shrink-0 me-2">
+																<span class="avatar-initial rounded bg-label-primary">
+																	<i class="bx bx-map-pin"></i>
+																</span>
+															</div>
+															<div>
+																<h6 class="mb-0 text-nowrap">{{offre.localisation}}</h6>
+																<small>Localisaion</small>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="d-flex align-items-center justify-content-center">
+													<a href="" class="btn btn-primary d-flex align-items-center me-3">
+												    <i class="bx bxs-user-rectangle me-1"></i>Postuler</a>
+												</div>
+											</div>
+										</div>
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="content-backdrop fade"></div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
 
- <div classcontainer">
-        <div classrow">
-            {% for offre in offres %}
-                <div classcol-md-4 mb-4">
-                    <div classcard">
-                        <div classcard-body">
-                            <h5 classcard-title">{{ offre.titre }}</h5>
-                           <p classcard-text">
-                                <strong :</strong {{ offre.description|slice(0, 100) ~ '...' }}<br>
-                               <strongLocalisation :</strong {{ offre.localisation }}<br>
-                               <strongNombre de postes :</strong {{ offre.nombrePostes }}<br>
-                               <strongalaire :</strong {{ offre.salaire }} €<br>
-                               <strong de début :</strong {{ offre.dateDebut|date('d/m/Y') }}<br>
-                               <strong de fin estimée :</strong {{ offre.dateFinEstimee|date('d/m/Y') }}
-                            </p>
-                           <a href class="btn btn-primary">Voir plus</a>
-                       </div>
- </div>
- </div>
- {% else %}
-                <p classtext-center">Aucune offre d'emploi disponible pour le moment.</p>
-           {%  endfor %}
-        </div>
- </div>
-  {% endblock %}

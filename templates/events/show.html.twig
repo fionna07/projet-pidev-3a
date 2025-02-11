@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de l'événement - {{ evenement.titre }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Détails de l'événement</h1>
+
+        <div class="card shadow">
+            <div class="card-body">
+                <h2 class="card-title">{{ evenement.titre }}</h2>
+                <p class="card-text text-muted">{{ evenement.description }}</p>
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <strong>Date de début :</strong>
+                                {{ evenement.dateDebut ? evenement.dateDebut|date('Y-m-d H:i:s') : 'Non spécifiée' }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Type de visite :</strong>
+                                {{ evenement.typeVisite }}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <strong>Localisation :</strong>
+                                {{ evenement.localisation }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Prix :</strong>
+                                {{ evenement.prix }} DTN
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="{{ path('app_events_index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+            <a href="{{ path('app_events_edit', {'id': evenement.id}) }}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Modifier
+            </a>
+            {{ include('events/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\EvenementRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EvenementRepository::class)]
 class Evenement
@@ -35,6 +36,7 @@ class Evenement
     #[ORM\ManyToOne]
     private ?Utilisateur $agriculteur = null;
 
+    // Getters et setters (inchangés)
     public function getId(): ?int
     {
         return $this->id;
