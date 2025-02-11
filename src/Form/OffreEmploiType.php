@@ -64,6 +64,7 @@ class OffreEmploiType extends AbstractType
                 'label' => 'Date de début',
                 'widget' => 'single_text',
                 'empty_data' => null,
+                'invalid_message' => 'La date de début doit être une date valide.',
                 'constraints' => [
                     new NotBlank(['message' => 'La date de début est obligatoire.']),
                     new GreaterThan([
@@ -76,6 +77,7 @@ class OffreEmploiType extends AbstractType
                 'label' => 'Date de fin estimée',
                 'widget' => 'single_text',
                 'empty_data' => null,
+                'invalid_message' => 'La date de fin estimée doit être une date valide.',
                 'constraints' => [
                     new NotBlank(['message' => 'La date de fin estimée est obligatoire.']),
                     new GreaterThan([

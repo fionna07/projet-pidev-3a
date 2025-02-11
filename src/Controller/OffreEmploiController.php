@@ -109,8 +109,8 @@ class OffreEmploiController extends AbstractController
         // Rediriger vers la liste des offres après suppression
         return $this->redirectToRoute('app_offre_emploi_back');
     }
-    #[Route("/offre/edit/{id}/admin", name: "offre_edit_back", methods: ["POST"])]
-    public function editBack(
+    #[Route("/offre/edit/admin/{id}", name: "offre_edit_back", methods: ["POST"])]
+    public function editOffre(
         int $id,
         Request $request,
         OffreEmploiRepository $offreEmploiRepository,

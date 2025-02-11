@@ -29,49 +29,66 @@
     <div class="mb-3">
         {{ form_label(form.titre) }}
         {{ form_widget(form.titre, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
         {{ form_errors(form.titre) }}
+        </div>
     </div>
 
     <div class="mb-3">
         {{ form_label(form.description) }}
         {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
         {{ form_errors(form.description) }}
+        </div>
+
     </div>
 
     <div class="mb-3">
         {{ form_label(form.nombrePostes) }}
         {{ form_widget(form.nombrePostes, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
         {{ form_errors(form.nombrePostes) }}
+        </div>
     </div>
 
     <div class="mb-3">
         {{ form_label(form.dateDebut) }}
         {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
         {{ form_errors(form.dateDebut) }}
+        </div>
     </div>
 
     <div class="mb-3">
         {{ form_label(form.dateFinEstimee) }}
         {{ form_widget(form.dateFinEstimee, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
         {{ form_errors(form.dateFinEstimee) }}
+        </div>
     </div>
 
     <div class="mb-3">
         {{ form_label(form.localisation) }}
         {{ form_widget(form.localisation, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
         {{ form_errors(form.localisation) }}
+        </div>
     </div>
 
     <div class="mb-3">
         {{ form_label(form.competencesRequises) }}
         {{ form_widget(form.competencesRequises, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
         {{ form_errors(form.competencesRequises) }}
+        </div>
     </div>
 
     <div class="mb-3">
         {{ form_label(form.salaire) }}
         {{ form_widget(form.salaire, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
         {{ form_errors(form.salaire) }}
+        </div>
     </div>
 
     <div class="modal-footer">
