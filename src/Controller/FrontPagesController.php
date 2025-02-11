@@ -48,37 +48,32 @@ class FrontPagesController extends AbstractController
     #[Route('offre/emploi', name: 'app_offreEmploi')]
     public function offreEmploi(OffreEmploiRepository $offreEmploiRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
-        // Créer une nouvelle offre
         $offre = new OffreEmploi();
-
-        // Définir la date de publication comme la date actuelle
         $offre->setDatePublication(new \DateTime());
-
-        // Définir le statut comme "actif" par défaut
         $offre->setStatus('actif');
 
-        // Créer le formulaire
         $form = $this->createForm(OffreEmploiType::class, $offre);
-
-        // Gérer la soumission du formulaire
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Enregistrer l'offre
-            $entityManager->persist($offre);
-            $entityManager->flush();
 
-            // Rediriger vers la page des offres
-            return $this->redirectToRoute('app_offreEmploi');
+        $modalOpen = false; // Par défaut, le modal ne s'ouvre pas
+
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $entityManager->persist($offre);
+                $entityManager->flush();
+                return $this->redirectToRoute('app_offreEmploi');
+            }
+            $modalOpen = true; // Si erreurs, on ouvre le modal
         }
 
-        // Récupérer toutes les offres
         $offres = $offreEmploiRepository->findAll();
 
-        // Afficher le template
         return $this->render('offre_emploi/index.html.twig', [
             'offres' => $offres,
-            'form' => $form->createView(), // Passer le formulaire au template
+            'form' => $form->createView(),
+            'modal_open' => $modalOpen, // On passe la variable au template
         ]);
     }
+
     
 }

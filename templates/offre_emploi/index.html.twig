@@ -14,7 +14,8 @@
     </div>
     
     <!-- Modal d'ajout -->
-    <div class="modal fade" id="addOffreModal" tabindex="-1" aria-labelledby="addOffreModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addOffreModal" tabindex="-1" aria-labelledby="addOffreModalLabel" aria-hidden="true"
+    data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -321,6 +322,14 @@
 
 	{% endfor %}
 
+    {% if modal_open %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addOffreModal'));
+            myModal.show();
+        });
+    </script>
+    {% endif %}
 
 
 </div>

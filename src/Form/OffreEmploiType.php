@@ -63,6 +63,7 @@ class OffreEmploiType extends AbstractType
             ->add('dateDebut', DateType::class, [
                 'label' => 'Date de début',
                 'widget' => 'single_text',
+                'empty_data' => null,
                 'constraints' => [
                     new NotBlank(['message' => 'La date de début est obligatoire.']),
                     new GreaterThan([
@@ -74,6 +75,7 @@ class OffreEmploiType extends AbstractType
             ->add('dateFinEstimee', DateType::class, [
                 'label' => 'Date de fin estimée',
                 'widget' => 'single_text',
+                'empty_data' => null,
                 'constraints' => [
                     new NotBlank(['message' => 'La date de fin estimée est obligatoire.']),
                     new GreaterThan([
