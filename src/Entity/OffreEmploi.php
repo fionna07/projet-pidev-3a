@@ -76,10 +76,11 @@ class OffreEmploi
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Les compétences requises sont obligatoires.")]
     #[Assert\Regex(
-        pattern: "/^([A-Za-zÀ-ÿ]+(, )?){2,}$/",
+        pattern: "/.+,.+/",
         message: "Il doit y avoir au moins deux compétences séparées par une virgule."
     )]
     private ?string $competencesRequises = null;
+
 
     #[ORM\Column]
     #[Assert\NotNull(message: "Le salaire est obligatoire.")]

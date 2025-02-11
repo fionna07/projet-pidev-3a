@@ -121,12 +121,13 @@ class OffreEmploiType extends AbstractType
                 'label' => 'Compétences requises (séparées par des virgules)',
                 'attr' => ['placeholder' => 'Ex: Plantation de blé, Entretien des cultures,...'],
                 'constraints' => [
-                    new NotBlank(['message' => 'Les compétences requises sont obligatoires.']),
-                    new Regex([
-                        'pattern' => "/^([A-Za-zÀ-ÿ]+(, )?){2,}$/",
-                        'message' => 'Il doit y avoir au moins deux compétences séparées par une virgule.',
-                    ]),
-                ],
+                new NotBlank(['message' => 'Les compétences requises sont obligatoires.']),
+                new Regex([
+                    'pattern' => "/.+,.+/",
+                    'message' => 'Il doit y avoir au moins deux compétences séparées par une virgule.',
+                ]),
+            ],
+
             ])
             ->add('salaire', NumberType::class, [
                 'label' => 'Salaire',
