@@ -16,16 +16,14 @@ class OffreEmploiController extends AbstractController
     #[Route('/offre/emploi', name: 'app_offre_emploi')]
     public function index(): Response
     {
-        // Pass a string instead of an undefined constant
         return $this->render('offre_emploi/index.html.twig', [
             'controller_name' => 'OffreEmploiController',
         ]);
     }
 
-    #[Route('/offre/emploi/admin', name: 'app_offre_emploi_back')]
+    #[Route('/back/offre', name: 'app_offre_emploi_back')]
     public function indexBack(): Response
     {
-        // Pass a string instead of an undefined constant
         return $this->render('offre_emploi/indexBack.html.twig', [
             'controller_name' => 'OffreEmploiController',
         ]);

@@ -45,6 +45,7 @@ class FrontPagesController extends AbstractController
             'controller_name' => 'FrontController',
         ]);
     }
+    //Offres d'emploi
     #[Route('offre/emploi', name: 'app_offreEmploi')]
     public function offreEmploi(OffreEmploiRepository $offreEmploiRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -71,7 +72,7 @@ class FrontPagesController extends AbstractController
         return $this->render('offre_emploi/index.html.twig', [
             'offres' => $offres,
             'form' => $form->createView(),
-            'modal_open' => $modalOpen, // On passe la variable au template
+            'modal_open' => $modalOpen, 
         ]);
     }
 

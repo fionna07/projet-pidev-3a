@@ -21,6 +21,7 @@ class BackPagesController extends AbstractController
             'controller_name' => 'BackPagesController',
         ]);
     }
+    //Offre d'emploi
     #[Route('/back/offre', name: 'app_back_offre')]
     public function offreEmploi(OffreEmploiRepository $offreEmploiRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
