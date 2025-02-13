@@ -79,7 +79,6 @@ class FrontPagesController extends AbstractController
         ]);
     }
 
-    //Offres d'emploi employé
     #[Route('offre/emploi/employe', name: 'app_offreEmploiEmploye')]
     public function offreEmploiEmploye(
         OffreEmploiRepository $offreEmploiRepository,
@@ -89,48 +88,54 @@ class FrontPagesController extends AbstractController
     ): Response {
         // Récupérer toutes les offres d'emploi
         $offres = $offreEmploiRepository->findAll();
-    
+
         // Créer un tableau de formulaires pour chaque offre
         $formulaireOffres = [];
         $forms = [];
+        $modalOpen = false; // Par défaut, le modal ne s'ouvre pas
+
         foreach ($offres as $offre) {
             $candidature = new Candidature();
             $form = $this->createForm(CandidatureType::class, $candidature);
             $form->handleRequest($request);
+            
             // Ajoutez la vue du formulaire pour chaque offre
             $formulaireOffres[$offre->getId()] = $form->createView();
             $forms[$offre->getId()] = $form;
         }
-    
+
         // Gestion de la soumission du formulaire
         if ($request->isMethod('POST')) {
             $offreId = $request->request->get('offre_id');
             $offre = $offreEmploiRepository->find($offreId);
-    
+
             // Récupérer le formulaire de l'offre spécifique
             $form = $forms[$offreId];
-    
-            if ($form->isSubmitted() && $form->isValid()) {
-                // Processus de la candidature
-                $candidature = $form->getData();
-                $candidature->setDateCandidature(new \DateTime());
-                $candidature->setEtat('en attente');
-                $candidature->setOffre($offre);
-    
-                $entityManager->persist($candidature);
-                $entityManager->flush();
-    
-                $this->addFlash('success', 'Votre candidature a été soumise avec succès !');
-                return $this->redirectToRoute('app_offreEmploiEmploye');
+
+            if ($form->isSubmitted()) {
+                if ($form->isValid()) {
+                    // Processus de la candidature
+                    $candidature = $form->getData();
+                    $candidature->setDateCandidature(new \DateTime());
+                    $candidature->setEtat('en attente');
+                    $candidature->setOffre($offre);
+
+                    $entityManager->persist($candidature);
+                    $entityManager->flush();
+
+                    $this->addFlash('success', 'Votre candidature a été soumise avec succès !');
+                    return $this->redirectToRoute('app_offreEmploiEmploye');
+                } else {
+                    $modalOpen = true; // Si erreurs, on ouvre le modal
+                }
             }
         }
-    
+
         return $this->render('offre_emploi/indexEmploye.html.twig', [
             'offres' => $offres,
             'formulaireOffres' => $formulaireOffres, // Passez les vues du formulaire
+            'modal_open' => $modalOpen, // Passez la variable modal_open pour gérer l'affichage
         ]);
     }
-    
-    
-    
+
 }

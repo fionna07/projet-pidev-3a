@@ -10,6 +10,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class CandidatureType extends AbstractType
 {
@@ -21,6 +23,13 @@ class CandidatureType extends AbstractType
             'label' => 'Compétences',
             'attr' => [
                 'placeholder' => 'Décrivez vos compétences...',
+            ],
+            'constraints' => [
+                new NotBlank(['message' => 'Vous devez mentionner vos compétences.']),
+                new Regex([
+                    'pattern' => "/.+,.+/",
+                    'message' => 'Il doit y avoir au moins deux compétences séparées par une virgule.',
+                ]),
             ],
         ]);
         

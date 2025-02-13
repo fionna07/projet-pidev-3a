@@ -19,6 +19,11 @@ class Candidature
 
     #[ORM\Column(length: 255)]
     private ?string $competences = null;
+    #[Assert\NotBlank(message: "Vous devez mentionner vos compétences.")]
+    #[Assert\Regex(
+        pattern: "/.+,.+/",
+        message: "Il doit y avoir au moins deux compétences séparées par une virgule."
+    )]
 
     #[ORM\Column(length: 255)]
     private ?string $etat = null;

@@ -75,9 +75,33 @@
                         <i class="fas fa-eye"></i> Détails
                     </button>
                     <!-- Bouton Postuler -->
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#postulerModal{{ offre.id }}">
-                        <i class="fas fa-paper-plane"></i> Postuler
+                    <button type="button" class="btn btn-sm" 
+                            {% if offre.status != 'actif' %} 
+                                disabled 
+                                style="background-color: #d6e8d7; border-color: #d6e8d7;" 
+                            {% else %}
+                                class="btn btn-success" 
+                                style="background-color: #28a745; border-color: #28a745;" 
+                            {% endif %} 
+                            data-bs-toggle="modal" data-bs-target="#postulerModal{{ offre.id }}">
+                        <!-- Icône et texte Postuler : Blanc si actif, sinon couleur originale -->
+                        <i class="fas fa-paper-plane" 
+                            {% if offre.status != 'actif' %} 
+                                style="color: #000;" 
+                            {% else %}
+                                style="color: white;" 
+                            {% endif %}>
+                        </i> 
+                        <span 
+                            {% if offre.status != 'actif' %} 
+                                style="color: #000;" 
+                            {% else %}
+                                style="color: white;" 
+                            {% endif %}>
+                            Postuler
+                        </span>
                     </button>
+
 
                     </div>
                 </div>
@@ -138,7 +162,7 @@
 		</div>
 	</div>
     <!-- Modal Postuler -->
-    <div class="modal fade" id="postulerModal{{ offre.id }}" tabindex="-1" aria-labelledby="postulerModalLabel{{ offre.id }}" aria-hidden="true">
+    <div class="modal fade" id="postulerModal{{ offre.id }}" tabindex="-1" aria-labelledby="postulerModalLabel{{ offre.id }}" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -147,10 +171,13 @@
                 </div>
                 <div class="modal-body">
                     <!-- Formulaire de candidature -->
-                    {{ form_start(formulaireOffres[offre.id], {'action': path('app_offreEmploiEmploye'), 'method': 'POST'}) }}
+                    {{ form_start(formulaireOffres[offre.id], {'action': path('app_offreEmploiEmploye'), 'method': 'POST', 'attr': {'novalidate': 'novalidate'}}) }}
                         <div class="mb-3">
                             {{ form_label(formulaireOffres[offre.id].competences) }} <!-- Rendu du label -->
                             {{ form_widget(formulaireOffres[offre.id].competences) }} <!-- Rendu du champ de saisie -->
+                            <div class="text-danger">
+                                {{ form_errors(formulaireOffres[offre.id].competences) }}
+                            </div>
                         </div>
                         <!-- Champ caché pour l'ID de l'offre -->
                         <input type="hidden" name="offre_id" value="{{ offre.id }}">
@@ -158,13 +185,23 @@
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
                             <button type="submit" class="btn btn-primary">Envoyer</button>
                         </div>
-                    {{ form_end(formulaireOffres[offre.id]) }} <!-- Ne pas oublier form_end pour fermer le formulaire -->
+                    {{ form_end(formulaireOffres[offre.id]) }}
                 </div>
             </div>
         </div>
     </div>
+    <!-- Script pour Modal -->
+    {% if modal_open %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var myModal = new bootstrap.Modal(document.getElementById('postulerModal{{ offre.id }}'));
+            myModal.show();
+        });
+    </script>
+    {% endif %}
+    {% endfor %}
 
-	{% endfor %}
+    
 
 </div>
 {% endblock %}
