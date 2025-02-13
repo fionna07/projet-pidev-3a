@@ -4,6 +4,18 @@
 
 {% block body %}
 <div class="container mt-4">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+
     <h1 class="mb-4">Offres d'Emploi</h1>
     
     <!-- Bouton Ajouter Offre -->
@@ -170,10 +182,48 @@
                     </button>
 
                     <!-- Bouton Supprimer (Rouge Clair) -->
-                    <form method="post" action="{{ path('offre_supprimer', {'id': offre.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">
-                        <button class="btn btn-danger btn-sm">
-                            <i class="fas fa-trash"></i> Supprimer
+                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmationModal">
+                        <i class="fas fa-trash"></i> Supprimer
                     </button>
+
+                    <!-- Modal de confirmation -->
+                    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmationModalLabel">Confirmation de suppression</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Êtes-vous sûr de vouloir supprimer cette offre d'emploi ? Cette action est irréversible.
+                                </div>
+                                <div class="modal-footer">
+                                <!-- Bouton Annuler (gris) -->
+                                <style>
+                                    .btn-gris {
+                                        background-color: #6c757d;  /* Gris Bootstrap par défaut */
+                                        color: white;
+                                    }
+
+                                    .btn-gris:hover {
+                                        background-color: #5a6268;  /* Gris un peu plus foncé au survol */
+                                        color: white;
+                                    }
+                                </style>
+
+                                <button type="button" class="btn btn-gris">Annuler</button>
+
+                                <!-- Formulaire de suppression -->
+                                <form method="post" action="{{ path('offre_supprimer', {'id': offre.id}) }}">
+                                    <!-- Bouton Confirmer (orange) -->
+                                    <button type="submit" class="btn btn-warning">Confirmer</button>
+                                </form>
+                            </div>
+
+                            </div>
+                        </div>
+                    </div>
+
 					</form>
 
                     </div>
@@ -347,6 +397,33 @@
         });
     </script>
     {% endif %}
+    <!-- JavaScript pour faire disparaître les messages flash après un délai -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Sélectionner les messages de succès et d'erreur
+            const successMessages = document.querySelectorAll('.alert-success');
+            const errorMessages = document.querySelectorAll('.alert-danger');
+
+            // Fonction pour faire disparaître les messages après 3 secondes
+            successMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+
+            errorMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+        });
+    </script>
 
 
 </div>

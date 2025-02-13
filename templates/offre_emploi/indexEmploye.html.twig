@@ -3,6 +3,17 @@
 {% block title %}Offres d'Emploi{% endblock %}
 
 {% block body %}
+    <!-- Affichage des messages de flash -->
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger" id="flash-error">
+                {{ message }}
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success" id="flash-success">
+                {{ message }}
+            </div>
+        {% endfor %}
 <div class="container mt-4">
     <h1 class="mb-4">Offres d'Emploi</h1>
 
@@ -200,7 +211,16 @@
     </script>
     {% endif %}
     {% endfor %}
-
+    <!-- Ajout du JavaScript en dehors du bloc javascripts -->
+    <script>
+        // Délai en millisecondes avant de masquer les messages flash (par exemple 3 secondes)
+        setTimeout(function() {
+            // Cacher les messages d'erreur après 3 secondes
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                alert.style.display = 'none';
+            });
+        }, 3000); // 3000 ms = 3 secondes
+    </script>
     
 
 </div>

@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+
+
+{% block body %}
+<body class="bg-light d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-lg rounded-lg p-4">
+                    <div class="card-header text-center">
+                        <h5 class="fw-bold">Créer un compte</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                        <div class="text-center mb-3">
+                            <label for="fileInput" class="cursor-pointer">
+                                <img id="imagePreview" src="https://via.placeholder.com/140" alt="Photo de profil" class="rounded-circle border shadow-sm" style="width: 100px; height: 100px; object-fit: cover;">
+                            </label>
+                            <input id="fileInput" type="file" class="d-none" onchange="previewImage(event)">
+                            <p class="small text-muted">Cliquez pour ajouter une photo</p>
+                            {{ form_row(registrationForm.image, {'attr': {'class': 'form-control'}, 'form_errors': false}) }}
+                            {{ form_errors(registrationForm.image) }}
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.firstName, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
+                                {{ form_errors(registrationForm.firstName) }}
+                            </div>
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.lastName, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
+                                {{ form_errors(registrationForm.lastName) }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3 mt-3">
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.adresse, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
+                                {{ form_errors(registrationForm.adresse) }}
+                            </div>
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.numTel, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
+                                {{ form_errors(registrationForm.numTel) }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3 mt-3">
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.dateNaissance, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
+                                {{ form_errors(registrationForm.dateNaissance) }}
+                            </div>
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.email, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
+                                {{ form_errors(registrationForm.email) }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3 mt-3">
+                            <div class="form-group w-50">
+                                {{ form_row(registrationForm.plainPassword, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'label': 'Mot de passe'}) }}
+                            </div>
+                            <div class="form-group w-50">
+                                <label for="confirm_password" class="form-label fw-bold small">Confirmer le mot de passe</label>
+                                <input type="password" id="confirm_password" name="confirm_password" class="form-control shadow-sm rounded-pill" placeholder="Confirmez votre mot de passe" required>
+                            </div>
+                        </div>
+
+                        <!-- Rôles -->
+                        <div class="form-group mt-3">
+                            <label class="form-label fw-bold">Choisissez un rôle :</label>
+                            <div class="d-flex flex-column gap-2">
+                                {{ form_widget(registrationForm.roles, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
+                                {{ form_errors(registrationForm.roles) }}
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm mt-4">
+                            <i class="fas fa-user-plus me-2"></i> S'inscrire
+                        </button>
+
+                        {{ form_end(registrationForm) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script pour prévisualiser l'image -->
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById('imagePreview').src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const password = document.getElementById("registration_form_plainPassword");
+    const confirmPassword = document.getElementById("confirm_password");
+    const form = document.querySelector("form");
+
+    form.addEventListener("submit", function (event) {
+        if (password.value !== confirmPassword.value) {
+            event.preventDefault();
+            alert("Les mots de passe ne correspondent pas.");
+        }
+    });
+});
+</script>
+
+
+</body>
+{% endblock %}

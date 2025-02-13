@@ -51,4 +51,6 @@ class BackPagesController extends AbstractController
             'modal_open' => $modalOpen, // On passe la variable au template
         ]);
     }
+    
 }
+

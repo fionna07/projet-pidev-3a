@@ -28,7 +28,7 @@ class Candidature
     #[ORM\Column(length: 255)]
     private ?string $etat = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(targetEntity: OffreEmploi::class, cascade: ['remove'])]
     private ?OffreEmploi $offre = null;
 
     #[ORM\ManyToOne]

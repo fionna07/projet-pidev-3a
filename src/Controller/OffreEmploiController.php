@@ -70,6 +70,10 @@ class OffreEmploiController extends AbstractController
         $entityManager->persist($offre);
         $entityManager->flush();
 
+        // Ajouter un message flash de succès
+        $this->addFlash('success', 'L\'offre d\'emploi a été mise à jour avec succès.');
+
+        // Redirection
         return $this->redirectToRoute('app_offre_emploi');
     }
 
@@ -89,9 +93,13 @@ class OffreEmploiController extends AbstractController
         $entityManager->remove($offre);
         $entityManager->flush();
 
+        // Message flash de succès
+        $this->addFlash('success', 'L\'offre d\'emploi a été supprimée avec succès.');
+
         // Rediriger vers la liste des offres après suppression
         return $this->redirectToRoute('app_offre_emploi');
     }
+
     #[Route("/offre/{id}/supprimer/admin", name: "offre_supprimer_back", methods: ["POST"])]
     public function supprimerOffreBack(
         int $id, 
@@ -107,6 +115,9 @@ class OffreEmploiController extends AbstractController
         // Suppression de l'offre
         $entityManager->remove($offre);
         $entityManager->flush();
+
+        // Message flash de succès
+        $this->addFlash('success', 'L\'offre d\'emploi a été supprimée de l\'administration.');
 
         // Rediriger vers la liste des offres après suppression
         return $this->redirectToRoute('app_offre_emploi_back');
@@ -148,19 +159,28 @@ class OffreEmploiController extends AbstractController
         $entityManager->persist($offre);
         $entityManager->flush();
 
+        // Message flash de succès
+        $this->addFlash('success', 'L\'offre d\'emploi a été mise à jour avec succès.');
+
         return $this->redirectToRoute('app_offre_emploi_back');
     }
+
     //Affichage des candidatures pour un user connecté
     
     #[Route('/mes-candidatures', name: 'app_mesCandidatures')]
-    public function mesCandidatures(CandidatureRepository $candidatureRepository): Response
+    public function mesCandidatures(CandidatureRepository $candidatureRepository, Security $security): Response
     {
-        // Simuler un utilisateur statique
-        $user = new Utilisateur();  // Créez un objet utilisateur fictif
-        $user->setId(4);
-        // Vous pouvez ajouter d'autres propriétés si nécessaire
+        // Récupérer l'utilisateur connecté
+        $user = $security->getUser();
 
-        // Trouver toutes les candidatures de cet utilisateur fictif
+        // Vérifier si un utilisateur est connecté
+        if (!$user) {
+            // Gérer le cas où l'utilisateur n'est pas connecté, par exemple, rediriger vers la page de connexion
+            $this->addFlash('error', 'Vous devez être connecté pour voir vos candidatures.');
+            return $this->redirectToRoute('app_login'); // Change 'app_login' par la route appropriée pour la connexion
+        }
+
+        // Trouver toutes les candidatures de l'utilisateur connecté
         $candidatures = $candidatureRepository->findBy(['employe' => $user]);
 
         // Retourner les candidatures dans la vue
@@ -168,6 +188,7 @@ class OffreEmploiController extends AbstractController
             'candidatures' => $candidatures,
         ]);
     }
+
     //détails offre
     #[Route('/offre/{offreId}', name: 'app_details_offre')]
     public function detailsOffre($offreId, OffreEmploiRepository $offreRepository): Response
@@ -187,26 +208,26 @@ class OffreEmploiController extends AbstractController
     }
     //Annuler candidature
     #[Route('/candidature/annuler/{candidatureId}', name: 'app_annuler_candidature', methods: ['POST'])]
-public function annulerCandidature($candidatureId, EntityManagerInterface $entityManager, CandidatureRepository $candidatureRepository): Response
-{
-    // Récupérer la candidature en fonction de l'ID
-    $candidature = $candidatureRepository->find($candidatureId);
+    public function annulerCandidature($candidatureId, EntityManagerInterface $entityManager, CandidatureRepository $candidatureRepository): Response
+    {
+        // Récupérer la candidature en fonction de l'ID
+        $candidature = $candidatureRepository->find($candidatureId);
 
-    // Si la candidature n'existe pas, afficher une erreur
-    if (!$candidature) {
-        throw $this->createNotFoundException('Candidature non trouvée');
+        // Si la candidature n'existe pas, afficher une erreur
+        if (!$candidature) {
+            throw $this->createNotFoundException('Candidature non trouvée');
+        }
+
+        // Annuler la candidature (par exemple, la supprimer ou mettre à jour son état)
+        $entityManager->remove($candidature);
+        $entityManager->flush();
+
+        // Ajouter un message de succès
+        $this->addFlash('success', 'Votre candidature a été annulée.');
+
+        // Rediriger vers la page des candidatures
+        return $this->redirectToRoute('app_mesCandidatures');
     }
-
-    // Annuler la candidature (par exemple, la supprimer ou mettre à jour son état)
-    $entityManager->remove($candidature);
-    $entityManager->flush();
-
-    // Ajouter un message de succès
-    $this->addFlash('success', 'Votre candidature a été annulée.');
-
-    // Rediriger vers la page des candidatures
-    return $this->redirectToRoute('app_mesCandidatures');
-}
 
 
     

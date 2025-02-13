@@ -13,9 +13,8 @@ use App\Form\OffreEmploiType;
 use Symfony\Component\Security\Core\Security;
 use App\Entity\Candidature;
 use App\Form\CandidatureType;
-
-
-
+use App\Entity\Utilisateur;
+use App\Repository\CandidatureRepository;
 
 class FrontPagesController extends AbstractController
 {
@@ -50,11 +49,23 @@ class FrontPagesController extends AbstractController
     }
     //Offres d'emploi agriculteur
     #[Route('offre/emploi', name: 'app_offreEmploi')]
-    public function offreEmploi(OffreEmploiRepository $offreEmploiRepository, Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function offreEmploi(
+        OffreEmploiRepository $offreEmploiRepository, 
+        Request $request, 
+        EntityManagerInterface $entityManager, 
+        Security $security
+    ): Response {
         $offre = new OffreEmploi();
         $offre->setDatePublication(new \DateTime());
         $offre->setStatus('actif');
+
+        // Récupérer l'utilisateur connecté
+        $user = $security->getUser();
+
+        if ($user instanceof Utilisateur) {
+            // Associer l'utilisateur connecté à l'offre (clé étrangère)
+            $offre->setUser($user); // Associe l'utilisateur connecté à l'offre
+        }
 
         $form = $this->createForm(OffreEmploiType::class, $offre);
         $form->handleRequest($request);
@@ -63,13 +74,19 @@ class FrontPagesController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $entityManager->persist($offre);
-                $entityManager->flush();
-                return $this->redirectToRoute('app_offreEmploi');
+                $entityManager->persist($offre); // Sauvegarder l'offre
+                $entityManager->flush(); // Valider les changements dans la base de données
+
+                // Affichage du message de succès
+                $this->addFlash('success', 'L\'offre d\'emploi a été ajoutée avec succès.');
+
+                return $this->redirectToRoute('app_offreEmploi'); // Redirige après le succès
             }
-            $modalOpen = true; // Si erreurs, on ouvre le modal
+
+            $modalOpen = true; // Si des erreurs, on ouvre le modal
         }
 
+        // Récupérer toutes les offres d'emploi
         $offres = $offreEmploiRepository->findAll();
 
         return $this->render('offre_emploi/index.html.twig', [
@@ -79,12 +96,14 @@ class FrontPagesController extends AbstractController
         ]);
     }
 
+    //Employé
     #[Route('offre/emploi/employe', name: 'app_offreEmploiEmploye')]
     public function offreEmploiEmploye(
         OffreEmploiRepository $offreEmploiRepository,
         Request $request,
         EntityManagerInterface $entityManager,
-        Security $security
+        Security $security,
+        CandidatureRepository $candidatureRepository // Injecter le CandidatureRepository pour vérifier les candidatures existantes
     ): Response {
         // Récupérer toutes les offres d'emploi
         $offres = $offreEmploiRepository->findAll();
@@ -109,6 +128,20 @@ class FrontPagesController extends AbstractController
             $offreId = $request->request->get('offre_id');
             $offre = $offreEmploiRepository->find($offreId);
 
+            // Vérifier si l'utilisateur a déjà postulé à cette offre
+            $user = $security->getUser();
+            if ($user) {
+                $existingCandidature = $candidatureRepository->findOneBy([
+                    'offre' => $offre,
+                    'employe' => $user,
+                ]);
+                if ($existingCandidature) {
+                    // Si la candidature existe déjà, afficher un message d'erreur
+                    $this->addFlash('error', 'Vous avez déjà postulé à cette offre.');
+                    return $this->redirectToRoute('app_offreEmploiEmploye'); // Rediriger pour ne pas resoumettre
+                }
+            }
+
             // Récupérer le formulaire de l'offre spécifique
             $form = $forms[$offreId];
 
@@ -119,6 +152,11 @@ class FrontPagesController extends AbstractController
                     $candidature->setDateCandidature(new \DateTime());
                     $candidature->setEtat('en attente');
                     $candidature->setOffre($offre);
+
+                    // Associer l'utilisateur connecté à la candidature
+                    if ($user) {
+                        $candidature->setEmploye($user);
+                    }
 
                     $entityManager->persist($candidature);
                     $entityManager->flush();
@@ -137,5 +175,6 @@ class FrontPagesController extends AbstractController
             'modal_open' => $modalOpen, // Passez la variable modal_open pour gérer l'affichage
         ]);
     }
+
 
 }
