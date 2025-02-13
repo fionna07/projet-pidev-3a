@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Candidatures{% endblock %}
+
+{% block body %}
+    <h1>Mes Candidatures</h1>
+
+    {% if candidatures is empty %}
+        <p>Vous n'avez aucune candidature enregistrée.</p>
+    {% else %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Offre</th>
+                    <th>Date de candidature</th>
+                    <th>État</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for candidature in candidatures %}
+                    <tr>
+                        <td>{{ candidature.offre.titre }}</td>
+                        <td>{{ candidature.dateCandidature|date('d/m/Y') }}</td>
+                        <td>{{ candidature.etat }}</td>
+                        <td>
+                            <!-- Bouton Voir l'Offre (Vert) -->
+                            <a href="{{ path('app_details_offre', {'offreId': candidature.offre.id}) }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-eye"></i> Voir l'Offre
+                            </a>
+                            <!-- Bouton Annuler (Jaune) -->
+                            <form action="{{ path('app_annuler_candidature', {'candidatureId': candidature.id}) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-times-circle"></i> Annuler
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}

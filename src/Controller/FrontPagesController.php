@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\OffreEmploi;
 use App\Form\OffreEmploiType;
+use Symfony\Component\Security\Core\Security;
+use App\Entity\Candidature;
+use App\Form\CandidatureType;
 
 
 
@@ -45,7 +48,7 @@ class FrontPagesController extends AbstractController
             'controller_name' => 'FrontController',
         ]);
     }
-    //Offres d'emploi
+    //Offres d'emploi agriculteur
     #[Route('offre/emploi', name: 'app_offreEmploi')]
     public function offreEmploi(OffreEmploiRepository $offreEmploiRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -76,5 +79,58 @@ class FrontPagesController extends AbstractController
         ]);
     }
 
+    //Offres d'emploi employé
+    #[Route('offre/emploi/employe', name: 'app_offreEmploiEmploye')]
+    public function offreEmploiEmploye(
+        OffreEmploiRepository $offreEmploiRepository,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Security $security
+    ): Response {
+        // Récupérer toutes les offres d'emploi
+        $offres = $offreEmploiRepository->findAll();
+    
+        // Créer un tableau de formulaires pour chaque offre
+        $formulaireOffres = [];
+        $forms = [];
+        foreach ($offres as $offre) {
+            $candidature = new Candidature();
+            $form = $this->createForm(CandidatureType::class, $candidature);
+            $form->handleRequest($request);
+            // Ajoutez la vue du formulaire pour chaque offre
+            $formulaireOffres[$offre->getId()] = $form->createView();
+            $forms[$offre->getId()] = $form;
+        }
+    
+        // Gestion de la soumission du formulaire
+        if ($request->isMethod('POST')) {
+            $offreId = $request->request->get('offre_id');
+            $offre = $offreEmploiRepository->find($offreId);
+    
+            // Récupérer le formulaire de l'offre spécifique
+            $form = $forms[$offreId];
+    
+            if ($form->isSubmitted() && $form->isValid()) {
+                // Processus de la candidature
+                $candidature = $form->getData();
+                $candidature->setDateCandidature(new \DateTime());
+                $candidature->setEtat('en attente');
+                $candidature->setOffre($offre);
+    
+                $entityManager->persist($candidature);
+                $entityManager->flush();
+    
+                $this->addFlash('success', 'Votre candidature a été soumise avec succès !');
+                return $this->redirectToRoute('app_offreEmploiEmploye');
+            }
+        }
+    
+        return $this->render('offre_emploi/indexEmploye.html.twig', [
+            'offres' => $offres,
+            'formulaireOffres' => $formulaireOffres, // Passez les vues du formulaire
+        ]);
+    }
+    
+    
     
 }
