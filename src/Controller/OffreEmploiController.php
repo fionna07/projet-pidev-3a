@@ -13,6 +13,8 @@ use App\Repository\OffreEmploiRepository;
 use App\Repository\CandidatureRepository;
 use App\Entity\Utilisateur;
 use Symfony\Component\Security\Core\Security;
+use App\Entity\Candidature;
+
 
 
 class OffreEmploiController extends AbstractController
@@ -376,11 +378,40 @@ class OffreEmploiController extends AbstractController
         // Rediriger vers la liste des candidatures pour l'offre
         return $this->redirectToRoute('offre_candidatures_back', ['id' => $candidature->getOffre()->getId()]);
     }
+    //Modifier statut offre par agriculteur
+    #[Route("/candidature/update/{id}", name: "candidature_update", methods: ["POST"])]
+    public function update(Request $request, Candidature $candidature, EntityManagerInterface $entityManager): Response
+    {
+        // Vérifier si le champ 'statut' est présent dans la requête
+        $newStatus = $request->request->get('statut');
 
+        if ($newStatus === null) {
+            $this->addFlash('error', 'Le statut est requis.');
+            return $this->redirectToRoute('liste_candidatures', ['_fragment' => 'section-candidatures']);
+        }
 
+        // Récupérer l'offre liée à la candidature
+        $offre = $candidature->getOffre();
 
+        // Vérifier si le statut passe à "acceptée"
+        if ($newStatus === 'acceptée' && $offre->getNombrePostes() > 0) {
+            // Décrémenter le nombre de postes disponibles
+            $offre->setNombrePostes($offre->getNombrePostes() - 1);
+        } elseif ($newStatus === 'acceptée' && $offre->getNombrePostes() <= 0) {
+            $this->addFlash('error', 'Impossible d\'accepter cette candidature, il n\'y a plus de postes disponibles.');
+            return $this->redirectToRoute('liste_candidatures', ['_fragment' => 'section-candidatures']);
+        }
 
-    
+        // Mettre à jour l'état de la candidature
+        $candidature->setEtat($newStatus);
 
-    
+        // Enregistrer les changements en base de données
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Statut mis à jour avec succès !');
+
+        // Rediriger vers la liste des candidatures avec une ancre
+        return $this->redirectToRoute('app_candidatures');
+    }
+  
 }
