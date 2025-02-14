@@ -206,7 +206,7 @@ class OffreEmploiController extends AbstractController
             'offre' => $offre,
         ]);
     }
-    //Annuler candidature
+    //Annuler candidature front
     #[Route('/candidature/annuler/{candidatureId}', name: 'app_annuler_candidature', methods: ['POST'])]
     public function annulerCandidature($candidatureId, EntityManagerInterface $entityManager, CandidatureRepository $candidatureRepository): Response
     {
@@ -228,7 +228,7 @@ class OffreEmploiController extends AbstractController
         // Rediriger vers la page des candidatures
         return $this->redirectToRoute('app_mesCandidatures');
     }
-    //Modifier Candidature
+    //Modifier Candidature front
     #[Route('/candidature/{candidatureId}/modifier-compétences', name: 'app_modifier_competence', methods: ['POST'])]
     public function modifierCompetences(Request $request, CandidatureRepository $candidatureRepository, EntityManagerInterface $entityManager, $candidatureId): Response
     {
@@ -251,6 +251,93 @@ class OffreEmploiController extends AbstractController
 
         // Rediriger vers la page des candidatures
         return $this->redirectToRoute('app_mesCandidatures');
+    }
+    //Liste des candidatures back office
+    #[Route('/offre/{id}/candidatures', name: 'offre_candidatures_back')]
+    public function offreCandidaturesBack(
+        int $id,
+        OffreEmploiRepository $offreEmploiRepository,
+        CandidatureRepository $candidatureRepository
+    ): Response {
+        // Récupérer l'offre d'emploi par son ID
+        $offre = $offreEmploiRepository->find($id);
+
+        // Vérifier si l'offre existe
+        if (!$offre) {
+            throw $this->createNotFoundException("L'offre avec l'ID $id n'existe pas.");
+        }
+
+        // Récupérer les candidatures associées à cette offre
+        $candidatures = $candidatureRepository->findBy(['offre' => $offre]);
+
+        // Afficher la vue avec les détails de l'offre et les candidatures
+        return $this->render('offre_emploi/listCandidaturesBack.html.twig', [
+            'offre' => $offre,
+            'candidatures' => $candidatures,
+        ]);
+    }
+    //Supprimer candiature Back office
+    #[Route('/candidature/{id}/supprimer', name: 'candidature_supprimer_back', methods: ['POST'])]
+    public function supprimerCandidatureBack(
+        int $id,
+        CandidatureRepository $candidatureRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        // Récupérer la candidature par son ID
+        $candidature = $candidatureRepository->find($id);
+
+        // Vérifier si la candidature existe
+        if (!$candidature) {
+            throw $this->createNotFoundException("La candidature avec l'ID $id n'existe pas.");
+        }
+
+        // Supprimer la candidature
+        $entityManager->remove($candidature);
+        $entityManager->flush();
+
+        // Message flash de succès
+        $this->addFlash('success', 'La candidature a été supprimée avec succès.');
+
+        // Rediriger vers la liste des candidatures pour l'offre
+        return $this->redirectToRoute('offre_candidatures_back', ['id' => $candidature->getOffre()->getId()]);
+    }
+    //Modifier etat candidature back office
+    #[Route('/candidature/{id}/modifier-etat', name: 'candidature_modifier_etat', methods: ['POST'])]
+    public function modifierEtatCandidature(
+        int $id,
+        Request $request,
+        CandidatureRepository $candidatureRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        // Récupérer la candidature par son ID
+        $candidature = $candidatureRepository->find($id);
+
+        // Vérifier si la candidature existe
+        if (!$candidature) {
+            throw $this->createNotFoundException("La candidature avec l'ID $id n'existe pas.");
+        }
+
+        // Récupérer le nouvel état depuis la requête
+        $nouvelEtat = $request->request->get('etat');
+
+        // Valider le nouvel état (optionnel, selon vos besoins)
+        if (!in_array($nouvelEtat, ['En attente', 'Acceptée', 'Refusée'])) {
+            $this->addFlash('error', 'État invalide.');
+            return $this->redirectToRoute('offre_candidatures_back', ['id' => $candidature->getOffre()->getId()]);
+        }
+
+        // Mettre à jour l'état de la candidature
+        $candidature->setEtat($nouvelEtat);
+
+        // Sauvegarder les modifications
+        $entityManager->persist($candidature);
+        $entityManager->flush();
+
+        // Message flash de succès
+        $this->addFlash('success', "L'état de la candidature a été mis à jour avec succès.");
+
+        // Rediriger vers la liste des candidatures pour l'offre
+        return $this->redirectToRoute('offre_candidatures_back', ['id' => $candidature->getOffre()->getId()]);
     }
 
 

@@ -170,6 +170,11 @@
                             <i class="fas fa-edit"></i>
                         </a>
 
+                        <!-- Bouton Voir les candidatures (icône bleue sans fond) -->
+                        <a href="{{ path('offre_candidatures_back', {'id': offre.id}) }}" class="text-primary me-2">
+                            <i class="fas fa-file-alt"></i>
+                        </a>
+
                         <!-- Bouton Supprimer (icône rouge sans fond) pour ouvrir le modal -->
                         <form method="post" action="#" style="display: inline;" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
                             <button type="button" class="btn btn-link text-danger p-0 border-0">

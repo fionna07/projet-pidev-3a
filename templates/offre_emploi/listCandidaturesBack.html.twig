@@ -1,0 +1,106 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Candidatures pour {{ offre.titre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Candidatures pour l'offre : {{ offre.titre }}</h1>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">ID Candidature</th>
+                    <th scope="col">Compétences</th>
+                    <th scope="col">Offre</th>
+                    <th scope="col">Employé (Nom et Prénom)</th>
+                    <th scope="col">Date de Candidature</th>
+                    <th scope="col">État</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for candidature in candidatures %}
+                    <tr>
+                        <td>{{ candidature.id }}</td>
+                        <td>{{ candidature.competences }}</td>
+                        <td>{{ candidature.offre.titre }}</td>
+                        <td>
+                            {% if candidature.employe %}
+                                {{ candidature.employe.firstName }} {{ candidature.employe.lastName }}
+                            {% else %}
+                                Non renseigné
+                            {% endif %}
+                        </td>
+                        <td>{{ candidature.dateCandidature|date('d/m/Y H:i') }}</td>
+                        <td>{{ candidature.etat }}</td>
+                        <td>
+                            <!-- Bouton Supprimer avec modal de confirmation -->
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ candidature.id }}">
+                                <i class="fas fa-trash"></i> 
+                            </button>
+
+                            <!-- Bouton Modifier avec modal -->
+                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editStatusModal{{ candidature.id }}">
+                                <i class="fas fa-edit"></i> 
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- Modal de confirmation de suppression -->
+                    <div class="modal fade" id="confirmDeleteModal{{ candidature.id }}" tabindex="-1" aria-labelledby="confirmDeleteModalLabel{{ candidature.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmDeleteModalLabel{{ candidature.id }}">Confirmer la suppression</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Êtes-vous sûr de vouloir supprimer cette candidature ?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <form method="post" action="{{ path('candidature_supprimer_back', {'id': candidature.id}) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal de modification de l'état de l'offre -->
+                    <div class="modal fade" id="editStatusModal{{ candidature.id }}" tabindex="-1" aria-labelledby="editStatusModalLabel{{ candidature.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editStatusModalLabel{{ candidature.id }}">Modifier l'état de l'offre</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form method="post" action="{{ path('candidature_modifier_etat', {'id': candidature.id}) }}">
+                                    <div class="modal-body">
+                                        <label for="etat{{ candidature.id }}" class="form-label">Nouvel état :</label>
+                                        <select class="form-select" id="etat{{ candidature.id }}" name="etat">
+                                            <option value="En attente" {% if candidature.etat == 'En attente' %}selected{% endif %}>En attente</option>
+                                            <option value="Acceptée" {% if candidature.etat == 'Acceptée' %}selected{% endif %}>Acceptée</option>
+                                            <option value="Refusée" {% if candidature.etat == 'Refusée' %}selected{% endif %}>Refusée</option>
+                                        </select>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">Aucune candidature trouvée pour cette offre.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
