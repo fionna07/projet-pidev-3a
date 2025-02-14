@@ -15,7 +15,16 @@
             </div>
         {% endfor %}
 <div class="container mt-4">
-    <h1 class="mb-4">Offres d'Emploi</h1>
+    <h1 class="mb-2 fs-3">Les offres d'Emploi</h1>
+    <!-- Barre de recherche -->
+    <div class="mb-4">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Rechercher une offre..." aria-label="Recherche" aria-describedby="button-addon2">
+            <button class="btn btn-outline-secondary text-success" type="button" id="button-addon2">
+                <i class="fas fa-search" style="color: #28a745;"></i> <!-- Icône verte -->
+            </button>
+        </div>
+    </div>
 
     <!-- Bouton Afficher Candidatures -->
     <div class="d-flex justify-content-end mb-3">
@@ -27,8 +36,8 @@
     <!-- Liste des offres -->
     <div class="row">
         {% for offre in offres %}
-            <div class="col-md-4 mb-4">
-                <div class="card position-relative shadow-sm">
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card position-relative shadow-lg border-light rounded-3" style="height: 100%; display: flex; flex-direction: column;"> <!-- Ajout de l'ombrage et flex pour la hauteur -->
                       <!-- Date de publication -->
                         <div class="position-absolute top-0 start-0 m-2 text-muted small" style="margin-bottom: 10px;">
                             {% set now = date() %}

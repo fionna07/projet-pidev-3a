@@ -4,23 +4,39 @@
 
 {% block body %}
 <div class="container mt-4">
-    <h1 class="mb-4">{{ offre.titre }}</h1>
-    
-    <p><strong>Description:</strong> {{ offre.description }}</p>
-    <p><strong>Compétences requises:</strong></p>
-    <ul>
-        {% for competence in offre.competencesRequises|split(',') %}
-            <li>{{ competence|trim }}</li>
-        {% endfor %}
-    </ul>
-    
-    <p><strong>Date de début:</strong> {{ offre.dateDebut|date('d/m/Y') }}</p>
-    <p><strong>Date de fin estimée:</strong> {{ offre.dateFinEstimee|date('d/m/Y') }}</p>
-    <p><strong>Salaire:</strong> {{ offre.salaire }} TND</p>
-    <p><strong>Localisation:</strong> {{ offre.localisation }}</p>
-    
-    <!-- Autres informations comme le nombre de postes, etc. -->
+    <!-- Card Container for the offer details -->
+    <div class="card shadow-lg p-4 rounded">
+        <h1 class="mb-4 text-center text-primary" style="font-size: 2.5rem;">{{ offre.titre }}</h1>
 
-    <a href="{{ path('app_offre_emploi') }}" class="btn btn-secondary">Retour aux offres</a>
+        <!-- Description Section -->
+        <p><strong class="fs-5">Description:</strong> <span class="fs-6">{{ offre.description }}</span></p>
+        
+        <!-- Competences Section -->
+        <p><strong class="fs-5">Compétences requises:</strong></p>
+        <ul class="fs-6">
+            {% for competence in offre.competencesRequises|split(',') %}
+                <li>{{ competence|trim }}</li>
+            {% endfor %}
+        </ul>
+        
+        <!-- Dates Section -->
+        <p><strong class="fs-5">Date de début:</strong> <span class="fs-6">{{ offre.dateDebut|date('d/m/Y') }}</span></p>
+        <p><strong class="fs-5">Date de fin estimée:</strong> <span class="fs-6">{{ offre.dateFinEstimee|date('d/m/Y') }}</span></p>
+        
+        <!-- Salary Section -->
+        <p><strong class="fs-5">Salaire:</strong> <span class="fs-6">{{ offre.salaire }} TND</span></p>
+
+        <!-- Location Section -->
+        <p><strong class="fs-5">Localisation:</strong> <span class="fs-6">{{ offre.localisation }}</span></p>
+        
+        <!-- New Section for Number of Available Positions -->
+        <p><strong class="fs-5">Nombre de places disponibles:</strong> <span class="fs-6">{{ offre.nombrePostes }}</span></p>
+    </div>
+    
+    <!-- Back Button Positioned at the Bottom -->
+    <div class="d-flex justify-content-center mt-4">
+        <a href="{{ path('app_offre_emploi') }}" class="btn btn-success btn-lg shadow-lg">Retour aux offres</a>
+    </div>
 </div>
+
 {% endblock %}

@@ -3,7 +3,8 @@
 {% block title %}Mes Candidatures{% endblock %}
 
 {% block body %}
-    <h1>Mes Candidatures</h1>
+<div class="container mt-4">
+    <h1 class="mb-2 fs-3">Mes Candidatures</h1>
 
     {% if candidatures is empty %}
         <p>Vous n'avez aucune candidature enregistrée.</p>
@@ -15,6 +16,7 @@
                     <th>Date de candidature</th>
                     <th>État</th>
                     <th>Compétences</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -29,19 +31,19 @@
                             {% endfor %}
                         </td>
                         <td>
-                            <!-- Bouton Voir l'Offre (Vert) avec icône seulement -->
+                            <!-- Bouton Voir l'Offre avec texte "Voir les détails de l'offre" -->
                             <a href="{{ path('app_details_offre', {'offreId': candidature.offre.id}) }}" class="btn btn-success btn-sm" title="Voir l'offre">
-                                <i class="fas fa-eye"></i>
+                                <i class="fas fa-eye"></i> Voir les détails de l'offre
                             </a>
 
                             <!-- Bouton Annuler (Jaune) avec icône seulement -->
-                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#confirmationModal{{ candidature.id }}" title="Annuler">
-                                <i class="fas fa-times-circle"></i>
+                            <button type="button" class="btn btn-link btn-sm" data-bs-toggle="modal" data-bs-target="#confirmationModal{{ candidature.id }}" title="Annuler">
+                                <i class="fas fa-times-circle text-danger"></i> <!-- Icône Supprimer en rouge -->
                             </button>
 
-                            <!-- Bouton Modifier les Compétences (Bleu) avec icône seulement -->
-                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#modifierCompetencesModal{{ candidature.id }}" title="Modifier les compétences">
-                                <i class="fas fa-edit"></i>
+                            <!-- Bouton Modifier les Compétences avec icône sans fond, couleur verte -->
+                            <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#modifierCompetencesModal{{ candidature.id }}" title="Modifier les compétences">
+                                <i class="fas fa-edit text-success"></i> <!-- Icône Modifier en vert -->
                             </button>
 
                             <!-- Modal de confirmation pour annuler -->
@@ -55,13 +57,20 @@
                                         <div class="modal-body">
                                             Êtes-vous sûr de vouloir annuler cette candidature ?
                                         </div>
+                                        <style>
+                                        .btn-secondary {
+                                            background-color: #6c757d !important; /* Gris */
+                                            border-color: #6c757d !important;
+                                        }
+                                        </style>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non</button>
-                                            <!-- Formulaire de suppression -->
-                                            <form action="{{ path('app_annuler_candidature', {'candidatureId': candidature.id}) }}" method="POST" style="display:inline;">
-                                                <button type="submit" class="btn btn-warning">Oui, annuler</button>
-                                            </form>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non</button>
+                                        <!-- Formulaire de suppression -->
+                                        <form action="{{ path('app_annuler_candidature', {'candidatureId': candidature.id}) }}" method="POST" style="display:inline;">
+                                            <button type="submit" class="btn btn-danger">Oui, annuler</button>
+                                        </form>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -91,5 +100,6 @@
                 {% endfor %}
             </tbody>
         </table>
+</div>        
     {% endif %}
 {% endblock %}

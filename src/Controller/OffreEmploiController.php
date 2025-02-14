@@ -218,9 +218,12 @@ class OffreEmploiController extends AbstractController
             throw $this->createNotFoundException('Candidature non trouvée');
         }
 
-        // Annuler la candidature (par exemple, la supprimer ou mettre à jour son état)
-        $entityManager->remove($candidature);
-        $entityManager->flush();
+        // Si la candidature est liée à une offre, la supprimer également
+        if ($candidature->getOffre()) {
+            // Supprimer la candidature liée à l'offre si nécessaire
+            $entityManager->remove($candidature);
+            $entityManager->flush();
+        }
 
         // Ajouter un message de succès
         $this->addFlash('success', 'Votre candidature a été annulée.');
@@ -228,7 +231,8 @@ class OffreEmploiController extends AbstractController
         // Rediriger vers la page des candidatures
         return $this->redirectToRoute('app_mesCandidatures');
     }
-    //Modifier Candidature front
+
+    // Modifier Candidature front
     #[Route('/candidature/{candidatureId}/modifier-compétences', name: 'app_modifier_competence', methods: ['POST'])]
     public function modifierCompetences(Request $request, CandidatureRepository $candidatureRepository, EntityManagerInterface $entityManager, $candidatureId): Response
     {
@@ -245,6 +249,21 @@ class OffreEmploiController extends AbstractController
         // Mettre à jour les compétences de la candidature
         $candidature->setCompetences($competences);
 
+        // Vérifier si l'état de la candidature a été modifié en "acceptée"
+        if ($candidature->getEtat() === 'acceptée') {
+            // Récupérer l'offre associée à cette candidature
+            $offre = $candidature->getOffre();
+
+            if ($offre) {
+                // Vérifier si le nombre de postes est supérieur à 0 avant de décrémenter
+                if ($offre->getNombrePostes() > 0) {
+                    // Décrémenter le nombre de postes de l'offre
+                    $offre->setNombrePostes($offre->getNombrePostes() - 1);
+                    $entityManager->persist($offre);  // Persister les changements de l'offre
+                }
+            }
+        }
+
         // Sauvegarder la candidature modifiée
         $entityManager->persist($candidature);
         $entityManager->flush();
@@ -252,6 +271,7 @@ class OffreEmploiController extends AbstractController
         // Rediriger vers la page des candidatures
         return $this->redirectToRoute('app_mesCandidatures');
     }
+
     //Liste des candidatures back office
     #[Route('/offre/{id}/candidatures', name: 'offre_candidatures_back')]
     public function offreCandidaturesBack(
@@ -329,7 +349,24 @@ class OffreEmploiController extends AbstractController
         // Mettre à jour l'état de la candidature
         $candidature->setEtat($nouvelEtat);
 
-        // Sauvegarder les modifications
+        // Si l'état est "Acceptée", décrémenter le nombre de postes de l'offre associée
+        if ($nouvelEtat === 'Acceptée') {
+            $offre = $candidature->getOffre(); // Récupérer l'offre associée
+
+            if ($offre) {
+                // Vérifier si le nombre de postes est supérieur à 0 avant de décrémenter
+                if ($offre->getNombrePostes() > 0) {
+                    // Décrémenter le nombre de postes
+                    $offre->setNombrePostes($offre->getNombrePostes() - 1);
+                    $entityManager->persist($offre); // Persister les changements de l'offre
+                } else {
+                    $this->addFlash('error', "Il n'y a plus de postes disponibles.");
+                    return $this->redirectToRoute('offre_candidatures_back', ['id' => $candidature->getOffre()->getId()]);
+                }
+            }
+        }
+
+        // Sauvegarder les modifications de la candidature
         $entityManager->persist($candidature);
         $entityManager->flush();
 
@@ -339,6 +376,7 @@ class OffreEmploiController extends AbstractController
         // Rediriger vers la liste des candidatures pour l'offre
         return $this->redirectToRoute('offre_candidatures_back', ['id' => $candidature->getOffre()->getId()]);
     }
+
 
 
 

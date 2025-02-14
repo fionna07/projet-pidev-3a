@@ -125,6 +125,7 @@
                     <th scope="col">Date de Fin Estimée</th>
                     <th scope="col">Compétences Requises</th>
                     <th scope="col">Salaire (TND)</th>
+                    <th scope="col">Nombre de postes disponibles</th>
                     <th scope="col">Actions</th>
                 </tr>
             </thead>
@@ -164,6 +165,7 @@
                             {% endfor %}
                         </td>
                         <td>{{ offre.salaire }}</td>
+                        <td>{{ offre.nombrePostes }}</td>
                         <td>
                         <!-- Bouton Modifier (icône orange sans fond) -->
                         <a href="#" class="text-warning me-2" data-bs-toggle="modal" data-bs-target="#editOffreModal{{ offre.id }}">

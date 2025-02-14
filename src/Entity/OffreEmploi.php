@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\OffreEmploiRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: OffreEmploiRepository::class)]
 class OffreEmploi
@@ -91,6 +93,10 @@ class OffreEmploi
     private ?float $salaire = null;
     #[ORM\ManyToOne(inversedBy: 'offreEmplois')]
     private ?Utilisateur $user = null;
+    
+    #[ORM\OneToMany(mappedBy: "offre", targetEntity: Candidature::class, cascade: ['remove'])]
+    private Collection $candidatures;
+
 
     public function getId(): ?int
     {
