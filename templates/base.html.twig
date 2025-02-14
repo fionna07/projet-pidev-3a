@@ -76,7 +76,20 @@
                 <div class="dropdown-menu rounded-0 m-0">
                   <a href="farms.html" class="dropdown-item">Market Place</a>
                   <a href="equipment.html" class="dropdown-item">Équipements</a>
-                  <a href="{{path('app_offreEmploi')}}" class="dropdown-item">Offres d'emploi</a>
+                  {% if app.user is not null %}
+                  <a href="{% if 'ROLE_AGRICULTEUR' in app.user.roles %}
+                              {{ path('app_offreEmploi') }}
+                          {% elseif 'ROLE_EMPLOYE' in app.user.roles %}
+                              {{ path('app_offreEmploiEmploye') }}
+                          {% else %}
+                              {{ path('app_front') }}
+                          {% endif %}" 
+                    class="dropdown-item">
+                      Offres d'emploi
+                  </a>
+              {% endif %}
+
+
                   <a href="events.html" class="dropdown-item">Événements</a>
                   
                 </div>

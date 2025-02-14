@@ -228,6 +228,31 @@ class OffreEmploiController extends AbstractController
         // Rediriger vers la page des candidatures
         return $this->redirectToRoute('app_mesCandidatures');
     }
+    //Modifier Candidature
+    #[Route('/candidature/{candidatureId}/modifier-compétences', name: 'app_modifier_competence', methods: ['POST'])]
+    public function modifierCompetences(Request $request, CandidatureRepository $candidatureRepository, EntityManagerInterface $entityManager, $candidatureId): Response
+    {
+        // Récupérer la candidature avec l'ID passé en paramètre
+        $candidature = $candidatureRepository->find($candidatureId);
+
+        if (!$candidature) {
+            throw $this->createNotFoundException('Candidature non trouvée');
+        }
+
+        // Récupérer les compétences modifiées depuis la requête
+        $competences = $request->request->get('competences');
+
+        // Mettre à jour les compétences de la candidature
+        $candidature->setCompetences($competences);
+
+        // Sauvegarder la candidature modifiée
+        $entityManager->persist($candidature);
+        $entityManager->flush();
+
+        // Rediriger vers la page des candidatures
+        return $this->redirectToRoute('app_mesCandidatures');
+    }
+
 
 
     

@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Candidatures{% endblock %}
+
+{% block body %}
+{# Afficher les messages flash #}
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    <div class="container mt-4">
+        <h1 class="mb-4">Liste des Candidatures</h1>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Nom et prénom de l'employé</th>
+                    <th scope="col">Compétences</th>
+                    <th scope="col">Date de candidature</th>
+                    <th scope="col">Statut</th>
+                    <th scope="col">Titre de l'offre</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for candidature in candidatures %}
+                    <tr>
+                        <td>{{ candidature.employe.lastName }} {{ candidature.employe.firstName }}</td>
+                        <td>
+                            {% for competence in candidature.competences|split(',') %}
+                                <span class="badge bg-success">{{ competence|trim }}</span> 
+                            {% endfor %}
+                        </td>
+                        <td>{{ candidature.dateCandidature|date('d/m/Y H:i') }}</td>
+                        <td>
+                            <select class="form-select statut-select" data-id="{{ candidature.id }}">
+                                <option value="en attente" {% if candidature.etat == 'en attente' %}selected{% endif %}>En attente</option>
+                                <option value="acceptée" {% if candidature.etat == 'acceptée' %}selected{% endif %}>Acceptée</option>
+                                <option value="refusée" {% if candidature.etat == 'refusée' %}selected{% endif %}>Refusée</option>
+                            </select>
+                        </td>
+                        <td>{{ candidature.offre.titre }}</td>
+                        <td>
+                            <button class="btn btn-primary btn-confirmer" data-id="{{ candidature.id }}">Confirmer</button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Aucune candidature trouvée.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.querySelectorAll('.btn-confirmer').forEach(button => {
+            button.addEventListener('click', function() {
+                let candidatureId = this.getAttribute('data-id');
+                let newStatus = document.querySelector('.statut-select[data-id="'+ candidatureId +'"]').value;
+
+                fetch('/candidature/update/' + candidatureId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '{{ csrf_token('update_candidature') }}'
+                    },
+                    body: JSON.stringify({ statut: newStatus })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Statut mis à jour avec succès !");
+                    } else {
+                        alert("Erreur lors de la mise à jour !");
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        // Fermer automatiquement le message flash après 5 secondes
+        setTimeout(function() {
+            var flashMessage = document.getElementById('flash-message');
+            if (flashMessage) {
+                flashMessage.classList.remove('show');
+                flashMessage.classList.add('fade');
+                setTimeout(function() {
+                    flashMessage.remove();
+                }, 150); // Temps pour l'animation de disparition
+            }
+        }, 5000); // 5000 millisecondes = 5 secondes
+    </script>
+{% endblock %}

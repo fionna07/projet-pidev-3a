@@ -175,6 +175,20 @@ class FrontPagesController extends AbstractController
             'modal_open' => $modalOpen, // Passez la variable modal_open pour gérer l'affichage
         ]);
     }
+    //Les candidatures
+    #[Route('/candidatures', name: 'app_candidatures')]
+    public function listCandidatures(CandidatureRepository $candidatureRepository): Response
+    {
+        // Récupérer toutes les candidatures
+        $candidatures = $candidatureRepository->findAll();
+
+        // Passer les candidatures à la vue Twig
+        return $this->render('offre_emploi/listCandidatures.html.twig', [
+            'candidatures' => $candidatures,
+        ]);
+    }
+    
+
 
 
 }
