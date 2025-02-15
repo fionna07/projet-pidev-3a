@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\OffreEmploiRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: OffreEmploiRepository::class)]
 class OffreEmploi
@@ -15,37 +17,89 @@ class OffreEmploi
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le titre est obligatoire.")]
+    #[Assert\Length(
+        min: 3,
+        max: 40,
+        maxMessage: "Le titre ne doit pas dépasser 40 caractères.",
+        minMessage: "Le titre doit avoir au minimum 3 caractères."
+
+    )]
+    #[Assert\Regex(
+        pattern: "/^[A-Za-zÀ-ÿ' ]+$/",
+        message: "Le titre ne doit contenir que des lettres."
+    )]
     private ?string $titre = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "La description est obligatoire.")]
+    #[Assert\Length(
+        min: 40,
+        minMessage: "La description doit contenir au moins 40 caractères."
+    )]
+    #[Assert\Regex(
+        pattern: "/^(?![\d\s]+$)[A-Za-z0-9À-ÿ,.' ]+$/",
+        message: "La description doit contenir au moins trois mots et ne doit pas être uniquement composée de chiffres."
+    )]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: "Le nombre de postes est obligatoire.")]
+    #[Assert\GreaterThan(
+        value: 2,
+        message: "Le nombre de postes doit être supérieur à 2."
+    )]
     private ?int $nombrePostes = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotNull(message: "La date de début est obligatoire.")]
+    #[Assert\GreaterThan(
+        "today",
+        message: "La date de début doit être supérieure à la date actuelle."
+    )]
     private ?\DateTimeInterface $dateDebut = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotNull(message: "La date de fin estimée est obligatoire.")]
+    #[Assert\GreaterThan(
+        propertyPath: "dateDebut",
+        message: "La date de fin estimée doit être supérieure à la date de début."
+    )]
     private ?\DateTimeInterface $dateFinEstimee = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le statut est obligatoire.")]
     private ?string $status = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "La localisation est obligatoire.")]
     private ?string $localisation = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $datePublication = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Les compétences requises sont obligatoires.")]
+    #[Assert\Regex(
+        pattern: "/.+,.+/",
+        message: "Il doit y avoir au moins deux compétences séparées par une virgule."
+    )]
     private ?string $competencesRequises = null;
 
-    #[ORM\Column]
-    private ?float $salaire = null;
 
+    #[ORM\Column]
+    #[Assert\NotNull(message: "Le salaire est obligatoire.")]
+    #[Assert\GreaterThan(
+        value: 0,
+        message: "Le salaire doit être supérieur à zéro."
+    )]
+    private ?float $salaire = null;
     #[ORM\ManyToOne(inversedBy: 'offreEmplois')]
     private ?Utilisateur $user = null;
+    
+    #[ORM\OneToMany(mappedBy: "offre", targetEntity: Candidature::class, cascade: ['remove'])]
+    private Collection $candidatures;
+
 
     public function getId(): ?int
     {

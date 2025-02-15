@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        
         <title>{% block title %}WeFarm - Plateforme de l'Agriculture Intelligente et Durable{% endblock %}</title>
         <meta content="width=device-width, initial-scale=1.0" name="viewport" />
             <meta content="Agriculture, développement durable, exploitation agricole, équipements, emploi, vente de récoltes" name="keywords" />
@@ -97,7 +98,18 @@
                   <div class="dropdown-menu rounded-0 m-0">
                       <a href="farms.html" class="dropdown-item">Market Place</a>
                       <a href="equipment.html" class="dropdown-item">Équipements</a>
-                      <a href="offreEmploi.html" class="dropdown-item">Offres d'emploi</a>
+                      {% if app.user is not null %}
+                      <a href="{% if 'ROLE_AGRICULTEUR' in app.user.roles %}
+                                  {{ path('app_offreEmploi') }}
+                              {% elseif 'ROLE_EMPLOYE' in app.user.roles %}
+                                  {{ path('app_offreEmploiEmploye') }}
+                              {% else %}
+                                  {{ path('app_front') }}
+                              {% endif %}" 
+                        class="dropdown-item">
+                          Offres d'emploi
+                      </a>
+                  {% endif %}
                       <a href="events.html" class="dropdown-item">Événements</a>
                   </div>
               

@@ -40,4 +40,13 @@ class OffreEmploiRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function findAll(): array
+    {
+        return $this->createQueryBuilder('o')
+            ->orderBy('o.datePublication', 'DESC') // Trier par date de publication (optionnel)
+            ->getQuery()
+            ->getResult();
+    }
+    
+
 }
