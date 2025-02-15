@@ -47,7 +47,7 @@ class FrontPagesController extends AbstractController
             'controller_name' => 'FrontController',
         ]);
     }
-    //Offres d'emploi agriculteur
+    //Offres d'emploi page Agriculteur
     #[Route('offre/emploi', name: 'app_offreEmploi')]
     public function offreEmploi(
         OffreEmploiRepository $offreEmploiRepository, 
@@ -63,8 +63,7 @@ class FrontPagesController extends AbstractController
         $user = $security->getUser();
 
         if ($user instanceof Utilisateur) {
-            // Associer l'utilisateur connecté à l'offre (clé étrangère)
-            $offre->setUser($user); // Associe l'utilisateur connecté à l'offre
+            $offre->setUser($user); 
         }
 
         $form = $this->createForm(OffreEmploiType::class, $offre);
@@ -80,7 +79,7 @@ class FrontPagesController extends AbstractController
                 // Affichage du message de succès
                 $this->addFlash('success', 'L\'offre d\'emploi a été ajoutée avec succès.');
 
-                return $this->redirectToRoute('app_offreEmploi'); // Redirige après le succès
+                return $this->redirectToRoute('app_offreEmploi'); 
             }
 
             $modalOpen = true; // Si des erreurs, on ouvre le modal
@@ -96,19 +95,19 @@ class FrontPagesController extends AbstractController
         ]);
     }
 
-    //Employé
+    //Offre d'employé page Employé
     #[Route('offre/emploi/employe', name: 'app_offreEmploiEmploye')]
     public function offreEmploiEmploye(
         OffreEmploiRepository $offreEmploiRepository,
         Request $request,
         EntityManagerInterface $entityManager,
         Security $security,
-        CandidatureRepository $candidatureRepository // Injecter le CandidatureRepository pour vérifier les candidatures existantes
+        CandidatureRepository $candidatureRepository 
     ): Response {
         // Récupérer toutes les offres d'emploi
         $offres = $offreEmploiRepository->findAll();
 
-        // Créer un tableau de formulaires pour chaque offre
+        // Créer un tableau de formulaires postuler pour chaque offre
         $formulaireOffres = [];
         $forms = [];
         $modalOpen = false; // Par défaut, le modal ne s'ouvre pas
@@ -138,7 +137,7 @@ class FrontPagesController extends AbstractController
                 if ($existingCandidature) {
                     // Si la candidature existe déjà, afficher un message d'erreur
                     $this->addFlash('error', 'Vous avez déjà postulé à cette offre.');
-                    return $this->redirectToRoute('app_offreEmploiEmploye'); // Rediriger pour ne pas resoumettre
+                    return $this->redirectToRoute('app_offreEmploiEmploye'); 
                 }
             }
 
@@ -171,11 +170,11 @@ class FrontPagesController extends AbstractController
 
         return $this->render('offre_emploi/indexEmploye.html.twig', [
             'offres' => $offres,
-            'formulaireOffres' => $formulaireOffres, // Passez les vues du formulaire
-            'modal_open' => $modalOpen, // Passez la variable modal_open pour gérer l'affichage
+            'formulaireOffres' => $formulaireOffres, 
+            'modal_open' => $modalOpen, 
         ]);
     }
-    //Les candidatures
+    //Affichage des candidatures pour les offres de l'agriculteur connecté
     #[Route('/candidatures', name: 'app_candidatures')]
     public function listCandidatures(CandidatureRepository $candidatureRepository): Response
     {
@@ -188,7 +187,4 @@ class FrontPagesController extends AbstractController
         ]);
     }
     
-
-
-
 }

@@ -34,7 +34,7 @@ class OffreEmploiController extends AbstractController
             'controller_name' => 'OffreEmploiController',
         ]);
     }
-   
+    //Modifier offre d'emploi par Agriculteur
     #[Route("/offre/edit/{id}", name: "offre_edit", methods: ["POST"])]
     public function edit(
         int $id,
@@ -47,7 +47,6 @@ class OffreEmploiController extends AbstractController
         if (!$offre) {
             throw $this->createNotFoundException("L'offre avec l'ID $id n'existe pas.");
         }
-
         // Mise à jour des champs
         $offre->setTitre($request->request->get('titre'));
         $offre->setDescription($request->request->get('description'));
@@ -75,10 +74,9 @@ class OffreEmploiController extends AbstractController
         // Ajouter un message flash de succès
         $this->addFlash('success', 'L\'offre d\'emploi a été mise à jour avec succès.');
 
-        // Redirection
         return $this->redirectToRoute('app_offre_emploi');
     }
-
+    //Suppression d'une offre d'emploi par un Agriculteur
     #[Route("/offre/{id}/supprimer", name: "offre_supprimer", methods: ["POST"])]
     public function supprimerOffre(
         int $id, 
@@ -90,7 +88,6 @@ class OffreEmploiController extends AbstractController
         if (!$offre) {
             throw $this->createNotFoundException("L'offre avec l'ID $id n'existe pas.");
         }
-
         // Suppression de l'offre
         $entityManager->remove($offre);
         $entityManager->flush();
@@ -98,10 +95,9 @@ class OffreEmploiController extends AbstractController
         // Message flash de succès
         $this->addFlash('success', 'L\'offre d\'emploi a été supprimée avec succès.');
 
-        // Rediriger vers la liste des offres après suppression
         return $this->redirectToRoute('app_offre_emploi');
     }
-
+    //Suppression d'une offre d'emploi par l'Admin
     #[Route("/offre/{id}/supprimer/admin", name: "offre_supprimer_back", methods: ["POST"])]
     public function supprimerOffreBack(
         int $id, 
@@ -121,9 +117,9 @@ class OffreEmploiController extends AbstractController
         // Message flash de succès
         $this->addFlash('success', 'L\'offre d\'emploi a été supprimée de l\'administration.');
 
-        // Rediriger vers la liste des offres après suppression
         return $this->redirectToRoute('app_offre_emploi_back');
     }
+    //Modification d'une offre d'emploi par l'Admin
     #[Route("/offre/edit/admin/{id}", name: "offre_edit_back", methods: ["POST"])]
     public function editOffre(
         int $id,
@@ -168,30 +164,21 @@ class OffreEmploiController extends AbstractController
     }
 
     //Affichage des candidatures pour un user connecté
-    
     #[Route('/mes-candidatures', name: 'app_mesCandidatures')]
     public function mesCandidatures(CandidatureRepository $candidatureRepository, Security $security): Response
     {
         // Récupérer l'utilisateur connecté
         $user = $security->getUser();
 
-        // Vérifier si un utilisateur est connecté
-        if (!$user) {
-            // Gérer le cas où l'utilisateur n'est pas connecté, par exemple, rediriger vers la page de connexion
-            $this->addFlash('error', 'Vous devez être connecté pour voir vos candidatures.');
-            return $this->redirectToRoute('app_login'); // Change 'app_login' par la route appropriée pour la connexion
-        }
-
         // Trouver toutes les candidatures de l'utilisateur connecté
         $candidatures = $candidatureRepository->findBy(['employe' => $user]);
 
-        // Retourner les candidatures dans la vue
         return $this->render('offre_emploi/mes_candidatures.html.twig', [
             'candidatures' => $candidatures,
         ]);
     }
 
-    //détails offre
+    //Voir les détails d'une offre à partir des tableau des candidatures
     #[Route('/offre/{offreId}', name: 'app_details_offre')]
     public function detailsOffre($offreId, OffreEmploiRepository $offreRepository): Response
     {
@@ -202,13 +189,11 @@ class OffreEmploiController extends AbstractController
         if (!$offre) {
             throw $this->createNotFoundException('Offre non trouvée');
         }
-
-        // Renvoyer la vue avec les détails de l'offre
         return $this->render('offre_emploi/details.html.twig', [
             'offre' => $offre,
         ]);
     }
-    //Annuler candidature front
+    //Annulation de candidature par un Employé 
     #[Route('/candidature/annuler/{candidatureId}', name: 'app_annuler_candidature', methods: ['POST'])]
     public function annulerCandidature($candidatureId, EntityManagerInterface $entityManager, CandidatureRepository $candidatureRepository): Response
     {
@@ -230,11 +215,10 @@ class OffreEmploiController extends AbstractController
         // Ajouter un message de succès
         $this->addFlash('success', 'Votre candidature a été annulée.');
 
-        // Rediriger vers la page des candidatures
         return $this->redirectToRoute('app_mesCandidatures');
     }
 
-    // Modifier Candidature front
+    // Modification de candidature par un Employé (compétences)
     #[Route('/candidature/{candidatureId}/modifier-compétences', name: 'app_modifier_competence', methods: ['POST'])]
     public function modifierCompetences(Request $request, CandidatureRepository $candidatureRepository, EntityManagerInterface $entityManager, $candidatureId): Response
     {
@@ -261,7 +245,7 @@ class OffreEmploiController extends AbstractController
                 if ($offre->getNombrePostes() > 0) {
                     // Décrémenter le nombre de postes de l'offre
                     $offre->setNombrePostes($offre->getNombrePostes() - 1);
-                    $entityManager->persist($offre);  // Persister les changements de l'offre
+                    $entityManager->persist($offre);  
                 }
             }
         }
@@ -270,11 +254,10 @@ class OffreEmploiController extends AbstractController
         $entityManager->persist($candidature);
         $entityManager->flush();
 
-        // Rediriger vers la page des candidatures
         return $this->redirectToRoute('app_mesCandidatures');
     }
 
-    //Liste des candidatures back office
+    //Lister les candidatures d'une offre d'emploi par l'Admin
     #[Route('/offre/{id}/candidatures', name: 'offre_candidatures_back')]
     public function offreCandidaturesBack(
         int $id,
@@ -292,13 +275,12 @@ class OffreEmploiController extends AbstractController
         // Récupérer les candidatures associées à cette offre
         $candidatures = $candidatureRepository->findBy(['offre' => $offre]);
 
-        // Afficher la vue avec les détails de l'offre et les candidatures
         return $this->render('offre_emploi/listCandidaturesBack.html.twig', [
             'offre' => $offre,
             'candidatures' => $candidatures,
         ]);
     }
-    //Supprimer candiature Back office
+    //Supprimer candiature par l'Admin
     #[Route('/candidature/{id}/supprimer', name: 'candidature_supprimer_back', methods: ['POST'])]
     public function supprimerCandidatureBack(
         int $id,
@@ -320,10 +302,9 @@ class OffreEmploiController extends AbstractController
         // Message flash de succès
         $this->addFlash('success', 'La candidature a été supprimée avec succès.');
 
-        // Rediriger vers la liste des candidatures pour l'offre
         return $this->redirectToRoute('offre_candidatures_back', ['id' => $candidature->getOffre()->getId()]);
     }
-    //Modifier etat candidature back office
+    //Modifier l'état d'une candidature (accepté,refusée) par l'Admin
     #[Route('/candidature/{id}/modifier-etat', name: 'candidature_modifier_etat', methods: ['POST'])]
     public function modifierEtatCandidature(
         int $id,
@@ -342,11 +323,6 @@ class OffreEmploiController extends AbstractController
         // Récupérer le nouvel état depuis la requête
         $nouvelEtat = $request->request->get('etat');
 
-        // Valider le nouvel état (optionnel, selon vos besoins)
-        if (!in_array($nouvelEtat, ['En attente', 'Acceptée', 'Refusée'])) {
-            $this->addFlash('error', 'État invalide.');
-            return $this->redirectToRoute('offre_candidatures_back', ['id' => $candidature->getOffre()->getId()]);
-        }
 
         // Mettre à jour l'état de la candidature
         $candidature->setEtat($nouvelEtat);
@@ -360,7 +336,7 @@ class OffreEmploiController extends AbstractController
                 if ($offre->getNombrePostes() > 0) {
                     // Décrémenter le nombre de postes
                     $offre->setNombrePostes($offre->getNombrePostes() - 1);
-                    $entityManager->persist($offre); // Persister les changements de l'offre
+                    $entityManager->persist($offre); 
                 } else {
                     $this->addFlash('error', "Il n'y a plus de postes disponibles.");
                     return $this->redirectToRoute('offre_candidatures_back', ['id' => $candidature->getOffre()->getId()]);
@@ -378,7 +354,7 @@ class OffreEmploiController extends AbstractController
         // Rediriger vers la liste des candidatures pour l'offre
         return $this->redirectToRoute('offre_candidatures_back', ['id' => $candidature->getOffre()->getId()]);
     }
-    //Modifier statut offre par agriculteur
+    //Modifier le statut d'une offre par Agriculteur
     #[Route("/candidature/update/{id}", name: "candidature_update", methods: ["POST"])]
     public function update(Request $request, Candidature $candidature, EntityManagerInterface $entityManager): Response
     {
@@ -410,8 +386,7 @@ class OffreEmploiController extends AbstractController
 
         $this->addFlash('success', 'Statut mis à jour avec succès !');
 
-        // Rediriger vers la liste des candidatures avec une ancre
         return $this->redirectToRoute('app_candidatures');
-    }
+    }    
   
 }

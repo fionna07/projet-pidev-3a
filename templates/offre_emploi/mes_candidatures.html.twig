@@ -24,7 +24,7 @@
                     <tr>
                         <td>{{ candidature.offre.titre }}</td>
                         <td>{{ candidature.dateCandidature|date('d/m/Y') }}</td>
-                        <td>{{ candidature.etat }}</td>
+                        <td>{{ candidature.etat|capitalize }}</td>
                         <td>
                             {% for competence in candidature.competences|split(',') %}
                                 <span class="badge bg-primary">{{ competence|trim }}</span>

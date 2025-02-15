@@ -33,7 +33,7 @@
                             {% endif %}
                         </td>
                         <td>{{ candidature.dateCandidature|date('d/m/Y H:i') }}</td>
-                        <td>{{ candidature.etat }}</td>
+                        <td>{{ candidature.etat|capitalize }}</td>
                         <td>
                             <!-- Bouton Supprimer avec modal de confirmation -->
                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ candidature.id }}">

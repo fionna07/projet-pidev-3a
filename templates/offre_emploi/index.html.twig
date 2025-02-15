@@ -19,24 +19,26 @@
     <h1 class="mb-2 fs-3">Les offres d'Emploi</h1>
     <!-- Barre de recherche -->
     <div class="mb-4">
-        <div class="input-group">
-            <input type="text" class="form-control" placeholder="Rechercher une offre..." aria-label="Recherche" aria-describedby="button-addon2">
-            <button class="btn btn-outline-secondary text-success" type="button" id="button-addon2">
-                <i class="fas fa-search" style="color: #28a745;"></i> <!-- Icône verte -->
-            </button>
-        </div>
-    </div>
-    <!-- Bouton Ajouter Offre -->
-    <div class="d-flex justify-content-end mb-3">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOffreModal">
-            <i class="fas fa-plus"></i> Ajouter une Offre
+    <div class="input-group">
+        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher une offre par titre..." aria-label="Recherche">
+        <button class="btn btn-outline-secondary text-success" type="button" id="searchButton">
+            <i class="fas fa-search" style="color: #28a745;"></i>
         </button>
     </div>
+    </div>
+
     <!-- Bouton Les candidatures -->
     <div class="d-flex justify-content-end mb-3">
         <a href="{{ path('app_candidatures') }}" class="btn btn-primary">
             <i class="fas fa-users"></i> Les candidatures
         </a>
+    </div>
+
+    <!-- Bouton Ajouter Offre -->
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOffreModal">
+            <i class="fas fa-plus"></i> Ajouter une Offre
+        </button>
     </div>
     
     <!-- Modal d'ajout -->
@@ -49,92 +51,92 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-    <!-- Formulaire d'ajout -->
-    {{ form_start(form, {'attr': {'class': 'form-horizontal', 'novalidate': 'novalidate'}}) }}
+                <!-- Formulaire d'ajout -->
+                {{ form_start(form, {'attr': {'class': 'form-horizontal', 'novalidate': 'novalidate'}}) }}
 
-    <div class="mb-3">
-        {{ form_label(form.titre) }}
-        {{ form_widget(form.titre, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.titre) }}
-        </div>
-    </div>
+                <div class="mb-3">
+                    {{ form_label(form.titre) }}
+                    {{ form_widget(form.titre, {'attr': {'class': 'form-control'}}) }}
+                    <div class="text-danger">
+                    {{ form_errors(form.titre) }}
+                    </div>
+                </div>
 
-    <div class="mb-3">
-        {{ form_label(form.description) }}
-        {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.description) }}
-        </div>
+                <div class="mb-3">
+                    {{ form_label(form.description) }}
+                    {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+                    <div class="text-danger">
+                    {{ form_errors(form.description) }}
+                    </div>
 
-    </div>
+                </div>
 
-    <div class="mb-3">
-        {{ form_label(form.nombrePostes) }}
-        {{ form_widget(form.nombrePostes, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.nombrePostes) }}
-        </div>
-    </div>
+                <div class="mb-3">
+                    {{ form_label(form.nombrePostes) }}
+                    {{ form_widget(form.nombrePostes, {'attr': {'class': 'form-control'}}) }}
+                    <div class="text-danger">
+                    {{ form_errors(form.nombrePostes) }}
+                    </div>
+                </div>
 
-    <div class="mb-3">
-        {{ form_label(form.dateDebut) }}
-        {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.dateDebut) }}
-        </div>
-    </div>
+                <div class="mb-3">
+                    {{ form_label(form.dateDebut) }}
+                    {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+                    <div class="text-danger">
+                    {{ form_errors(form.dateDebut) }}
+                    </div>
+                </div>
 
-    <div class="mb-3">
-        {{ form_label(form.dateFinEstimee) }}
-        {{ form_widget(form.dateFinEstimee, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.dateFinEstimee) }}
-        </div>
-    </div>
+                <div class="mb-3">
+                    {{ form_label(form.dateFinEstimee) }}
+                    {{ form_widget(form.dateFinEstimee, {'attr': {'class': 'form-control'}}) }}
+                    <div class="text-danger">
+                    {{ form_errors(form.dateFinEstimee) }}
+                    </div>
+                </div>
 
-    <div class="mb-3">
-        {{ form_label(form.localisation) }}
-        {{ form_widget(form.localisation, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.localisation) }}
-        </div>
-    </div>
+                <div class="mb-3">
+                    {{ form_label(form.localisation) }}
+                    {{ form_widget(form.localisation, {'attr': {'class': 'form-control'}}) }}
+                    <div class="text-danger">
+                    {{ form_errors(form.localisation) }}
+                    </div>
+                </div>
 
-    <div class="mb-3">
-        {{ form_label(form.competencesRequises) }}
-        {{ form_widget(form.competencesRequises, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.competencesRequises) }}
-        </div>
-    </div>
+                <div class="mb-3">
+                    {{ form_label(form.competencesRequises) }}
+                    {{ form_widget(form.competencesRequises, {'attr': {'class': 'form-control'}}) }}
+                    <div class="text-danger">
+                    {{ form_errors(form.competencesRequises) }}
+                    </div>
+                </div>
 
-    <div class="mb-3">
-        {{ form_label(form.salaire) }}
-        {{ form_widget(form.salaire, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.salaire) }}
-        </div>
-    </div>
+                <div class="mb-3">
+                    {{ form_label(form.salaire) }}
+                    {{ form_widget(form.salaire, {'attr': {'class': 'form-control'}}) }}
+                    <div class="text-danger">
+                    {{ form_errors(form.salaire) }}
+                    </div>
+                </div>
 
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="submit" class="btn btn-primary">Ajouter</button>
-    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
 
-    {{ form_end(form) }}
-</div>
+                {{ form_end(form) }}
+            </div>
             </div>
         </div>
     </div>
 
     <!-- Liste des offres -->
-    <div class="row">
+    <div class="row" id="offresList">
         {% for offre in offres %}
-            <div class="col-md-6 col-lg-4 mb-4"> <!-- Cartes plus grandes et centrées -->
-                <div class="card position-relative shadow-lg border-light rounded-3" style="height: 100%; display: flex; flex-direction: column;"> <!-- Ajout de l'ombrage et flex pour la hauteur -->
+            <div class="col-md-6 col-lg-4 mb-4 offre-card" data-titre="{{ offre.titre }}">
+                <div class="card position-relative shadow-lg border-light rounded-3" style="height: 100%; display: flex; flex-direction: column;">
                     <!-- Date de publication -->
-                    <div class="position-absolute top-0 start-0 m-2 text-muted small" style="margin-bottom: 10px;">
+                    <div class="position-absolute top-0 start-0 m-2 text-muted small">
                         {% set now = date() %}
                         {% set diff = now.diff(offre.datePublication) %}
                         {% set days = diff.days %}
@@ -161,7 +163,7 @@
                     </div>
 
                     <!-- Corps de la carte -->
-                    <div class="card-body" style="padding-top: 30px; flex-grow: 1;"> <!-- Utilisation de flex-grow pour étirer la carte -->
+                    <div class="card-body" style="padding-top: 30px; flex-grow: 1;">
                         <h5 class="card-title fw-bold">{{ offre.titre|capitalize }}</h5>
 
                         <!-- Dates -->
@@ -211,20 +213,12 @@
                                         <div class="modal-body">
                                             Êtes-vous sûr de vouloir supprimer cette offre d'emploi ? Cette action est irréversible.
                                         </div>
-                                        <style>
-                                            .btn-secondary {
-                                                background-color: #6c757d !important; /* Gris */
-                                                border-color: #6c757d !important;
-                                            }
-                                        </style>
-
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                                             <form method="post" action="{{ path('offre_supprimer', {'id': offre.id}) }}">
-                                                <button type="submit" class="btn btn-danger">Confirmer</button> <!-- Red button -->
+                                                <button type="submit" class="btn btn-danger">Confirmer</button>
                                             </form>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -428,7 +422,45 @@
             });
         });
     </script>
+    <!-- JavaScript pour la recherche -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const offresList = document.getElementById('offresList');
+        const offreCards = document.querySelectorAll('.offre-card');
 
+        // Fonction pour normaliser les accents
+        function normalizeString(str) {
+            return str
+                .normalize("NFD") // Décompose les caractères accentués en base + diacritique
+                .replace(/[\u0300-\u036f]/g, ""); // Supprime les diacritiques
+        }
 
+        // Fonction de filtrage insensible à la casse et aux accents
+        function filterOffres() {
+            const searchTerm = normalizeString(searchInput.value.trim().toLowerCase()); // Normaliser et convertir en minuscules
+
+            offreCards.forEach(card => {
+                const competences = normalizeString(card.getAttribute('data-titre').toLowerCase()); // Normaliser et convertir en minuscules
+                if (competences.includes(searchTerm)) {
+                    card.style.display = 'block'; // Afficher la carte si la compétence correspond
+                } else {
+                    card.style.display = 'none'; // Masquer la carte si la compétence ne correspond pas
+                }
+            });
+        }
+
+        // Écouteur d'événement pour le bouton de recherche
+        searchButton.addEventListener('click', filterOffres);
+
+        // Écouteur d'événement pour la touche "Entrée"
+        searchInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                filterOffres();
+            }
+        });
+    });
+    </script>
 </div>
 {% endblock %}

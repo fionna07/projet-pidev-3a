@@ -61,7 +61,7 @@
 </div>
 
 <script>
-    // Fermer automatiquement les messages flash après 5 secondes
+    // Fermer automatiquement les messages flash après 3 secondes
     document.addEventListener("DOMContentLoaded", function() {
         setTimeout(function() {
             document.querySelectorAll('.flash-message').forEach(function(flash) {
@@ -70,7 +70,7 @@
                     flash.remove();
                 }, 500); // Délai pour la suppression après l'animation
             });
-        }, 5000); // Disparition après 5 secondes
+        }, 3000); // Disparition après 3 secondes
     });
 </script>
 

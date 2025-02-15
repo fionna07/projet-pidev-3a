@@ -17,22 +17,25 @@ class OffreEmploi
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Le titre ne peut pas être vide.")]
+    #[Assert\NotBlank(message: "Le titre est obligatoire.")]
     #[Assert\Length(
-        max: 100,
-        maxMessage: "Le titre ne doit pas dépasser 100 caractères."
+        min: 3,
+        max: 40,
+        maxMessage: "Le titre ne doit pas dépasser 40 caractères.",
+        minMessage: "Le titre doit avoir au minimum 3 caractères."
+
     )]
     #[Assert\Regex(
         pattern: "/^[A-Za-zÀ-ÿ' ]+$/",
-        message: "Le titre ne doit contenir que des lettres, espaces et apostrophes."
+        message: "Le titre ne doit contenir que des lettres."
     )]
     private ?string $titre = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "La description ne peut pas être vide.")]
+    #[Assert\NotBlank(message: "La description est obligatoire.")]
     #[Assert\Length(
-        min: 10,
-        minMessage: "La description doit contenir au moins 10 caractères."
+        min: 40,
+        minMessage: "La description doit contenir au moins 40 caractères."
     )]
     #[Assert\Regex(
         pattern: "/^(?![\d\s]+$)[A-Za-z0-9À-ÿ,.' ]+$/",

@@ -24,14 +24,17 @@ class OffreEmploiType extends AbstractType
                 'label' => 'Titre de l\'offre',
                 'attr' => ['placeholder' => 'Entrez le titre de l\'offre'],
                 'constraints' => [
-                    new NotBlank(['message' => 'Le titre ne peut pas être vide.']),
+                    new NotBlank(['message' => 'Le titre est obligatoire.']),
                     new Length([
-                        'max' => 100,
-                        'maxMessage' => 'Le titre ne doit pas dépasser 100 caractères.',
+                        'min' => 3,
+                        'max' => 40,
+                        'maxMessage' => 'Le titre ne doit pas dépasser 40 caractères.',
+                        'minMessage' => 'Le titre doit avoir au minimum 3 caractères.',
+
                     ]),
                     new Regex([
                         'pattern' => "/^[A-Za-zÀ-ÿ' ]+$/",
-                        'message' => 'Le titre ne doit contenir que des lettres, espaces et apostrophes.',
+                        'message' => 'Le titre ne doit contenir que des lettres.',
                     ]),
                 ],
             ])
@@ -39,10 +42,10 @@ class OffreEmploiType extends AbstractType
                 'label' => 'Description',
                 'attr' => ['placeholder' => 'Entrez une description'],
                 'constraints' => [
-                    new NotBlank(['message' => 'La description ne peut pas être vide.']),
+                    new NotBlank(['message' => 'La description est obligatoire.']),
                     new Length([
-                        'min' => 10,
-                        'minMessage' => 'La description doit contenir au moins 10 caractères.',
+                        'min' => 40,
+                        'minMessage' => 'La description doit contenir au moins 40 caractères.',
                     ]),
                     new Regex([
                         'pattern' => "/^(?![\d\s]+$)[A-Za-z0-9À-ÿ,.' ]+$/",
