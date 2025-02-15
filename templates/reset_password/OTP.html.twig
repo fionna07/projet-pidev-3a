@@ -1,13 +1,57 @@
-
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <title>OTP validation</title>
     <link href="{{ asset('/css/otp.css') }}" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/js/bootstrap.bundle.min.js"></script>
+    <script src="//code.jquery.com/jquery.js"></script>
 
 </head>
-<body >
-<div class="container">
+<body style="background-color: #EFFDF5">
+
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div id="liveSuccessToast" class="toast align-items-center text-white bg-success border-0 hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fa-solid fa-check" style="color: #ffffff;"></i>
+                <span style="margin-left: 5px;">Le code a été renvoyé avec succès.</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div id="liveInfoToast" class="toast align-items-center text-white bg-primary border-0 hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <svg xmlns="http://www.w3.org/2000/svg" color=#ffffff width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                </svg>
+                <span style="margin-left: 5px;">Le renvoie est en cours...</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div id="liveWarningToast" class="toast align-items-center text-white bg-warning border-0 hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fa-solid fa-triangle-exclamation" style="color: #ffffff;"></i>
+                <span style="margin-left: 5px;">Erreur lors de l'envoi du code.</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<div class="OTPcontainer">
 
     <form class="otp-Form" id="otpForm"
           action="{{ path('app_verifyotp') }}"
@@ -32,10 +76,49 @@
     </form>
 </div>
 
-<script src="//code.jquery.com/jquery.js"></script>
-
-
 <script>
+    function showSuccessToast() {
+        var toastEl = new bootstrap.Toast(document.getElementById('liveSuccessToast'), {
+            delay: 3000 // 3 secondes
+        });
+        toastEl.show();
+    }
+
+    function showWarningToast() {
+        var toastEl = new bootstrap.Toast(document.getElementById('liveWarningToast'), {
+            delay: 3000 // 3 secondes
+        });
+        toastEl.show();
+    }
+    function showInfoToast() {
+        var toastEl = new bootstrap.Toast(document.getElementById('liveInfoToast'), {
+            delay: 2000 // 3 secondes
+        });
+        toastEl.show();
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelector('.resendBtn').addEventListener('click', function() {
+            showInfoToast();
+            fetch('/resend-otp', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message=='success') {
+                        showSuccessToast();
+                    } else {
+                        showWarningToast();
+                    }
+                })
+                .catch(error => console.error('Erreur:', error));
+        });
+    });
+
+
     let otp1=document.getElementById("otp-input1") ;
     let otp2=document.getElementById("otp-input2") ;
     let otp3=document.getElementById("otp-input3") ;
@@ -59,7 +142,7 @@
                 var popoverTriggerEl = document.querySelector('.verifyButton');
                 var popover = new bootstrap.Popover(popoverTriggerEl, {
                     customClass: 'custom-popover',
-                    title: 'Custom popover',
+                    title: 'Incomplete OTP Verification',
                     content: 'Les champs de saisie sont requis.'
                 });
 

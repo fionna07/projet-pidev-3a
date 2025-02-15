@@ -1,9 +1,10 @@
 body{
-    background-color: #EFFDF5;
+    background-color: #fbfbfb;
 }
 
-.container {
+.OTPcontainer {
     display: flex;
+    
     justify-content: center;
     align-items: center;
     height: 100%;

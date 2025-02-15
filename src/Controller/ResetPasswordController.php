@@ -140,7 +140,39 @@ final class ResetPasswordController extends AbstractController
     }
 
 
+    #[Route('/resend-otp', name: 'app_resend_otp', methods: ['POST'])]
+    public function resendOTP(Request $request, ManagerRegistry $doctrine, SessionInterface $session): Response
 
+    {
+        $email = $session->get('email');
+        $entityManager = $doctrine->getManager();
+        $user = $entityManager->getRepository(Utilisateur::class)->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            return $this->json(['message' => 'error'], Response::HTTP_OK);
+        }
+
+        $userId = $user->getId();
+        $OTP = rand(1000, 9999);
+
+        $transport = Transport::fromDsn('smtp://benharbfarah85@gmail.com:usvjuzoqaluwufif@smtp.gmail.com:587?encryption=tls&auth_mode=login');
+        $mailer = new Mailer($transport);
+
+        $emailOTP = (new Email())
+            ->from(new Address('wefarm.support@gmail.com', 'Wefarm Support'))
+            ->to($email)
+            ->subject('Demande de réinitialisation de mot de passe')
+            ->html('<p>Bonjour,</p><p>Vous avez demandé la réinitialisation de votre mot de passe. 
+            Voici votre code de validation : <strong>' . $OTP . '</strong>.</p><p>Cordialement,<br>Wefarm Support</p>');
+        $mailer->send($emailOTP);
+
+        $session->set('userId', $userId);
+        $session->set('OTP', $OTP);
+
+
+        return $this->json(['message' => 'success'], Response::HTTP_OK);
+
+    }
 
 
 }
