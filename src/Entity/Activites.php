@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Entity;
+use App\Entity\Utilisateur;
 
 use App\Repository\ActivitesRepository;
 use Doctrine\DBAL\Types\Types;
@@ -23,8 +24,10 @@ class Activites
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
-    #[ORM\ManyToOne]
-    private ?Utilisateur $user = null;
+    
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: "activites")]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    private ?Utilisateur $utilisateur = null;
 
     public function getId(): ?int
     {
@@ -45,6 +48,7 @@ class Activites
 
     
 
+
     
 
     public function getMetaData(): array
@@ -58,11 +62,17 @@ class Activites
 
         return $this;
     }
-
+    public function addMetadata(string $key, mixed $value): self 
+    {
+        $this->metaData[$key] = $value;
+        return $this;
+    
+    }
     public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
     }
+
 
     public function setDate(\DateTimeInterface $date): static
     {
@@ -73,12 +83,12 @@ class Activites
 
     public function getUser(): ?Utilisateur
     {
-        return $this->user;
+        return $this->utilisateur;
     }
 
     public function setUser(?Utilisateur $user): static
     {
-        $this->user = $user;
+        $this->utilisateur = $user;
 
         return $this;
     }

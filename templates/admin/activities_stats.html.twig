@@ -1,0 +1,163 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %} Statistiques des Activités {% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">📊 Statistiques des Activités</h1>
+
+        <div class="row">
+            <!-- Cadre des Graphiques -->
+            <div class="col-md-7">
+                <div class="card shadow-lg p-10">
+                    <h4 class="text-center mb-3">Graphique des Activités</h4>
+                    <canvas id="statsChart"></canvas>
+                </div>
+            </div>
+
+         <!-- Cadre des Filtres -->
+<div class="col-md-5">
+    <div class="card shadow-lg p-4 rounded">
+        <h4 class="mb-3 text-center">Filtres</h4>
+
+        <!-- Type de Graphique -->
+        <h5 class="mt-1">Type de graphique</h5>
+        <div class="btn-group d-flex gap-2">
+            <input class="btn-check" type="radio" name="chartType" value="bar" id="chartBar" checked>
+            <label class="btn btn-outline-primary flex-fill rounded" for="chartBar">📊 Histogramme</label>
+
+            <input class="btn-check" type="radio" name="chartType" value="pie" id="chartPie">
+            <label class="btn btn-outline-primary flex-fill rounded" for="chartPie">🥧 Camembert</label>
+
+            <input class="btn-check" type="radio" name="chartType" value="line" id="chartLine">
+            <label class="btn btn-outline-primary flex-fill rounded" for="chartLine">📈 Courbe</label>
+        </div>
+
+        <!-- Statistiques par -->
+        <h5 class="mt-3">Statistiques par</h5>
+        <div class="btn-group d-flex gap-2">
+            <input class="btn-check" type="radio" name="statType" value="weekly" id="statWeekly">
+            <label class="btn btn-outline-secondary flex-fill rounded" for="statWeekly">📅 Semaine</label>
+
+            <input class="btn-check" type="radio" name="statType" value="monthly" id="statMonthly" checked>
+            <label class="btn btn-outline-secondary flex-fill rounded" for="statMonthly">📆 Mois</label>
+
+            <input class="btn-check" type="radio" name="statType" value="yearly" id="statYearly">
+            <label class="btn btn-outline-secondary flex-fill rounded" for="statYearly">🗓 Année</label>
+        </div>
+
+        <!-- Filtre par Catégorie -->
+        <h5 class="mt-3">Filtrer par catégorie</h5>
+        <select id="categoryFilter" class="form-select shadow-sm rounded">
+            <option value="all" selected>Toutes les catégories</option>
+        </select>
+    </div>
+</div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let currentChartType = 'bar';
+        let currentStatType = 'monthly';
+        let currentCategory = 'all';
+        let chart;
+        let statsData;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/admin/activities/stats/data')
+                .then(response => response.json())
+                .then(data => {
+                    statsData = data;
+                    populateCategoryFilter(data.categories);
+                    initializeChart(data);
+                    setupEventListeners(data);
+                });
+        });
+
+        function populateCategoryFilter(categories) {
+            const categoryFilter = document.getElementById('categoryFilter');
+            Object.keys(categories).forEach(category => {
+                let option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryFilter.appendChild(option);
+            });
+        }
+
+        function initializeChart(data) {
+            const ctx = document.getElementById('statsChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: currentChartType,
+                data: getChartData(data, currentStatType, currentCategory)
+            });
+        }
+
+        function getChartData(data, statType, category) {
+            let stats = category === 'all' ? data[statType] : data.categories[category][statType];
+
+            return {
+                labels: Object.keys(stats),
+                datasets: [{
+                    label: 'Activités par ' + (statType === 'weekly' ? 'Semaine' : statType === 'monthly' ? 'Mois' : 'Année'),
+                    data: Object.values(stats),
+                    backgroundColor: currentChartType === 'pie' ? [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)'
+                    ] : 'rgba(75, 192, 192, 0.5)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: currentChartType === 'line'
+                }]
+            };
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('input[name="chartType"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    currentChartType = this.value;
+                    updateChart();
+                });
+            });
+
+            document.querySelectorAll('input[name="statType"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    currentStatType = this.value;
+                    updateChart();
+                });
+            });
+
+            document.getElementById('categoryFilter').addEventListener('change', function() {
+                currentCategory = this.value;
+                updateChart();
+            });
+        }
+
+        function updateChart() {
+            chart.destroy();
+            chart = new Chart(document.getElementById('statsChart').getContext('2d'), {
+                type: currentChartType,
+                data: getChartData(statsData, currentStatType, currentCategory)
+            });
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-group .btn {
+            font-size: 14px;
+            font-weight: 500;
+        }
+    </style>
+{% endblock %}

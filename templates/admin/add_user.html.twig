@@ -1,0 +1,108 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Ajouter un utilisateur{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header text-white text-center py-3" style="background-color: #4CAF50; border-top-left-radius: 10px; border-top-right-radius: 10px;">
+                <h2><i class="bi bi-person-plus-fill me-2"></i>Ajouter un utilisateur</h2>
+            </div>
+
+            <div class="card-body p-4">
+                {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+                {# Section pour l'image de profil avec aperçu #}
+                <div class="mb-4 text-center">
+                    <label class="form-label fw-bold">Image de profil</label>
+                    <div class="d-flex justify-content-center">
+                        <img id="previewImage" src="https://via.placeholder.com/120" class="rounded-circle border" width="120" height="120" alt="Aperçu de l'image">
+                    </div>
+                    <div class="mt-2">
+                        {{ form_widget(form.image, {'attr': {'class': 'form-control', 'onchange': 'previewFile(this)'}}) }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.email, {'attr': {'class': 'form-control', 'placeholder': 'Entrez l\'email'}}) }}
+                        <div class="invalid-feedback">{{ form_errors(form.email) }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.password, 'Mot de passe', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.password, {'attr': {'class': 'form-control', 'placeholder': 'Entrez le mot de passe'}}) }}
+                        <div class="invalid-feedback">{{ form_errors(form.password) }}</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.firstName, 'Prénom', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.firstName, {'attr': {'class': 'form-control', 'placeholder': 'Entrez le prénom'}}) }}
+                        <div class="invalid-feedback">{{ form_errors(form.firstName) }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.lastName, 'Nom', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.lastName, {'attr': {'class': 'form-control', 'placeholder': 'Entrez le nom'}}) }}
+                        <div class="invalid-feedback">{{ form_errors(form.lastName) }}</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.adresse, 'Adresse', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.adresse, {'attr': {'class': 'form-control', 'placeholder': 'Entrez l\'adresse'}}) }}
+                        <div class="invalid-feedback">{{ form_errors(form.adresse) }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.numTel, 'Numéro de téléphone', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.numTel, {'attr': {'class': 'form-control', 'placeholder': 'Entrez le numéro'}}) }}
+                        <div class="invalid-feedback">{{ form_errors(form.numTel) }}</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.dateNaissance, 'Date de naissance', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.dateNaissance, {'attr': {'class': 'form-control'}}) }}
+                        <div class="invalid-feedback">{{ form_errors(form.dateNaissance) }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.roles, 'Rôle', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.roles, {'attr': {'class': 'form-control'}}) }}
+                        <div class="invalid-feedback">{{ form_errors(form.roles) }}</div>
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    {{ form_widget(form.isVerified, {'attr': {'class': 'form-check-input'}}) }}
+                    {{ form_label(form.isVerified, 'Compte vérifié', {'label_attr': {'class': 'form-check-label fw-bold'}}) }}
+                    <div class="invalid-feedback">{{ form_errors(form.isVerified) }}</div>
+                </div>
+
+                {# Boutons d'action #}
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success btn-lg"><i class="bi bi-save me-2"></i>Enregistrer</button>
+                    <a href="{{ path('admin_users') }}" class="btn btn-secondary btn-lg"><i class="bi bi-arrow-left me-2"></i>Retour</a>
+                </div>
+                
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function previewFile(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+{% endblock %}

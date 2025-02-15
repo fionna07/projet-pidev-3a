@@ -1,0 +1,74 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Activités des utilisateurs{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card shadow-lg p-4 rounded-4">
+        <h1 class="mb-4 text-center">📊 Activités des utilisateurs</h1>
+
+        <!-- Barre de recherche -->
+        <form method="GET" action="{{ path('admin_activities') }}" class="mb-4">
+            <div class="input-group shadow-sm w-50 mx-auto">
+                <input type="text" name="search" class="form-control form-control-sm rounded-start" 
+                       placeholder="🔍 Rechercher..." value="{{ search }}">
+                <button type="submit" class="btn btn-primary btn-sm rounded-end">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </form>
+
+        <!-- Bouton statistiques -->
+        <div class="text-end mb-3">
+            <a href="{{ path('admin_activities_stats') }}" class="btn btn-success btn-sm">
+                <i class="fas fa-chart-bar"></i> Statistiques
+            </a>
+        </div>
+
+        <!-- Tableau des activités -->
+        <div class="table-responsive">
+            <table class="table align-middle table-striped shadow-sm">
+                <thead class="bg-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Utilisateur</th>
+                        <th>Action</th>
+                        <th>Date</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in activities %}
+                        <tr>
+                            <td>{{ activity.id }}</td>
+                            <td>{{ activity.user.email }}</td>
+                            <td>
+                                <span class="badge bg-info text-dark">
+                                    <i class="fas fa-edit"></i> {{ activity.action }}
+                                </span>
+                            </td>
+                            <td>{{ activity.date|date('d/m/Y H:i') }}</td>
+                            <td class="text-center">
+                                <!-- Bouton Modifier -->
+                                <a href="{{ path('admin_activity_edit', {id: activity.id}) }}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <!-- Bouton Supprimer -->
+                                <a href="{{ path('admin_activity_delete', {id: activity.id}) }}" class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Voulez-vous vraiment supprimer cette activité ?');">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">Aucune activité trouvée.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

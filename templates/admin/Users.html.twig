@@ -1,29 +1,47 @@
 {% extends 'baseBack.html.twig' %}
 
 {% block content %}
-<div class="mb-3 text-center">
-    <h2>Gestion des utilisateurs</h2>
-    <a href="{{ path('user_add') }}" class="btn btn-success btn-sm">Ajouter un utilisateur</a>
-</div>
+<div class="container mt-4">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Gestion des utilisateurs</h2>
+        <a href="{{ path('user_add') }}" class="btn btn-success">
+            <i class="fas fa-user-plus"></i> Ajouter un utilisateur
+        </a>
+    </div>
 
-<table class="table table-bordered table-sm text-center">
-    <thead class="table-dark">
-        <tr>
-            <th>ID</th>
-            <th>Nom</th>
-            <th>Email</th>
-            <th>Rôle</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for user in users %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Identifiant</th>
+                        <th>Prénom</th>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+             <tbody>
+    {% for user in users %}
+        {% if user.email != 'wefarmapplication@gmail.com' %}
             <tr>
                 <td>{{ user.id }}</td>
-                <td>{{ user.firstName ~ ' ' ~ user.lastName }}</td>
+                <td>{{ user.lastName }}</td>
+                <td>{{ user.firstName }}</td>
                 <td>{{ user.email }}</td>
-                <td>{{ user.roles|join(', ') }}</td>
+                <td>
+                    {% set roleMapping = {
+                        'ROLE_ADMIN': 'Administrateur',
+                        'ROLE_USER': 'Utilisateur',
+                        'ROLE_AGRICULTEUR': 'Agriculteur',
+                        'ROLE_EMPLOYE': 'Employé',
+                        'ROLE_FOURNISSEUR': 'Fournisseur',
+                        'ROLE_CLIENT': 'Client',
+                    } %}
+                    {{ user.roles|map(r => roleMapping[r] | default(r)) | join(', ') }}
+                </td>
                 <td>
                     {% if user.status == 'actif' %}
                         <span class="badge bg-success">Actif</span>
@@ -33,23 +51,36 @@
                 </td>
                 <td>
                     <div class="btn-group">
-                        <a href="{{ path('user_show', { 'id': user.id }) }}" class="btn btn-light btn-sm">Détails</a>
-                        <a href="{{ path('user_edit', { 'id': user.id }) }}" class="btn btn-warning btn-sm">Modifier</a>
-                        <a href="{{ path('user_delete', { 'id': user.id }) }}" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cet utilisateur ?');">Supprimer</a>
-
+                        <a href="{{ path('user_show', { 'id': user.id }) }}" class="btn btn-outline-primary btn-sm" title="Détails">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ path('user_edit', { 'id': user.id }) }}" class="btn btn-outline-warning btn-sm" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form action="{{ path('user_delete', { 'id': user.id }) }}" method="post" style="display:inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer" onclick="return confirm('Voulez-vous vraiment supprimer cet utilisateur ?');">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
                         {% if user.status == 'actif' %}
-                            <a href="{{ path('user_disable', { 'id': user.id }) }}" class="btn btn-secondary btn-sm">Désactiver</a>
+                            <a href="{{ path('user_disable', { 'id': user.id }) }}" class="btn btn-outline-secondary btn-sm" title="Désactiver">
+                                <i class="fas fa-user-slash"></i>
+                            </a>
                         {% else %}
-                            <a href="{{ path('user_enable', { 'id': user.id }) }}" class="btn btn-success btn-sm">Activer</a>
+                            <a href="{{ path('user_enable', { 'id': user.id }) }}" class="btn btn-outline-success btn-sm" title="Activer">
+                                <i class="fas fa-user-check"></i>
+                            </a>
                         {% endif %}
                     </div>
                 </td>
             </tr>
-        {% else %}
-            <tr>
-                <td colspan="6" class="text-center">Aucun utilisateur trouvé.</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        {% endif %}
+    {% endfor %}
+</tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

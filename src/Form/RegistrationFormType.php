@@ -28,7 +28,7 @@ class RegistrationFormType extends AbstractType
         ->add('image', FileType::class, [
             'label' => 'Photo de profil',
             'mapped' => false,
-            'required' => true, // Obligatoire
+            'required' => true, 
             'attr' => ['class' => 'form-control'],
             'constraints' => [
                 new NotBlank(['message' => 'Veuillez ajouter une image.']),
@@ -49,12 +49,12 @@ class RegistrationFormType extends AbstractType
             ->add('dateNaissance', DateType::class, [
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd',
-                'required' => false, // Facultatif
+                'required' => false,
                 'attr' => ['class' => 'form-control shadow-sm rounded-pill'],
                 'label' => 'Date de naissance',
-                'data' => new \DateTime(), // Définit une date par défaut (aujourd'hui)
-                'invalid_message' => 'La date de fin estimée doit être une date valide.',
-            ])
+                'data' => new \DateTime(), 
+
+                ])
             
 
             ->add('adresse', TextType::class, [
@@ -87,16 +87,20 @@ class RegistrationFormType extends AbstractType
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,
                 'constraints' => [
-                    new NotBlank([
+                    new Assert\NotBlank([
                         'message' => 'Veuillez entrer un mot de passe',
                     ]),
-                    new Length([
+                    new Assert\Length([
                         'min' => 8,
                         'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
-                        // max length allowed by Symfony for security reasons
                         'max' => 4096,
                     ]),
+                    new Assert\Regex([
+                        'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/',
+                        'message' => 'Votre mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.',
+                    ]),
                 ],
+                'attr' => ['class' => 'form-control']
             ]);
     }
 

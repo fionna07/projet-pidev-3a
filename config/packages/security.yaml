@@ -26,22 +26,23 @@ security:
             logout:
                 path: app_logout
                 target: app_login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800 # 1 semaine
+                path: /
+                always_remember_me: true  # Si l'utilisateur coche "se souvenir de moi" par défaut
             
 
 
 
-            remember_me:
-                secret: '%kernel.secret%'
-                lifetime: 604800
-                path: /
+            
                     # by default, the feature is enabled by checking a checkbox in the
                     # login form, uncomment the following line to always enable it.
                     #always_remember_me: true
 
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/profile, roles: ROLE_USER }  # 🔹 Accès réservé aux utilisateurs connectés
-
+        - { path: ^/profile, roles: [ROLE_FOURNISSEUR, ROLE_CLIENT, ROLE_EMPLOYEE, ROLE_AGRICULTEUR,ROLE_USER] }
 when@test:
     security:
         password_hashers:

@@ -13,12 +13,22 @@
             <link rel="preconnect" href="https://fonts.googleapis.com" />
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
             <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Inter:wght@700;800&display=swap" rel="stylesheet" />
+            
+              <!--Farah-->
+              <!-- Bootstrap CSS -->
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
 
-         
+        
+
         {% block stylesheets %}
+         <!--Farah-->
+              <!-- Bootstrap CSS -->
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
             <!-- Icon Font Stylesheet -->
             <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet" />
             <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
+             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
             <!-- Libraries Stylesheet -->
             <link href="{{asset('lib/animate/animate.min.css')}}" rel="stylesheet" />
@@ -57,11 +67,9 @@
           <script src="{{asset('lib/easing/easing.min.js')}}"></script>
           <script src="{{asset('lib/waypoints/waypoints.min.js')}}"></script>
           <script src="{{asset('lib/owlcarousel/owl.carousel.min.js')}}"></script>
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-           <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-          <!-- Template Javascript -->
-          <script src="{{asset('js/main.js')}}"></script>
+      
         
         {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
@@ -84,31 +92,39 @@
               <a href="{{path('app_about')}}" class="nav-item nav-link">À propos</a>
               <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Services</a>
-                <div class="dropdown-menu rounded-0 m-0">
-                  <a href="farms.html" class="dropdown-item">Market Place</a>
-                  <a href="equipment.html" class="dropdown-item">Équipements</a>
-                  <a href="offreEmploi.html" class="dropdown-item">Offres d'emploi</a>
-                  <a href="events.html" class="dropdown-item">Événements</a>
-                  
-                </div>
+                {% if app.user %}
+   
+                  <div class="dropdown-menu rounded-0 m-0">
+                      <a href="farms.html" class="dropdown-item">Market Place</a>
+                      <a href="equipment.html" class="dropdown-item">Équipements</a>
+                      <a href="offreEmploi.html" class="dropdown-item">Offres d'emploi</a>
+                      <a href="events.html" class="dropdown-item">Événements</a>
+                  </div>
+              
+          {% endif %}
+
               </div>
               <a href="{{path('app_contact')}}" class="nav-item nav-link">Contact</a>
             </div>
                 {% if app.user %}
-                    <div class="d-flex align-items-center gap-2">
-                        <!-- Mon Profil (Marron) - Réduit -->
-                        <a href="{{ path('app_userprofile') }}" class="fw-bold text-white bg-brown py-1 px-2 rounded small">
-                            Mon profil
-                        </a>
+                   <div class="d-flex align-items-center gap-3">
+    <!-- Mon Profil (Marron-like) -->
+   <a href="{{ path('app_userprofile') }}" class="fw-bold text-white bg-warning py-2 px-3 rounded-pill shadow-sm d-flex align-items-center">
+    <i class="fa fa-user me-2"></i>Mon profil
+</a>
 
-                        <!-- Barre de séparation -->
-                        <div class="border-start border-2" style="height: 15px;"></div>
 
-                        <!-- Déconnexion (Orange) - Réduit -->
-                        <a href="{{ path('app_logout') }}" class="text-white bg-orange py-1 px-2 rounded small">
-                            <i class="fa fa-power-off"></i>
-                        </a>
-                    </div>
+    <!-- Barre de séparation -->
+    <div class="border-start border-2" style="height: 18px; margin-top: 5px;"></div>
+
+    <!-- Déconnexion (Orange) -->
+  <a href="{{ path('app_logout') }}" class="text-dark py-2 px-3 rounded-pill d-flex align-items-center">
+    <i class="fa fa-power-off me-2"></i>
+</a>
+
+
+</div>
+
                 {% else %}
                     <!-- Bouton Se connecter (Vert) - Taille normale -->
                     <a href="{{ path('app_login') }}" class="btn btn-success rounded-0 py-3 px-4 fw-bold text-white">
