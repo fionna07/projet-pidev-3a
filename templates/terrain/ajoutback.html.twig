@@ -1,0 +1,126 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Gestion des Terrains{% endblock %}
+
+{% block content %}
+    
+
+    <div class="container-fluid">
+        <div class="container mt-4">
+            <h1 class="h3 mb-4 text-gray-800">Liste des Terrains</h1>
+
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <!-- Bouton pour accéder à la page d'ajout -->
+                    <a href="{{ path('app_terrain_new') }}" class="btn btn-primary mb-3">
+                        <i class="fas fa-plus-circle mr-2"></i>Ajouter un Terrain
+                    </a>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead class="bg-light">
+    <tr>
+        <th>Photo</th>
+        <th>Adresse</th>
+        <th>Surface (m²)</th>
+        <th>Type de Sol</th>
+        <th>Prix (TND)</th>
+        <th>Statut</th>
+        <th>Propriétaire</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+        <th>Actions</th>
+    </tr>
+</thead>
+<tbody>
+    {% for terrain in terrains %}
+        <tr>
+            <!-- Affichage de la photo -->
+            <td>
+                {% if terrain.photos %}
+                    <img src="{{ asset('uploads/terrains/' ~ terrain.photos) }}" 
+                         alt="Photos du terrain" 
+                         class="img-thumbnail" 
+                         style="width: 80px; height: 80px; object-fit: cover;">
+                {% else %}
+                    <span class="text-muted">Aucune image</span>
+                {% endif %}
+            </td>
+            <td>{{ terrain.adresse }}</td>
+            <td>{{ terrain.surface|number_format(2, ',', ' ') }}</td>
+            
+            <!-- Affichage du type de sol avec badge coloré -->
+            <td>
+                <span class="badge 
+                    {% if terrain.typeSol == 'argileux' %}badge-danger
+                    {% elseif terrain.typeSol == 'sablonneux' %}badge-warning
+                    {% elseif terrain.typeSol == 'limoneux' %}badge-success
+                    {% else %}badge-secondary{% endif %}">
+                    {{ terrain.typeSol }}
+                </span>
+            </td>
+            
+            <td>{{ terrain.prix|number_format(2, ',', ' ') }}</td>
+            <td>
+                <span class="badge badge-{{ terrain.status == 'disponible' ? 'success' : 'warning' }}">
+                    {{ terrain.status }}
+                </span>
+            </td>
+            <td>{{ terrain.proprietaire ?: 'Non attribué' }}</td>
+            <td>{{ terrain.latitude|number_format(6, ',', ' ') }}</td>
+            <td>{{ terrain.longitude|number_format(6, ',', ' ') }}</td>
+            <td>
+                <div class="btn-group">
+                    <a href="{{ path('app_terrain_edit', {'id': terrain.id}) }}" 
+                       class="btn btn-sm btn-primary"
+                       data-toggle="tooltip" 
+                       title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form method="post" 
+                          action="{{ path('app_terrain_delete', {'id': terrain.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ terrain.id) }}">
+                        <button class="btn btn-sm btn-danger ml-2" 
+                                data-toggle="tooltip" 
+                                title="Supprimer"
+                                onclick="return confirm('Êtes-vous sûr ?')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="10" class="text-center text-muted py-4">
+                <i class="fas fa-exclamation-circle mr-2"></i>Aucun terrain trouvé
+            </td>
+        </tr>
+    {% endfor %}
+</tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+   
+    <script>
+        $(document).ready(function() {
+            // Initialisation DataTable uniquement
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/French.json"
+                },
+                "order": [[3, "desc"]],
+                "columnDefs": [
+                    { "orderable": false, "targets": 8 }
+                ]
+            });
+        });
+    </script>
+{% endblock %}
