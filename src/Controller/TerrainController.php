@@ -67,7 +67,7 @@ class TerrainController extends AbstractController
             if ($photoFile) {
                 $uploadsDirectory = $this->getParameter('terrain_images_directory');
                 $newFilename = uniqid().'.'.$photoFile->guessExtension();
-
+  
                 try {
                     $photoFile->move($uploadsDirectory, $newFilename);
                     $terrain->setPhotos($newFilename);
@@ -75,6 +75,13 @@ class TerrainController extends AbstractController
                     $this->addFlash('error', "L'upload de la photo a échoué.");
                 }
             }
+            /*else {
+                // Si le formulaire est soumis et non valide, on reste sur la même page
+                // Les erreurs seront disponibles dans $form
+                return $this->render('terrain/new.html.twig', [
+                    'form' => $form->createView(),
+                ]);
+            }*/
 
             $em->persist($terrain);
             $em->flush();
@@ -155,6 +162,49 @@ class TerrainController extends AbstractController
             'terrains' => $terrainRepository->findAll(),
         ]);
     }
+
+
+
+    // ...
+#[Route('/newfront', name: 'app_terrain_newfront', methods: ['GET', 'POST'])]
+public function newFront(Request $request, EntityManagerInterface $em): Response
+{
+    $terrain = new Terrain();
+    $form = $this->createForm(TerrainType::class, $terrain);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Vérification des coordonnées
+        if (!$terrain->getLatitude() || !$terrain->getLongitude()) {
+            $terrain->setLatitude(48.8566);
+            $terrain->setLongitude(2.3522);
+            $this->addFlash('warning', 'Les coordonnées n\'ont pas été choisies, valeurs par défaut (Paris) utilisées.');
+        }
+
+        // Gestion de l'upload d'image
+        $photoFile = $form->get('photos')->getData();
+        if ($photoFile) {
+            $uploadsDirectory = $this->getParameter('terrain_images_directory');
+            $newFilename = uniqid().'.'.$photoFile->guessExtension();
+
+            try {
+                $photoFile->move($uploadsDirectory, $newFilename);
+                $terrain->setPhotos($newFilename);
+            } catch (FileException $e) {
+                $this->addFlash('error', "L'upload de la photo a échoué.");
+            }
+        }
+
+        $em->persist($terrain);
+        $em->flush();
+        return $this->redirectToRoute('terrain_front'); // Par exemple, vers la page front-office des terrains
+    }
+
+    return $this->render('terrain/newfront.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
+
     
     
 }

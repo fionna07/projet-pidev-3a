@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Entity;
 
 use App\Repository\TransactionRepository;
@@ -14,47 +13,47 @@ class Transaction
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    // Le champ 'type' reste une chaîne de caractères
+    #[ORM\Column(type: "string", length: 50)]
     private ?string $type = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateTransaction = null;
 
     #[ORM\Column]
-    private ?float $prixTransaction = null;
+    private ?float $montant = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $etat = null;
-
-    #[ORM\ManyToOne(inversedBy: 'terrain')]
-    private ?Terrain $terrain = null;
-
-    #[ORM\ManyToOne(inversedBy: 'client')]
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $client = null;
 
-    #[ORM\ManyToOne(inversedBy: 'agri')]
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $agriculteur = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $conversation = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Terrain $terrain = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    // Getter pour récupérer le 'type' comme une chaîne de caractères
     public function getType(): ?string
     {
         return $this->type;
     }
 
+    // Setter pour définir le 'type' en tant que chaîne
     public function setType(string $type): static
     {
         $this->type = $type;
-
         return $this;
     }
 
+ 
     public function getDateTransaction(): ?\DateTimeInterface
     {
         return $this->dateTransaction;
@@ -63,43 +62,18 @@ class Transaction
     public function setDateTransaction(\DateTimeInterface $dateTransaction): static
     {
         $this->dateTransaction = $dateTransaction;
-
         return $this;
     }
+  
 
-    public function getPrixTransaction(): ?float
+    public function getMontant(): ?float
     {
-        return $this->prixTransaction;
+        return $this->montant;
     }
 
-    public function setPrixTransaction(float $prixTransaction): static
+    public function setMontant(float $montant): static
     {
-        $this->prixTransaction = $prixTransaction;
-
-        return $this;
-    }
-
-    public function getEtat(): ?string
-    {
-        return $this->etat;
-    }
-
-    public function setEtat(string $etat): static
-    {
-        $this->etat = $etat;
-
-        return $this;
-    }
-
-    public function getTerrain(): ?Terrain
-    {
-        return $this->terrain;
-    }
-
-    public function setTerrain(?Terrain $terrain): static
-    {
-        $this->terrain = $terrain;
-
+        $this->montant = $montant;
         return $this;
     }
 
@@ -111,7 +85,6 @@ class Transaction
     public function setClient(?Utilisateur $client): static
     {
         $this->client = $client;
-
         return $this;
     }
 
@@ -123,19 +96,17 @@ class Transaction
     public function setAgriculteur(?Utilisateur $agriculteur): static
     {
         $this->agriculteur = $agriculteur;
-
         return $this;
     }
 
-    public function getConversation(): ?string
+    public function getTerrain(): ?Terrain
     {
-        return $this->conversation;
+        return $this->terrain;
     }
 
-    public function setConversation(string $conversation): static
+    public function setTerrain(?Terrain $terrain): static
     {
-        $this->conversation = $conversation;
-
+        $this->terrain = $terrain;
         return $this;
     }
 }

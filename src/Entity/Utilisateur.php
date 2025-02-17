@@ -40,12 +40,15 @@ class Utilisateur
     #[ORM\Column(length: 255)]
     private ?string $image = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
+    #[ORM\Column(type:'json')]
     private array $role = [];
 
     #[ORM\Column(length: 255)]
     private ?string $adresse = null;
-
+    public function getNom(): ?string
+    {
+        return $this->firstName;
+    }
     /**
      * @var Collection<int, Terrain>
      */

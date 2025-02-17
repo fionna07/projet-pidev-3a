@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une Transaction{% endblock %}
+
+{% block body %}
+    <h1>Créer une Transaction</h1>
+
+    {{ form_start(form) }}
+    
+    <!-- Affichage des erreurs globales du formulaire -->
+    {% for error in form.vars.errors %}
+        <div class="alert alert-danger">{{ error.message }}</div>
+    {% endfor %}
+
+    <div class="form-group">
+        {{ form_label(form.client, 'Client') }}
+        {{ form_widget(form.client, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.client) }}
+    </div>
+  <div class="form-group">
+        {{ form_label(form.type, 'Type') }}
+        {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.type) }}
+    </div>
+
+
+    <div class="form-group">
+        {{ form_label(form.montant, 'Montant') }}
+        {{ form_widget(form.montant, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.montant) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.dateTransaction, 'Date de la Transaction') }}
+        {{ form_widget(form.dateTransaction, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.dateTransaction) }}
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Créer</button>
+    </div>
+
+    {{ form_end(form) }}
+{% endblock %}

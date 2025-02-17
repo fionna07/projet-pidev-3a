@@ -4,7 +4,13 @@
 
 {% block body %}
 <div class="container my-4">
-    <h1 class="text-center mb-4">Nos Terrains</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-center">Nos Terrains</h1>
+        <!-- Bouton pour ajouter un terrain -->
+        <a href="{{ path('app_terrain_newfront') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle mr-2"></i>Ajouter un terrain
+        </a>
+    </div>
     <div class="row">
         {% for terrain in terrains %}
             <div class="col-md-4 mb-4">
@@ -40,7 +46,6 @@
                         </p>
                     </div>
                     <div class="card-footer text-center">
-                        
                         <a href="{{ path('app_terrain_edit', {'id': terrain.id}) }}" class="btn btn-primary btn-sm">
                             Modifier
                         </a>
@@ -48,6 +53,30 @@
                             <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ terrain.id) }}">
                             <button class="btn btn-danger btn-sm" type="submit">Supprimer</button>
                         </form>
+                        <!-- Bouton pour ouvrir le modal de création de transaction -->
+                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#transactionModal{{ terrain.id }}">
+                            Faire Action
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {# Modal pour la transaction pour ce terrain #}
+            <div class="modal fade" id="transactionModal{{ terrain.id }}" tabindex="-1" role="dialog" aria-labelledby="transactionModalLabel{{ terrain.id }}" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="transactionModalLabel{{ terrain.id }}">
+                                Créer une Transaction pour {{ terrain.adresse }}
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            {# Inclusion du formulaire de transaction en passant la variable terrain #}
+                            {% include 'transaction/transac.html.twig' with { 'terrain': terrain } %}
+                        </div>
                     </div>
                 </div>
             </div>
