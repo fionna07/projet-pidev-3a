@@ -3,22 +3,363 @@
 {% block title %}Profil de {{ UserDetail.firstName }} {{ UserDetail.lastName }}{% endblock %}
 
 {% block body %}
-    <h1>Profil de {{ UserDetail.firstName }} {{ UserDetail.lastName }}</h1>
+{% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
 
-    <div class="profile-info">
-        <p><strong>Email :</strong> {{ UserDetail.email }}</p>
-        <p><strong>Prénom :</strong> {{ UserDetail.firstName }}</p>
-        <p><strong>Nom :</strong> {{ UserDetail.lastName }}</p>
-        <p><strong>Date de naissance :</strong> {{ UserDetail.dateNaissance|date('d-m-Y') }}</p>
-        <p><strong>Adresse :</strong> {{ UserDetail.adresse }}</p>
-        <p><strong>Numéro de téléphone :</strong> {{ UserDetail.numTel }}</p>
-        
-        {% if UserDetail.image %}
-            <p><strong>Image :</strong><br><img src="{{ asset('images/' ~ UserDetail.image) }}" alt="Image de profil" style="width: 150px; height: 150px;"></p>
-        {% else %}
-            <p><strong>Image :</strong> Aucun profil image disponible.</p>
-        {% endif %}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+<div class="container mt-5">
+    <div class="card shadow-lg rounded-lg p-5">
+        <div class="row">
+
+            <!-- 📌 Partie Gauche : Photo de Profil + Statut -->
+            <div class="col-md-4 text-center">
+                {# Vérifie si l'utilisateur a une image #}
+                {% if UserDetail.image %}
+                    <img src="{{ asset(UserDetail.image) }}" alt="Photo de profil"
+                         class="rounded-circle border border-primary shadow-lg mb-4" width="200" height="200">
+                {% else %}
+                    <img src="{{ asset('uploads/default-profile.png') }}" alt="Photo par défaut"
+                         class="rounded-circle border border-primary shadow-lg mb-4" width="200" height="200">
+                {% endif %}
+
+                <!-- ✅ Statut du compte -->
+                <div class="mt-3">
+                    {% if UserDetail.status %}
+                        <span class="badge bg-success"><i class="fas fa-check-circle"></i> Actif</span>
+                    {% else %}
+                        <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Inactif</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- 📌 Partie Droite : Informations Utilisateur -->
+            <div class="col-md-8">
+                <h2 class="text-dark">{{ UserDetail.firstName|title  }} {{ UserDetail.lastName|title }}</h2>
+                <p class="text-muted mb-3"><i class="fas fa-envelope"></i> {{ UserDetail.email }}</p>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Date de naissance :</strong> {{ UserDetail.dateNaissance|date('d/m/Y') }}</p>
+                        <p><strong>Adresse :</strong> {{ UserDetail.adresse }}</p>
+                        <p><strong>Téléphone :</strong> {{ UserDetail.numTel }}</p>
+                    </div>
+                </div>
+                
+
+                <!-- 📌 Boutons d'actions -->
+                <div class="d-flex justify-content-end mt-4">
+                <!-- Bouton Modifier -->
+                <button class="btn btn-outline-warning me-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                    <i class="fas fa-edit"></i> Modifier
+                </button>
+
+
+                    <!-- Bouton Désactiver avec couleur marron -->
+                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#disableAccountModal">
+                        Désactiver
+                    </button>
+
+                    <!-- Bouton Supprimer avec couleur orange -->
+                    <a href="{{ path('app_delete_account') }}" class="btn btn-outline-warning ms-2">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </a>
+                </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+<div class="container mt-5">
+    <div class="row">
+        <!-- Section des cartes de profil à gauche -->
+        <div class="col-md-8">
+            <div class="row text-center">
+                <!-- Card 1 : Suivi des cultures -->
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm border-light rounded p-3">
+                        <i class="fas fa-seedling fa-3x text-success mb-3"></i>
+                        <h5 class="card-title text-dark">Suivi des cultures</h5>
+                        <p class="card-text text-muted">Suivez la croissance de vos cultures grâce à des outils d'analyse intelligents.</p>
+                    </div>
+                </div>
+
+                <!-- Card 2 : Gestion des ressources -->
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm border-light rounded p-3">
+                        <i class="fas fa-tint fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title text-dark">Gestion des ressources</h5>
+                        <p class="card-text text-muted">Optimisez l'utilisation de l'eau et des ressources naturelles avec des systèmes intelligents.</p>
+                    </div>
+                </div>
+
+                <!-- Card 3 : Prévisions météorologiques -->
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm border-light rounded p-3">
+                        <i class="fas fa-cloud-sun fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title text-dark">Prévisions météorologiques</h5>
+                        <p class="card-text text-muted">Recevez des alertes météo précises pour planifier vos activités agricoles.</p>
+                    </div>
+                </div>
+
+                <!-- Card 4 : Marché des produits -->
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm border-light rounded p-3">
+                        <i class="fas fa-leaf fa-3x text-info mb-3"></i>
+                        <h5 class="card-title text-dark">Marché des produits</h5>
+                        <p class="card-text text-muted">Accédez à une plateforme pour vendre vos produits directement aux consommateurs.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section affichée à droite des cartes (par exemple, un panneau latéral avec des fonctionnalités supplémentaires) -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-light rounded p-3">
+                <h5 class="text-dark">Fonctionnalités supplémentaires</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Partage de bonnes pratiques
+                        <i class="fas fa-share-alt text-success"></i>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Suivi des performances
+                        <i class="fas fa-chart-line text-danger"></i>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Agriculture de précision
+                        <i class="fas fa-wrench text-primary"></i>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Éducation et formations
+                        <i class="fas fa-book text-info"></i>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
+</div>
 
-    <a href="{{ path('app_edit_profile') }}" class="btn btn-primary">Modifier le profil</a>
+
+
+<!-- MODAL : Modification du profil -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white d-flex align-items-center p-3 border-bottom">
+            <h5 class="modal-title fw-bold mb-0 text-white" id="editProfileModalLabel">Modifier mon profil</h5>
+                <button type="button" class="btn-close ms-auto p-2" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-light p-4">
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+                {% for message in app.flashes('error') %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+
+                <!-- Section de l'image de profil -->
+                <div class="text-center mb-4">
+                    <label for="imageUpload" class="cursor-pointer">
+                        <img id="imagePreview" src="{{ UserDetail.image ? UserDetail.image : asset('img/default-avatar.png') }}" class="rounded-circle img-thumbnail border border-2 border-primary shadow-sm" style="width: 150px; height: 150px; object-fit: cover;" alt="Image de profil">
+                    </label>
+                    <input type="file" class="d-none" id="imageUpload" name="{{ form.image.vars.full_name }}" accept="image/*" onchange="previewImage(this)">
+                    {{ form_widget(form.image, {'attr': {'class': 'd-none'}}) }}
+                    <div class="text-danger small">{{ form_errors(form.image) }}</div>
+                </div>
+
+                <!-- Section des informations personnelles -->
+                <div class="row mb-3">
+                    <h6 class="text-muted fw-bold mb-2">Informations personnelles</h6>
+                    <div class="col-md-6">
+                        {{ form_label(form.firstName, 'Prénom') }}
+                        {{ form_widget(form.firstName, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                        <div class="text-danger small">{{ form_errors(form.firstName) }}</div>
+
+                        {{ form_label(form.lastName, 'Nom') }}
+                        {{ form_widget(form.lastName, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                        <div class="text-danger small">{{ form_errors(form.lastName) }}</div>
+
+                        {{ form_label(form.dateNaissance, 'Date de naissance') }}
+                        {{ form_widget(form.dateNaissance, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                        <div class="text-danger small">{{ form_errors(form.dateNaissance) }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_label(form.email, 'Adresse e-mail') }}
+                        {{ form_widget(form.email, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                        <div class="text-danger small">{{ form_errors(form.email) }}</div>
+
+                        {{ form_label(form.numTel, 'Numéro de téléphone') }}
+                        {{ form_widget(form.numTel, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                        <div class="text-danger small">{{ form_errors(form.numTel) }}</div>
+
+                        {{ form_label(form.adresse, 'Adresse') }}
+                        {{ form_widget(form.adresse, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                        <div class="text-danger small">{{ form_errors(form.adresse) }}</div>
+                    </div>
+                </div>
+
+                <!-- Section du mot de passe -->
+                <div class="form-group mb-4">
+                    <div class="form-check d-flex align-items-center">
+                        <label for="changer_mdp" class="form-check-label text-success me-2" data-bs-toggle="collapse" href="#password-collapse" role="button" aria-expanded="false" aria-controls="password-collapse">
+                            <i class="fas fa-lock"></i> Changer mon mot de passe
+                        </label>
+                        <i class="fas fa-chevron-down" id="password-toggle-icon"></i>
+                    </div>
+                </div>
+
+                <div class="collapse" id="password-collapse">
+                    <div class="border rounded p-3 mt-2 shadow-sm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nouveau mot de passe</label>
+                            {{ form_widget(form.password, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                            <div class="text-danger small">{{ form_errors(form.password) }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Confirmer le mot de passe</label>
+                            {{ form_widget(form.confirmPassword, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                            <div class="text-danger small">{{ form_errors(form.confirmPassword) }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end mt-4">
+                    <button type="submit" class="btn btn-success btn-lg rounded-pill shadow-sm">Sauvegarder</button>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour choisir la durée -->
+<div class="modal fade" id="disableAccountModal" tabindex="-1" aria-labelledby="disableAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="disableAccountModalLabel">Désactiver mon compte</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+      <div class="modal-body">
+                <form id="disableAccountForm" method="POST" action="{{ path('app_disable_account') }}">
+                <label for="duration">Combien de temps souhaitez-vous désactiver votre compte ?</label>
+                <select class="form-control" name="duration" id="duration">
+                <option value="1">1 jour</option>
+                <option value="7">1 semaine</option>
+                <option value="30">1 mois</option>
+                <option value="permanent">Indéfiniment</option>
+                </select>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('disable_account') }}">
+            </form>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+               <a href="{{ path('app_login') }}" class="btn btn-danger" role="button">Confirmer</a>
+     
+
+            </div>
+         </div>
+        </div>
+    </div>
+</div>
+<!-- Script pour l'aperçu de l'image -->
+<script>
+    function previewImage(input) {
+        const preview = document.getElementById('imagePreview');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+  
+    document.addEventListener('DOMContentLoaded', () => {
+        const imagePreview = document.getElementById('imagePreview');
+        const imageUpload = document.getElementById('imageUpload');
+
+        if (imagePreview && imageUpload) {
+            imagePreview.addEventListener('click', () => {
+                imageUpload.click();
+            });
+        }
+    });
+    </script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggleButton = document.querySelector('[href="#password-collapse"]');
+    const icon = document.getElementById('password-toggle-icon');
+    const collapseSection = document.getElementById('password-collapse');
+
+    if (toggleButton && icon && collapseSection) {
+        // Gérer le clic sur le bouton principal
+        toggleButton.addEventListener('click', () => {
+      
+            const isCollapsed = toggleButton.getAttribute('aria-expanded') === 'false';
+            icon.classList.toggle('fa-chevron-up', !isCollapsed); 
+            icon.classList.toggle('fa-chevron-down', isCollapsed); 
+        });
+
+        icon.addEventListener('click', (event) => {
+            event.stopPropagation(); 
+        
+            if (collapseSection.classList.contains('show')) {
+            
+                toggleButton.setAttribute('aria-expanded', 'false');
+                collapseSection.classList.remove('show');
+                icon.classList.remove('fa-chevron-up'); 
+                icon.classList.add('fa-chevron-down'); 
+            } else {
+               
+                toggleButton.setAttribute('aria-expanded', 'true');
+                collapseSection.classList.add('show');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up'); 
+            }
+        });
+    }
+});
+ </script>
+ <!-- JavaScript pour faire disparaître les messages flash après un délai -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Sélectionner les messages de succès et d'erreur
+            const successMessages = document.querySelectorAll('.alert-success');
+            const errorMessages = document.querySelectorAll('.alert-danger');
+
+            // Fonction pour faire disparaître les messages après 3 secondes
+            successMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+
+            errorMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+        });
+    </script>   
+
 {% endblock %}
+

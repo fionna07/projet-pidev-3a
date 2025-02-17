@@ -10,13 +10,15 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 #[UniqueEntity(fields: ['email'], message: 'Un compte existe déjà avec cet email.')]
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
-class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
+
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -29,6 +31,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     
     #[ORM\Column(type: 'json')]
+    #[Assert\NotBlank(message: 'Veuillez choisir un role.')]
     private array $roles = [];
 
     #[ORM\Column(length: 255)]
@@ -46,7 +49,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $password = null;
     
-    #[ORM\Column(type: 'string', length: 100, unique: true)]
+    #[ORM\Column(type: 'string', length: 100)]
     #[Assert\NotBlank(message: 'Le prénom est obligatoire.')]
     #[Assert\Regex(
         pattern: '/^[a-zA-ZÀ-ÿ\s\-]+$/',
@@ -54,7 +57,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     private ?string $firstName = null;
 
-    #[ORM\Column(type: 'string', length: 100, unique: true)]
+    #[ORM\Column(type: 'string', length: 100)]
     #[Assert\NotBlank(message: 'Le nom est obligatoire.')]
     #[Assert\Regex(
         pattern: '/^[a-zA-ZÀ-ÿ\s\-]+$/',
@@ -73,7 +76,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)] 
     private ?string $image = null;
     
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: "datetime", nullable: false)]
     private ?\DateTimeInterface $dateCreation = null;
 
     #[ORM\Column(length: 255)]
@@ -84,8 +87,20 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
      
     #[ORM\Column(length:225)]
     private $confirmationToken;
-
-    // ... autres getters et setters
+  
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $reactivationDate = null;
+    
+    public function getReactivationDate(): ?\DateTimeInterface
+    {
+        return $this->reactivationDate;
+    }
+    
+    public function setReactivationDate(?\DateTimeInterface $reactivationDate): self
+    {
+        $this->reactivationDate = $reactivationDate;
+        return $this;
+    }
 
     public function getConfirmationToken(): ?string
     {
@@ -103,6 +118,15 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->id;
     }
+    public function isEqualTo(UserInterface $user): bool
+    {
+        if (!$user instanceof self) {
+            return false;
+        }
+    
+        return $this->getId() === $user->getId();
+    }
+    
 
     public function getEmail(): ?string
     {
@@ -129,11 +153,8 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // S'assurer que ROLE_USER est toujours présent
-        if (!in_array('ROLE_USER', $roles, true)) {
-        $roles[] = 'ROLE_USER';
-           }
-           return $roles;
+    $roles[] = 'ROLE_USER'; 
+    return array_unique($roles);
     
    }
 
@@ -226,16 +247,14 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
     public function getDateCreation(): ?\DateTimeInterface
     {
         return $this->dateCreation;
     }
-
-    public function setDateCreation(\DateTimeInterface $dateCreation): static
+    
+    public function setDateCreation(?\DateTimeInterface $dateCreation): self
     {
         $this->dateCreation = $dateCreation;
-
         return $this;
     }
 
@@ -262,7 +281,67 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-      /**
+    #[ORM\OneToMany(targetEntity: Activites::class, mappedBy: "utilisateur", cascade: ["persist", "remove"])]
+    private Collection $activites;
+    
+
+
+public function getActivites(): Collection
+{
+    return $this->activites;
+}
+
+public function addActivite(Activites $activite): self
+{
+    if (!$this->activites->contains($activite)) {
+        $this->activites->add($activite);
+        $activite->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeActivite(Activites $activite): self
+{
+    if ($this->activites->removeElement($activite)) {
+        if ($activite->getUser() === $this) {
+            $activite->setUser(null);
+        }
+    }
+
+    return $this;
+}
+  
+
+    #[ORM\Column(type: 'integer')]
+    #[Assert\NotBlank(message: 'Le numéro de téléphone est obligatoire.')]
+    #[Assert\Regex(
+        pattern: '/^[259]\d{7}$/',
+        message: 'Le numéro de téléphone doit commencer par 2, 5 ou 9 et contenir 8 chiffres.'
+    )]
+    private ?int $numTel = null;
+    
+    public function getNumTel(): ?int
+    {
+        return $this->numTel;
+    }
+
+    public function setNumTel(int $numTel): static
+    {
+        $this->numTel = $numTel;
+
+        return $this;
+    }
+    public function __construct()
+    {
+        $this->agriculteur = new ArrayCollection();
+        $this->client = new ArrayCollection();
+        $this->agri = new ArrayCollection();
+        $this->offreEmplois = new ArrayCollection();
+        $this->dateCreation = new \DateTime(); // Définit la date actuelle
+        $this->activites = new ArrayCollection();
+    }
+        /**
      * @return Collection<int, Terrain>
      */
     public function getAgriculteur(): Collection
@@ -314,21 +393,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToMany(targetEntity: OffreEmploi::class, mappedBy: 'user')]
     private Collection $offreEmplois;
-
-    #[ORM\Column(type: 'string', length: 15, unique: true)]
-    #[Assert\NotBlank(message: 'Le numéro de téléphone est obligatoire.')]
-    #[Assert\Regex(
-        pattern: '/^[259]\d{7}$/',
-        message: 'Le numéro de téléphone doit commencer par 2, 5 ou 9 et contenir 8 chiffres.'
-    )]
-    private ?int $numTel = null;
-    public function __construct()
-    {
-        $this->agriculteur = new ArrayCollection();
-        $this->client = new ArrayCollection();
-        $this->agri = new ArrayCollection();
-        $this->offreEmplois = new ArrayCollection();
-    }
     
     /**
      * @return Collection<int, OffreEmploi>
@@ -419,16 +483,5 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getNumTel(): ?int
-    {
-        return $this->numTel;
-    }
-
-    public function setNumTel(int $numTel): static
-    {
-        $this->numTel = $numTel;
-
-        return $this;
-    }
 
 }

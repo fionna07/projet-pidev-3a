@@ -1,8 +1,25 @@
 {% extends 'base.html.twig' %}
-
-
+{% block stylesheets %}
+    {{ parent() }} {# Garde les styles existants #}
+    <style>
+        .border-marron {
+            border-color: #c4a484 !important; /* Marron clair */
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
+{% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
 <body class="bg-light d-flex justify-content-center align-items-center" style="min-height: 100vh;">
     <div class="container">
         <div class="row justify-content-center">
@@ -12,73 +29,145 @@
                         <h5 class="fw-bold">Créer un compte</h5>
                     </div>
                     <div class="card-body">
-                        {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
+                        {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate','enctype': 'multipart/form-data'}}) }}
 
-                        <div class="text-center mb-3">
-                            <label for="fileInput" class="cursor-pointer">
-                                <img id="imagePreview" src="https://via.placeholder.com/140" alt="Photo de profil" class="rounded-circle border shadow-sm" style="width: 100px; height: 100px; object-fit: cover;">
-                            </label>
-                            <input id="fileInput" type="file" class="d-none" onchange="previewImage(event)">
-                            <p class="small text-muted">Cliquez pour ajouter une photo</p>
-                            {{ form_row(registrationForm.image, {'attr': {'class': 'form-control'}, 'form_errors': false}) }}
-                            {{ form_errors(registrationForm.image) }}
-                        </div>
+
+<div class="text-center">
+ 
+                <div class="mb-4 text-center">
+                    <label class="form-label fw-bold">Image de profil</label>
+                    <div class="d-flex justify-content-center">
+                        <img id="previewImage" src="{{ asset('img/default-avatar.jpg') }}" class="rounded-circle border" width="120" height="120" alt="Aperçu de l'image">
+                    </div>
+                    <div class="mt-2">
+                        {{ form_widget(registrationForm.image, {'attr': {'class': 'form-control', 'onchange': 'previewFile(this)'}}) }}
+                    </div>
+                </div>
+
+  
+
+    <div class="text-danger small">
+        {{ form_errors(registrationForm.image) }}
+    </div>
+</div>
 
                         <div class="d-flex gap-3">
+                          <div class="form-group w-50">
+    {{ form_label(registrationForm.firstName, 'Prénom') }}
+    {{ form_widget(registrationForm.firstName, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+    <div class="text-danger small">
+        {{ form_errors(registrationForm.firstName) }}
+    </div>
+</div>
+
+                             <div class="form-group w-50">
+                                {{ form_label(registrationForm.lastName, 'Nom') }}
+                                {{ form_widget(registrationForm.lastName, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                                <div class="text-danger small">
+                                    {{ form_errors(registrationForm.lastName) }}
+                                </div>
+                            </div>
+                        </div>
+
+
+                         <div class="d-flex gap-3 mt-3">
                             <div class="form-group w-50">
-                                {{ form_row(registrationForm.firstName, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
-                                {{ form_errors(registrationForm.firstName) }}
+                                {{ form_label(registrationForm.adresse, 'Adresse') }}
+                                {{ form_widget(registrationForm.adresse, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                                <div class="text-danger small">
+                                    {{ form_errors(registrationForm.adresse) }}
+                                </div>
                             </div>
                             <div class="form-group w-50">
-                                {{ form_row(registrationForm.lastName, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
-                                {{ form_errors(registrationForm.lastName) }}
+                                {{ form_label(registrationForm.numTel, 'Numéro de téléphone') }}
+                                {{ form_widget(registrationForm.numTel, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                                <div class="text-danger small">
+                                    {{ form_errors(registrationForm.numTel) }}
+                                </div>
                             </div>
                         </div>
 
                         <div class="d-flex gap-3 mt-3">
                             <div class="form-group w-50">
-                                {{ form_row(registrationForm.adresse, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
-                                {{ form_errors(registrationForm.adresse) }}
+                                {{ form_label(registrationForm.dateNaissance, 'Date de naissance') }}
+                                {{ form_widget(registrationForm.dateNaissance, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                                <div class="text-danger small">
+                                    {{ form_errors(registrationForm.dateNaissance) }}
+                                </div>
                             </div>
                             <div class="form-group w-50">
-                                {{ form_row(registrationForm.numTel, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
-                                {{ form_errors(registrationForm.numTel) }}
-                            </div>
-                        </div>
-
-                        <div class="d-flex gap-3 mt-3">
-                            <div class="form-group w-50">
-                                {{ form_row(registrationForm.dateNaissance, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
-                                {{ form_errors(registrationForm.dateNaissance) }}
-                            </div>
-                            <div class="form-group w-50">
-                                {{ form_row(registrationForm.email, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
-                                {{ form_errors(registrationForm.email) }}
+                                {{ form_label(registrationForm.email, 'Email') }}
+                                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                                <div class="text-danger small">
+                                    {{ form_errors(registrationForm.email) }}
+                                </div>
                             </div>
                         </div>
 
+                       
                         <div class="d-flex gap-3 mt-3">
                             <div class="form-group w-50">
-                                {{ form_row(registrationForm.plainPassword, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'label': 'Mot de passe'}) }}
+                            
+                            
+                                {{ form_label(registrationForm.plainPassword, 'Mot de passe') }}
+                                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control shadow-sm rounded-pill'}}) }}
+                                <div class="text-danger small">
+                                    {{ form_errors(registrationForm.plainPassword) }}
+                                </div>
                             </div>
                             <div class="form-group w-50">
-                                <label for="confirm_password" class="form-label fw-bold small">Confirmer le mot de passe</label>
+                                <label for="confirm_password" class="form-label small">Confirmer le mot de passe</label>
                                 <input type="password" id="confirm_password" name="confirm_password" class="form-control shadow-sm rounded-pill" placeholder="Confirmez votre mot de passe" required>
+                                <div class="text-danger small" id="password_error"></div>
                             </div>
                         </div>
 
                         <!-- Rôles -->
-                        <div class="form-group mt-3">
-                            <label class="form-label fw-bold">Choisissez un rôle :</label>
-                            <div class="d-flex flex-column gap-2">
-                                {{ form_widget(registrationForm.roles, {'attr': {'class': 'form-control shadow-sm rounded-pill'}, 'form_errors': false}) }}
-                                {{ form_errors(registrationForm.roles) }}
+  <div class="form-group mt-1">
+    <label class="form-label">Choisissez un rôle :</label>
+    <div class="d-flex gap-1 flex-wrap">
+     <div class="row">
+        {% for role in registrationForm.roles %}
+         <div class="col-md-6">
+            <div class="form-check">
+                {{ form_widget(role, {'attr': {'class': 'form-check-input d-none'}}) }}
+                <label class="form-check-label btn btn-outline-success d-flex flex-column align-items-center justify-content-center p-3 rounded-3 role-label"
+                    style="cursor: pointer; min-width: 150px; transition: all 0.3s ease;"
+                    for="{{ role.vars.id }}">
+                    
+                    <!-- Icônes personnalisées pour chaque rôle -->
+                    {% if role.vars.label == 'Fournisseur' %}
+                        <i class="fas fa-tractor fa-2x mb-1"></i> 
+                    {% elseif role.vars.label == 'Client' %}
+                       <i class="fas fa-shopping-cart fa-2x mb-1"></i>
+                    {% elseif role.vars.label == 'Agriculteur' %}
+                         <i class="fas fa-tools fa-2x mb-1"></i> 
+                         {% elseif role.vars.label == 'Employé' %}
+                         <i class="fas fa-user-tie fa-2x mb-1"></i> 
+                    {% endif %}
+                    <span class="fw-bold">{{ role.vars.label }}</span>
+                </label>
+            </div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+    <div class="text-danger">
+        {{ form_errors(registrationForm.roles) }}
+    </div>
+</div>
+                        <div class="d-flex justify-content-end align-items-center mt-3">
+                            {{ form_widget(registrationForm.agreeTerms) }}
+                            <label for="registration_form_agreeTerms" class="form-label ms-2">J'accepte les termes</label>
+                            <div class="text-danger">
+                                {{ form_errors(registrationForm.agreeTerms) }}
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm mt-4">
-                            <i class="fas fa-user-plus me-2"></i> S'inscrire
-                        </button>
+                    <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill shadow-sm mt-4">
+    <i class="fas fa-user-plus me-2"></i> S'inscrire
+</button>
+
 
                         {{ form_end(registrationForm) }}
                     </div>
@@ -87,31 +176,74 @@
         </div>
     </div>
 
-    <!-- Script pour prévisualiser l'image -->
+    <!-- Vérification des mots de passe avant soumission -->
     <script>
-        function previewImage(event) {
-            const reader = new FileReader();
-            reader.onload = function() {
-                document.getElementById('imagePreview').src = reader.result;
-            };
-            reader.readAsDataURL(event.target.files[0]);
-        }
-    </script>
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-    const password = document.getElementById("registration_form_plainPassword");
-    const confirmPassword = document.getElementById("confirm_password");
-    const form = document.querySelector("form");
+        document.addEventListener("DOMContentLoaded", function () {
+            const password = document.getElementById("registration_form_plainPassword");
+            const confirmPassword = document.getElementById("confirm_password");
+            const form = document.querySelector("form");
+            const passwordError = document.getElementById("password_error");
 
-    form.addEventListener("submit", function (event) {
-        if (password.value !== confirmPassword.value) {
-            event.preventDefault();
-            alert("Les mots de passe ne correspondent pas.");
-        }
+            form.addEventListener("submit", function (event) {
+                if (password.value !== confirmPassword.value) {
+                    event.preventDefault();
+                    passwordError.textContent = "Les mots de passe ne correspondent pas.";
+                }
+            });
+        });
+    </script>
+    
+<!-- Inclusion du script -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const roleLabels = document.querySelectorAll('.role-label');
+
+    roleLabels.forEach(label => {
+        label.addEventListener('click', () => {
+            roleLabels.forEach(l => l.classList.replace('btn-success', 'btn-outline-success'));
+            label.classList.replace('btn-outline-success', 'btn-success');
+        });
     });
 });
 </script>
+  <script>
+        function previewFile(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+<!-- JavaScript pour faire disparaître les messages flash après un délai -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Sélectionner les messages de succès et d'erreur
+            const successMessages = document.querySelectorAll('.alert-success');
+            const errorMessages = document.querySelectorAll('.alert-danger');
 
+            // Fonction pour faire disparaître les messages après 3 secondes
+            successMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
 
+            errorMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+        });
+    </script>
 </body>
 {% endblock %}

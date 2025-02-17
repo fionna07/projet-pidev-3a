@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des terrains{% endblock %}
+
+{% block body %}
+ 
+    <div class="container mt-5">
+        <h1 class="text-center">Nos Terrains</h1>
+        <div class="row">
+            {% for terrain in terrains %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ asset('uploads/terrains/' ~ terrain.photos) }}" class="card-img-top" alt="Photo du terrain">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ terrain.adresse }}</h5>
+                            <p class="card-text">Prix: {{ terrain.prix }} DT</p>
+                            <p class="card-text">Surface: {{ terrain.surface }} m²</p>
+                            <a href="{{ path('terrain_detail', {'id': terrain.id}) }}" class="btn btn-primary">Voir Détails</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center">Aucun terrain disponible.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

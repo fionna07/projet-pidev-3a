@@ -1,6 +1,17 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+{% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
 <body class="bg-light">
     <div class="container d-flex justify-content-center align-items-center vh-100">
         <div class="card shadow-lg p-4 w-50">
@@ -23,12 +34,12 @@
 
                 <div class="form-group mb-3">
                     <label for="inputEmail" class="form-label">Adresse E-mail</label>
-                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" placeholder="Entrez votre e-mail" autocomplete="email" required autofocus>
+                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" placeholder="example@gmail.com" autocomplete="email" required autofocus>
                 </div>
                 
                 <div class="form-group mb-3">
                     <label for="inputPassword" class="form-label">Mot de Passe</label>
-                    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Entrez votre mot de passe" autocomplete="current-password" required>
+                    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="mot de passe" autocomplete="current-password" required>
                 </div>
                 
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
@@ -41,7 +52,7 @@
                 <button type="submit" class="btn btn-primary w-100">Se connecter</button>
                 
                 <div class="d-flex justify-content-between mt-3">
-                    <a href="{{ path('app_forgetPassword') }}" class="text-muted">Mot de passe oublié ?</a>
+                    <a href="{{ path('app_reset_password') }}" class="text-muted">Mot de passe oublié ?</a>
                   <a href="{{ path('app_register') }}" class="text-muted">Créer un compte</a>
 
                 </div>
@@ -49,4 +60,31 @@
         </div>
     </div>
 </body>
+<!-- JavaScript pour faire disparaître les messages flash après un délai -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Sélectionner les messages de succès et d'erreur
+            const successMessages = document.querySelectorAll('.alert-success');
+            const errorMessages = document.querySelectorAll('.alert-danger');
+
+            // Fonction pour faire disparaître les messages après 3 secondes
+            successMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+
+            errorMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+        });
+    </script>
 {% endblock %}

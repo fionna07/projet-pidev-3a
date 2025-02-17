@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Email verification</title>
+    <link href="{{ asset('/css/verifyEmail.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('/css/bootstrap.min.css') }}" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div id="liveToast" class="toast align-items-center text-white bg-danger border-0 hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fa-solid fa-triangle-exclamation" style="color: #ffffff;"></i>
+                <span style="margin-left: 5px;">Email invalide.</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<div class="form-container">
+    <div class="logo-container">
+        Vérification d'adresse email
+    </div>
+
+    <form class="form" id="myform"
+          action="{{ path('app_verifyemail')}}"
+          method="POST">
+        <div class="form-group">
+            <label for="email" >Email</label>
+
+            <input type="text" id="email" name="email" placeholder="Votre email" >
+
+            <div id="emailError" style="  border: 1px solid red; border-radius:3px; margin-top:4px; padding-left:4px; padding:0px; display: none;">
+                <div class="error-container">
+                    <div class="icon-container">
+                        <i class="fas fa-exclamation fa-xs" style="color: white;"></i>
+                    </div>
+                    <div class="error-message" style="font-size: 15px">Le champs <b>Email</b> est requis.</div>
+                </div>
+            </div>
+
+            <div id="emailRegex" style="border: 1px solid red; border-radius:3px; margin-top:4px; padding-left:4px; padding:0px; display: none;">
+                <div class="error-container">
+                    <div class="icon-container">
+                        <i id=" icon"class="fas fa-exclamation fa-xs" style="color: white;"></i>
+                    </div>
+                    <div class="error-message" style="font-size: 15px">Veuillez saisir une <b>adresse email</b> valide.</div>
+                </div>
+            </div>
+
+            <div id="emailInvalid" style="border: 1px solid red; border-radius:3px; margin-top:4px; padding-left:4px; padding:0px; display: none;">
+                <div class="error-container">
+                    <div class="icon-container">
+                        <i id=" icon"class="fas fa-exclamation fa-xs" style="color: white;"></i>
+                    </div>
+                    <div class="error-message" style="font-size: 15px"><b>Adresse email </b>introuvable.</div>
+                </div>
+            </div>
+
+        </div>
+
+        <button id="submitBtn" class="form-submit-btn" type="submit"  >Envoyer code </button>
+        <p style="font-size:17px" class="signup-link"> Vous n'avez pas de compte ?
+            <a
+                    href="{{ path('app_register')}}"
+                    class="signup-link link"> S'inscrire</a>
+        </p>
+    </form>
+</div>
+
+<script src="//code.jquery.com/jquery.js"></script>
+
+<script>
+
+    function showDangerToast() {
+        var toastEl = new bootstrap.Toast(document.getElementById('liveToast'), {
+            delay: 3000 // 3 secondes
+        });
+        toastEl.show();
+    }
+
+    let myForm = document.getElementById('myform');
+    let myRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    let emailInput = document.getElementById('email');
+    let emailError = document.getElementById('emailError');
+    let emailRegex = document.getElementById('emailRegex');
+    let emailInvalid = document.getElementById('emailInvalid');
+    // let emailExistance = document.getElementById('emailExistance');
+
+    myForm.addEventListener('submit', function(e) {
+        if (emailInput.value.trim() === "") {
+            emailError.style.display = 'block';
+            emailRegex.style.display = 'none';
+            emailInvalid.style.display = 'none';
+            // emailExistance.style.display='none';
+            e.preventDefault();
+
+        } else if (!myRegex.test(emailInput.value)) {
+            emailRegex.style.display = 'block';
+            emailError.style.display = 'none';
+            emailInvalid.style.display = 'none';
+            showDangerToast();
+            e.preventDefault();
+
+        } else {
+            emailError.style.display = 'none';
+            emailRegex.style.display = 'none';
+        }
+    });
+
+    // Vérification côté serveur (si l'email n'existe pas)
+    {% if error == 'invalid_email' %}
+    emailRegex.style.display = 'none';
+    emailError.style.display = 'none';
+    emailInvalid.style.display = 'block';
+    {% endif %}
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+</html>

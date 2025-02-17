@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\OffreEmploi;
 use App\Form\OffreEmploiType;
+use App\Entity\Utilisateur;
 
 
 class BackPagesController extends AbstractController
@@ -19,6 +20,15 @@ class BackPagesController extends AbstractController
     {
         return $this->render('back_pages/index.html.twig', [
             'controller_name' => 'BackPagesController',
+        ]);
+    }
+    #[Route('/admin/users', name: 'admin_users')]
+    public function listUsers(EntityManagerInterface $entityManager): Response
+    {
+        $users = $entityManager->getRepository(Utilisateur::class)->findAll();
+    
+        return $this->render('admin/users.html.twig', [
+            'users' => $users,
         ]);
     }
     //Affichage des offres d'emploi Back Office

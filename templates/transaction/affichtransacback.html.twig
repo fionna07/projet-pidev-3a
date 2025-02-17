@@ -1,0 +1,70 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Toutes les Transactions{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="container mt-4">
+            <h1 class="h3 mb-4 text-gray-800">Liste de toutes les Transactions</h1>
+
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Date</th>
+                                    <th>Montant</th>
+                                    <th>Client</th>
+                                    <th>Agriculteur</th>
+                                    <th>Terrain</th>
+                                    <th>Type</th>
+                                    <th>Actions</th> <!-- Ajout de la colonne pour les actions -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                    <tr>
+                                        <td>{{ transaction.id }}</td>
+                                        <td>{{ transaction.dateTransaction|date('Y-m-d H:i') }}</td>
+                                        <td>{{ transaction.montant }}</td>
+                                        <td>{{ transaction.client.firstName }} {{ transaction.client.lastName }}</td>
+                                        <td>{{ transaction.agriculteur.firstName }} {{ transaction.agriculteur.lastName }}</td>
+                                        <td>{{ transaction.terrain.adresse }}</td>
+                                        <td>{{ transaction.type }}</td>
+                                        <td>
+                                            <form action="{{ path('app_transaction_delete', {'id': transaction.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette transaction ?')">
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-trash-alt"></i> Supprimer
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted py-4">
+                                            <i class="fas fa-exclamation-circle mr-2"></i>Aucune transaction trouvée
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/French.json"
+                }
+            });
+        });
+    </script>
+{% endblock %}

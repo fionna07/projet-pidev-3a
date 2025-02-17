@@ -1,10 +1,10 @@
 <?php
-
 namespace App\Entity;
 
 use App\Repository\TransactionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
 class Transaction
@@ -14,44 +14,58 @@ class Transaction
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    // Le champ 'type' doit être 'vente' ou 'location'
+    #[ORM\Column(type: "string", length: 50)]
+    #[Assert\NotBlank(message: "Le type de la transaction ne peut pas être vide.")]
+    #[Assert\Choice(
+        choices: ["vente", "location"],
+        message: "Le type de la transaction doit être 'vente' ou 'location'."
+    )]
     private ?string $type = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    // Date de la transaction, doit être dans le futur
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotBlank(message: "La date de la transaction ne peut pas être vide.")]
+    #[Assert\Type("\DateTimeInterface", message: "La date doit être un objet DateTime valide.")]
+    #[Assert\GreaterThan("today", message: "La date de la transaction doit être dans le futur.")]
     private ?\DateTimeInterface $dateTransaction = null;
 
     #[ORM\Column]
-    private ?float $prixTransaction = null;
+    #[Assert\NotBlank(message: "Le montant de la transaction ne peut pas être vide.")]
+    #[Assert\Type(type: "numeric", message: "Le montant doit être un nombre valide.")]
+    #[Assert\Positive(message: "Le montant doit être positif.")]
+    private ?float $montant = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $etat = null;
-
-    #[ORM\ManyToOne(inversedBy: 'terrain')]
-    private ?Terrain $terrain = null;
-
-    #[ORM\ManyToOne(inversedBy: 'client')]
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    
     private ?Utilisateur $client = null;
 
-    #[ORM\ManyToOne(inversedBy: 'agri')]
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    
     private ?Utilisateur $agriculteur = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $conversation = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    
+    private ?Terrain $terrain = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    // Getter pour récupérer le 'type' comme une chaîne de caractères
     public function getType(): ?string
     {
         return $this->type;
     }
 
+    // Setter pour définir le 'type' en tant que chaîne
     public function setType(string $type): static
     {
         $this->type = $type;
-
         return $this;
     }
 
@@ -63,43 +77,17 @@ class Transaction
     public function setDateTransaction(\DateTimeInterface $dateTransaction): static
     {
         $this->dateTransaction = $dateTransaction;
-
         return $this;
     }
 
-    public function getPrixTransaction(): ?float
+    public function getMontant(): ?float
     {
-        return $this->prixTransaction;
+        return $this->montant;
     }
 
-    public function setPrixTransaction(float $prixTransaction): static
+    public function setMontant(float $montant): static
     {
-        $this->prixTransaction = $prixTransaction;
-
-        return $this;
-    }
-
-    public function getEtat(): ?string
-    {
-        return $this->etat;
-    }
-
-    public function setEtat(string $etat): static
-    {
-        $this->etat = $etat;
-
-        return $this;
-    }
-
-    public function getTerrain(): ?Terrain
-    {
-        return $this->terrain;
-    }
-
-    public function setTerrain(?Terrain $terrain): static
-    {
-        $this->terrain = $terrain;
-
+        $this->montant = $montant;
         return $this;
     }
 
@@ -111,7 +99,6 @@ class Transaction
     public function setClient(?Utilisateur $client): static
     {
         $this->client = $client;
-
         return $this;
     }
 
@@ -123,19 +110,17 @@ class Transaction
     public function setAgriculteur(?Utilisateur $agriculteur): static
     {
         $this->agriculteur = $agriculteur;
-
         return $this;
     }
 
-    public function getConversation(): ?string
+    public function getTerrain(): ?Terrain
     {
-        return $this->conversation;
+        return $this->terrain;
     }
 
-    public function setConversation(string $conversation): static
+    public function setTerrain(?Terrain $terrain): static
     {
-        $this->conversation = $conversation;
-
+        $this->terrain = $terrain;
         return $this;
     }
 }

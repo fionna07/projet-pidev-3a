@@ -13,6 +13,11 @@
            <!-- Favicon -->
         <!-- Ou si vous utilisez un fichier PNG -->
         <link rel="icon" href="{{asset('Back/img/favicon.png')}}" type="image/png">
+        <!--farah-->
+        <head>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        </head>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <!-- Polices personnalisées pour ce template-->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
@@ -22,6 +27,8 @@
         <link
             href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
             rel="stylesheet">
+        <!--farah's buttons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
         <!-- Styles personnalisés pour ce template-->
         <link href="{{asset('Back/css/sb-admin-2.min.css')}}" rel="stylesheet">
@@ -85,7 +92,7 @@
 
                 <!-- Nav Item - Dashboard -->
                 <li class="nav-item active">
-                    <a class="nav-link" href="index.html">
+                    <a class="nav-link" href="{{path('app_back_pages')}}">
                         <i class="fas fa-fw fa-tachometer-alt"></i>
                         <span>Tableau de bord</span></a>
                 </li>
@@ -100,7 +107,7 @@
 
                 <!-- Nav Item - Gestion des utilisateurs -->
                 <li class="nav-item">
-                    <a class="nav-link" href="utilisateurs.html">
+                    <a class="nav-link" href="{{path('admin_users')}}">
                         <i class="fas fa-fw fa-users"></i>
                         <span>Utilisateurs</span>
                     </a>
@@ -140,10 +147,10 @@
 
                 <!-- Nav Item - Gestion des terrains -->
                 <li class="nav-item">
-                    <a class="nav-link" href="terrains.html">
-                        <i class="fas fa-fw fa-seedling"></i>
-                        <span>Terrains</span>
-                    </a>
+                    <a class="nav-link" href="{{ path('app_terrain_index') }}">
+        <i class="fas fa-fw fa-seedling"></i>
+        <span>Terrains</span>
+    </a>
                 </li>
 
                 <!-- Divider -->
@@ -340,27 +347,28 @@
                             <li class="nav-item dropdown no-arrow">
                                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="mr-2 d-none d-lg-inline text-gray-600 small">UserName</span>
+                                    <span class="mr-2 d-none d-lg-inline text-gray-600 small">Admin</span>
                                     <img class="img-profile rounded-circle"
                                         src="{{asset('Back/img/undraw_profile.svg')}}">
                                 </a>
                                 <!-- Dropdown - User Information -->
                                 <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                     aria-labelledby="userDropdown">
-                                    <a class="dropdown-item" href="#">
+                                  <a class="dropdown-item" href="{{ path('app_profile_admin') }}">
                                         <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                         Profile
                                     </a>
+
                                     <a class="dropdown-item" href="#">
                                         <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
                                         Paramètres
                                     </a>
-                                    <a class="dropdown-item" href="#">
+                                    <a class="dropdown-item" href="{{path('admin_activities')}}">
                                         <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
                                         Activités Log
                                     </a>
                                     <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <a class="dropdown-item" href="{{ path('app_logout') }}" data-toggle="modal" data-target="#logoutModal">
                                         <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                         Déconnexion
                                     </a>
@@ -635,13 +643,20 @@
                     <div class="modal-body">Sélectionnez "Déconnexion" ci-dessous si vous êtes prêt à mettre fin à votre session actuelle.</div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
-                        <a class="btn btn-primary" href="login.html">Déconnexion</a>
+<a class="btn btn-primary" id="confirmLogout" href="#">Déconnexion</a>
                     </div>
                 </div>
             </div>
         </div>
 
-    
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("confirmLogout").addEventListener("click", function() {
+        window.location.href = "{{ path('app_logout') }}";
+    });
+});
+</script>
+
 
    </body>
        

@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une Transaction{% endblock %}
+
+{% block body %}
+    <h1>Créer une Transaction</h1>
+
+    {{ form_start(form, {'attr': {'data-turbo': 'false','enctype': 'multipart/form-data','novalidate':'novalidate'}}) }} 
+
+
+    <!-- Affichage des erreurs globales du formulaire -->
+    {% for error in form.vars.errors %}
+        <div class="alert alert-danger">{{ error.message }}</div>
+    {% endfor %}
+
+    <div class="form-group">
+        {{ form_row(form.client, {'attr': {'class': 'form-control'}}) }}
+        <!-- Affichage des erreurs pour le champ 'client' -->
+        <div class="invalid-feedback">
+            {{ form_errors(form.client) }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form_row(form.type, {'attr': {'class': 'form-control'}}) }}
+        <!-- Affichage des erreurs pour le champ 'type' -->
+        <div class="invalid-feedback">
+            {{ form_errors(form.type) }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form_row(form.montant, {'attr': {'class': 'form-control'}}) }}
+        <!-- Affichage des erreurs pour le champ 'montant' -->
+        <div class="invalid-feedback">
+            {{ form_errors(form.montant) }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form_row(form.dateTransaction, {'attr': {'class': 'form-control'}}) }}
+        <!-- Affichage des erreurs pour le champ 'dateTransaction' -->
+        <div class="invalid-feedback">
+            {{ form_errors(form.dateTransaction) }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Créer</button>
+    </div>
+
+    {{ form_end(form) }}
+{% endblock %}

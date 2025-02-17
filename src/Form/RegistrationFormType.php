@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class RegistrationFormType extends AbstractType
 {
@@ -27,10 +28,17 @@ class RegistrationFormType extends AbstractType
         ->add('image', FileType::class, [
             'label' => 'Photo de profil',
             'mapped' => false,
-            'required' => false,
+            'required' => true, 
             'attr' => ['class' => 'form-control'],
+            'constraints' => [
+                new NotBlank(['message' => 'Veuillez ajouter une image.']),
+                new Assert\Image([
+                    'maxSize' => '2M',
+                    'mimeTypes' => ['image/jpeg', 'image/png', 'image/gif'],
+                    'mimeTypesMessage' => 'Seuls les fichiers JPG, PNG et GIF sont autorisés.',
+                ]),
+            ],
         ])
-        
             ->add('email', EmailType::class, [
             ])
             ->add('firstName', TextType::class, [
@@ -39,16 +47,16 @@ class RegistrationFormType extends AbstractType
 
             ])
             ->add('dateNaissance', DateType::class, [
-                'widget' => 'single_text', // Afficher comme un input de type date
-                'format' => 'yyyy-MM-dd',  // Format de date
-                'required' => true, // Champ obligatoire
-                'empty_data' => null, // Permet une valeur nulle
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd',
+                'required' => false,
                 'attr' => ['class' => 'form-control shadow-sm rounded-pill'],
                 'label' => 'Date de naissance',
-                'constraints' => [
-                    new NotBlank(['message' => 'La date de naissance est obligatoire.']),
-                ],
-            ])
+                'data' => new \DateTime(), 
+
+                ])
+            
+
             ->add('adresse', TextType::class, [
                 
             ])
@@ -63,9 +71,12 @@ class RegistrationFormType extends AbstractType
                     'Client' => 'ROLE_CLIENT',
                     'Fournisseur' => 'ROLE_FOURNISSEUR',
                 ],
-                'expanded' => true,  // Pour afficher sous forme de cases à cocher
-                'multiple' => true,  // Pour permettre plusieurs sélections
+                'expanded' => true,
+                'multiple' => true,
                 'required' => true,
+               
+                  
+            
             ])
             
             
@@ -76,16 +87,20 @@ class RegistrationFormType extends AbstractType
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,
                 'constraints' => [
-                    new NotBlank([
+                    new Assert\NotBlank([
                         'message' => 'Veuillez entrer un mot de passe',
                     ]),
-                    new Length([
+                    new Assert\Length([
                         'min' => 8,
                         'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
-                        // max length allowed by Symfony for security reasons
                         'max' => 4096,
                     ]),
+                    new Assert\Regex([
+                        'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/',
+                        'message' => 'Votre mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.',
+                    ]),
                 ],
+                'attr' => ['class' => 'form-control']
             ]);
     }
 
