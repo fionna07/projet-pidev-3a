@@ -1,0 +1,72 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %} Logs d'Activités {% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Logs d'Activités</h1>
+
+    <!-- Tableau des activités -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Utilisateur</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for activity in activities %}
+                <tr>
+                    <td>{{ activity.date|date('d/m/Y H:i') }}</td>
+                    <td>{{ activity.user.email }}</td>
+                    <td>{{ activity.action }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="3">Aucune activité enregistrée.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Graphique d'activité -->
+    <div class="card mt-4 mx-auto text-center" style="max-width: 300px;">
+        <div class="card-body" style="padding: 10px;">
+            <h5 style="font-size: 14px;">Activité</h5>
+            <canvas id="activityChart" width="180" height="180"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Script pour le graphique -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var ctx = document.getElementById('activityChart').getContext('2d');
+
+        var activityChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Ajouts', 'Modifications', 'Suppressions'],
+                datasets: [{
+                    data: [{{ activities|length }}, 10, 5], // À ajuster avec des stats réelles
+                    backgroundColor: ['#4e73df', '#1cc88a', '#e74a3b'],
+                    hoverBackgroundColor: ['#2e59d9', '#17a673', '#be2617'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

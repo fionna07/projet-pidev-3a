@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du terrain{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1>{{ terrain.adresse }}</h1>
+        <img src="{{ asset('uploads/terrains/' ~ terrain.photos) }}" class="img-fluid mb-3" alt="Photo du terrain">
+        <p><strong>Surface:</strong> {{ terrain.surface }} m²</p>
+        <p><strong>Prix:</strong> {{ terrain.prix }} DT</p>
+        <p><strong>Statut:</strong> {{ terrain.status }}</p>
+        <p><strong>Type de sol:</strong> {{ terrain.typeSol }}</p>
+        <p><strong>Description:</strong> {{ terrain.description }}</p>
+        <a href="{{ path('terrain_front') }}" class="btn btn-secondary">Retour</a>
+    </div>
+{% endblock %}

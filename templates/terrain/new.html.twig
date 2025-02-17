@@ -1,0 +1,248 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Ajouter votre Terrain{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css"
+          integrity="sha256-sA+QoC7FdfSf/WzO6b4h8tR3wzDQeI0fGkboK0HeXkA=" crossorigin=""/>
+    <style>
+        .card-form {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .card-form:hover {
+            transform: translateY(-5px);
+        }
+        .form-control:focus {
+            border-color: #4e73df;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+        /* Taille pour la carte Leaflet dans le modal */
+        #leaflet-map {
+            height: 500px;
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Ajouter votre Terrain</h1>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+            <div class="card card-form border-left-primary animate__animated animate__fadeInUp">
+                <div class="card-header py-3 bg-white">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-plus-circle fa-fw mr-2"></i>Formulaire d'ajout
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'data-turbo': 'false','enctype': 'multipart/form-data','novalidate':'novalidate'}}) }} 
+
+                    {# Affichage global des erreurs si le formulaire a été soumis et n'est pas valide #}
+                    {% if form.vars.submitted and not form.vars.valid %}
+                        <div class="alert alert-danger">
+                            {{ form_errors(form) }}
+                        </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group animate__animated animate__fadeInLeft">
+                                {{ form_label(form.adresse) }}
+                                {{ form_widget(form.adresse, {'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'Ex: 123 Rue des Champs'
+                                }}) }}
+                                {{ form_errors(form.adresse) }}
+                            </div>
+
+                            <div class="form-group animate__animated animate__fadeInLeft">
+                                {{ form_label(form.surface) }}
+                                {{ form_widget(form.surface, {'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'Surface en m²'
+                                }}) }}
+                                {{ form_errors(form.surface) }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group animate__animated animate__fadeInRight">
+                                {{ form_label(form.prix) }}
+                                {{ form_widget(form.prix, {'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'Prix en DT'
+                                }}) }}
+                                {{ form_errors(form.prix) }}
+                            </div>
+
+                            <div class="form-group animate__animated animate__fadeInRight">
+                                {{ form_label(form.status) }}
+                                {{ form_widget(form.status, {'attr': {
+                                    'class': 'form-control'
+                                }}) }}
+                                {{ form_errors(form.status) }}
+                            </div>
+
+                            
+                        </div>
+                    </div>
+                    
+                    {# Champs pour Type de sol et Photo #}
+                    <div class="row mt-4">
+                        <div class="col-md-6 animate__animated animate__fadeInLeft">
+                            <div class="form-group">
+                                {{ form_label(form.typeSol) }}
+                                {{ form_widget(form.typeSol, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.typeSol) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 animate__animated animate__fadeInRight">
+                            <div class="form-group">
+                                {{ form_label(form.photos) }}
+                                {{ form_widget(form.photos, {'attr': {'class': 'form-control-file'}}) }}
+                                {{ form_errors(form.photos) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Champ Description #}
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="form-group">
+                                {{ form_label(form.description) }}
+                                {{ form_widget(form.description, {'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'Description du terrain'
+                                }}) }}
+                                {{ form_errors(form.description) }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6 animate__animated animate__fadeInUp">
+                            <div class="form-group">
+                                {{ form_label(form.latitude) }}
+                                <div class="input-group">
+                                    {{ form_widget(form.latitude, {'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Coordonnée GPS (Latitude)',
+                                        'readonly': true
+                                    }}) }}
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#mapModal">
+                                            <i class="fas fa-map-marker-alt"></i> Choisir sur la carte
+                                        </button>
+                                    </div>
+                                </div>
+                                {{ form_errors(form.latitude) }}
+                            </div>
+                        </div>
+                        <input type="hidden" id="selectedLatitude" name="selectedLatitude" value="{{ form.latitude.vars.value }}">
+                        <input type="hidden" id="selectedLongitude" name="selectedLongitude" value="{{ form.longitude.vars.value }}">       
+                        
+                        <div class="col-md-6 animate__animated animate__fadeInUp">
+                            <div class="form-group">
+                                {{ form_label(form.longitude) }}
+                                {{ form_widget(form.longitude, {'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'Coordonnée GPS (Longitude)',
+                                    'readonly': true
+                                }}) }}
+                                {{ form_errors(form.longitude) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-5">
+                        {# Utilisation du widget du bouton "save" défini dans le FormType #}
+                        {{ form_widget(form.save, {'attr': {'class': 'btn btn-primary btn-lg animate__animated animate__pulse'}}) }}
+                        <a href="{{ path('app_terrain_index') }}" class="btn btn-secondary btn-lg ml-3">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour la carte Leaflet -->
+<div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mapModalLabel">Sélectionner une localisation</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="leaflet-map">
+            {% include 'terrain/map.html.twig' %}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="setCoordinates()">Valider</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"
+            integrity="sha256-o9N1j7k+g9Z3xDx1Zd9ITG0N1FxQF3sT5Qlfu3rKk8M="
+            crossorigin=""></script>
+    <script>
+        // Lorsque le modal est affiché, initialiser la carte
+        $('#mapModal').on('shown.bs.modal', function () {
+            // Récupérer les valeurs actuelles ou définir des valeurs par défaut (ici, Paris)
+            var latVal = parseFloat($('#{{ form.latitude.vars.id }}').val()) || 48.8566;
+            var lngVal = parseFloat($('#{{ form.longitude.vars.id }}').val()) || 2.3522;
+
+            // Créer la carte dans le div "leaflet-map"
+            var map = L.map('leaflet-map').setView([latVal, lngVal], 13);
+
+            // Ajouter la couche OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            // Ajouter un marqueur draggable sur la position actuelle
+            var marker = L.marker([latVal, lngVal], {draggable: true}).addTo(map);
+
+            // Mettre à jour les champs latitude/longitude quand le marqueur est déplacé
+            marker.on('dragend', function(e) {
+                var position = marker.getLatLng();
+                $('#{{ form.latitude.vars.id }}').val(position.lat.toFixed(6));
+                $('#{{ form.longitude.vars.id }}').val(position.lng.toFixed(6));
+            });
+
+            // Mettre à jour le marqueur et les champs lors d'un clic sur la carte
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                $('#{{ form.latitude.vars.id }}').val(e.latlng.lat.toFixed(6));
+                $('#{{ form.longitude.vars.id }}').val(e.latlng.lng.toFixed(6));
+            });
+
+            // S'assurer que la carte s'ajuste après l'ouverture du modal
+            map.invalidateSize();
+        });
+    </script>
+{% endblock %}

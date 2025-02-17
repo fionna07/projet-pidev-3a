@@ -1,0 +1,53 @@
+<!-- Charger Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Carte Leaflet -->
+<div id="map" style="height: 400px;"></div>
+
+<script>
+    // Initialiser la carte centrée sur la Tunisie
+    var map = L.map('map').setView([33.8869, 9.5375], 6);
+
+    // Ajouter la couche OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Ajouter un marqueur au clic
+    var marker;
+    map.on('click', function(e) {
+        var lat = e.latlng.lat.toFixed(6);
+        var lng = e.latlng.lng.toFixed(6);
+
+        // Supprimer l'ancien marqueur s'il existe
+        if (marker) {
+            map.removeLayer(marker);
+        }
+
+        // Ajouter un nouveau marqueur
+        marker = L.marker([lat, lng]).addTo(map);
+
+        // Stocker les coordonnées dans les champs cachés
+        document.getElementById('selectedLatitude').value = lat;
+        document.getElementById('selectedLongitude').value = lng;
+    });
+
+    // Quand on clique sur "Valider", mettre les valeurs dans le formulaire principal
+    function setCoordinates() {
+        var lat = document.getElementById('selectedLatitude').value;
+        var lng = document.getElementById('selectedLongitude').value;
+
+        if (lat && lng) {
+               document.getElementById('{{ form.latitude.vars.id }}').value = lat;
+        document.getElementById('{{ form.longitude.vars.id }}').value = lng;
+        }
+
+        // Fermer la modale
+        $('#mapModal').modal('hide');
+    }
+</script>
+
+<!-- Champs cachés pour stocker les coordonnées avant validation -->
+<input type="hidden" id="selectedLatitude">
+<input type="hidden" id="selectedLongitude">

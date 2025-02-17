@@ -1,0 +1,39 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Détails de l'utilisateur{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h2 class="mb-4">Détails de l'utilisateur</h2>
+
+        <div class="card">
+            <div class="card-body text-center">
+                <!-- Affichage de l'image de profil -->
+                   <div class="mb-3">
+                 {% if utilisateur.image %}
+        <div>
+            <p>Image actuelle :</p>
+            <img src="{{ utilisateur.image }}" alt="Image de profil" width="150">
+        </div>
+        {% else %}
+                    <img src="{{ asset('images/default-profile.png') }}" alt="Image par défaut" class="rounded-circle" width="150">
+                {% endif %}
+
+                <h3 class="mt-3">{{ utilisateur.firstName }} {{ utilisateur.lastName }}</h3>
+                <p>Email : {{ utilisateur.email }}</p>
+                <p>Adresse : {{ utilisateur.adresse }}</p>
+                <p><strong>Numéro de téléphone :</strong> {{ utilisateur.numTel }}</p>
+
+                <p>Date de naissance : {{ utilisateur.dateNaissance|date('d/m/Y') }}</p>
+                <p>Rôle : {{ utilisateur.roles|join(', ') }}</p>
+                <p>Status : <span class="badge {% if utilisateur.status == 'actif' %}badge-success{% else %}badge-danger{% endif %}">
+                    {{ utilisateur.status }}
+                </span></p>
+
+                <p>Date de création : {{ utilisateur.dateCreation|date('d/m/Y H:i') }}</p>
+
+                <a href="{{ path('admin_users') }}" class="btn btn-primary mt-3">Retour à la liste</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

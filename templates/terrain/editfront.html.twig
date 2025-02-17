@@ -1,0 +1,129 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un Terrain{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <!-- Ajout de la bibliothèque Animate.css pour les animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        /* Animation personnalisée pour la carte */
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Centrage du formulaire */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Style pour les messages d'erreur */
+        .form-error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Titre de la page -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Modifier un Terrain</h1>
+    </div>
+
+    <!-- Carte contenant le formulaire -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4 animate__animated animate__fadeIn">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Formulaire de modification</h6>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{ form_label(form.adresse, 'Adresse') }}
+                                {{ form_widget(form.adresse, {'attr': {'class': 'form-control', 'placeholder': 'Adresse du terrain'}}) }}
+                                {{ form_errors(form.adresse) }}
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{ form_label(form.surface, 'Surface (m²)') }}
+                                {{ form_widget(form.surface, {'attr': {'class': 'form-control', 'placeholder': 'Surface en m²'}}) }}
+                                {{ form_errors(form.surface) }}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{ form_label(form.typeSol, 'Type de sol') }}
+                                {{ form_widget(form.typeSol, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.typeSol) }}
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{ form_label(form.prix, 'Prix') }}
+                                {{ form_widget(form.prix, {'attr': {'class': 'form-control', 'placeholder': 'Prix en TND'}}) }}
+                                {{ form_errors(form.prix) }}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{ form_label(form.status, 'Statut') }}
+                                {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.status) }}
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{ form_label(form.description, 'Description') }}
+                                {{ form_widget(form.description, {'attr': {'class': 'form-control', 'placeholder': 'Description du terrain'}}) }}
+                                {{ form_errors(form.description) }}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{ form_label(form.latitude, 'Latitude') }}
+                                {{ form_widget(form.latitude, {'attr': {'class': 'form-control', 'placeholder': 'Latitude'}}) }}
+                                {{ form_errors(form.latitude) }}
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{ form_label(form.longitude, 'Longitude') }}
+                                {{ form_widget(form.longitude, {'attr': {'class': 'form-control', 'placeholder': 'Longitude'}}) }}
+                                {{ form_errors(form.longitude) }}
+                            </div>
+                        </div>
+
+                        <!-- Bouton de soumission -->
+                        <div class="form-group text-center">
+                            <button type="submit" class="btn btn-primary btn-lg animate__animated animate__pulse">
+                                <i class="fas fa-save mr-2"></i>Modifier
+                            </button>
+                            <a href="{{ path('app_terrain_index') }}" class="btn btn-secondary btn-lg ml-3">
+                                <i class="fas fa-times mr-2"></i>Annuler
+                            </a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <!-- Animation au chargement de la page -->
+    <script>
+        $(document).ready(function() {
+            // Ajouter l'animation uniquement une fois au chargement
+            $('.card').addClass('animate__animated animate__fadeIn').one('animationend', function() {
+                $(this).removeClass('animate__animated animate__fadeIn');
+            });
+        });
+    </script>
+{% endblock %}
