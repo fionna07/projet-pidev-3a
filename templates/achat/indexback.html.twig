@@ -1,0 +1,203 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Achats{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Gestion des Achats</h1>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+    
+    <!-- Bouton Ajouter Achat -->
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAchatModal">
+            <i class="fas fa-plus"></i> Ajouter un Achat
+        </button>
+    </div>
+    
+    <!-- Modal d'ajout -->
+    <div class="modal fade" id="addAchatModal" tabindex="-1" aria-labelledby="addAchatModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="addAchatModalLabel">Ajouter un Achat</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(form, {'attr': {'class': 'form-horizontal', 'novalidate': 'novalidate'}}) }}
+
+                    <div class="mb-3">
+                        {{ form_label(form.date) }}
+                        {{ form_widget(form.date, {'attr': {'class': 'form-control'}}) }}
+                        <div class="text-danger">
+                            {{ form_errors(form.date) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.total) }}
+                        {{ form_widget(form.total, {'attr': {'class': 'form-control'}}) }}
+                        <div class="text-danger">
+                            {{ form_errors(form.total) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.utilisateur) }}
+                        {{ form_widget(form.utilisateur, {'attr': {'class': 'form-control'}}) }}
+                        <div class="text-danger">
+                            {{ form_errors(form.utilisateur) }}
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-success">Ajouter</button>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des achats -->
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Utilisateur</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="tables">
+                {% for achat in achats|sort((a, b) => a.id <=> b.id) %}
+                    <tr id="tr{{ achat.id }}">
+                        <td>{{ achat.id }}</td>
+                        <td>{{ achat.date|date('Y-m-d') }}</td>
+                        <td>{{ achat.total }} TND</td>
+                        <td>{{ achat.utilisateur.firstname }}</td>
+                        <td>
+                            <!-- Bouton Modifier -->
+                            <a href="#" class="text-warning me-2" data-bs-toggle="modal" data-bs-target="#editAchatModal{{ achat.id }}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
+                            <!-- Bouton Supprimer -->
+                            <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteAchatModal{{ achat.id }}">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Modal de Modification -->
+                    <div class="modal fade" id="editAchatModal{{ achat.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Modifier l'achat</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" action="{{ path('achat_edit', {'id': achat.id}) }}" class="needs-validation" novalidate>
+                                        <div class="mb-3">
+                                            <label for="date{{ achat.id }}" class="form-label">Date</label>
+                                            <input type="date" class="form-control" 
+                                                id="date{{ achat.id }}" name="date" 
+                                                value="{{ achat.date|date('Y-m-d') }}" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="total{{ achat.id }}" class="form-label">Total</label>
+                                            <input type="number" class="form-control" 
+                                                id="total{{ achat.id }}" name="total" 
+                                                value="{{ achat.total }}" required 
+                                                min="0" 
+                                                step="0.01">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="utilisateur{{ achat.id }}" class="form-label">Utilisateur</label>
+                                            <select class="form-control" id="utilisateur{{ achat.id }}" name="utilisateur" required>
+                                                {% for user in utilisateurs %}
+                                                    <option value="{{ user.id }}" {% if user.id == achat.utilisateur.id %}selected{% endif %}>
+                                                        {{ user.firstname }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                            <button type="submit" class="btn btn-warning">Enregistrer</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal de Suppression -->
+                    <div class="modal fade" id="deleteAchatModal{{ achat.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Confirmer la suppression</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Êtes-vous sûr de vouloir supprimer cet achat ?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <form method="post" action="{{ path('achat_delete', {'id': achat.id}) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-danger">Confirmer</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if modal_open %}
+    <script>
+    
+        document.addEventListener("DOMContentLoaded", function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addAchatModal'));
+            myModal.show();
+        });
+    </script>
+    {% endif %}
+
+    <!-- JavaScript pour les messages flash -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    alert.style.opacity = 0;
+                    setTimeout(function() {
+                        alert.style.display = 'none';
+                    }, 500);
+                }, 3000);
+            });
+        });
+    </script>
+      <script src="{{ asset('Back/js/search.js') }}"></script>
+</div>
+{% endblock %}
