@@ -42,11 +42,12 @@
                         <tr>
                             <td>{{ activity.id }}</td>
                             <td>{{ activity.user.email }}</td>
-                            <td>
-                                <span class="badge bg-info text-dark">
-                                    <i class="fas fa-edit"></i> {{ activity.action }}
-                                </span>
-                            </td>
+                           <td>
+                            <span class="badge text-dark" style="background-color: #c0c0c0;">
+                                <i class="fas fa-edit"></i> {{ activity.action }}
+                            </span>
+                        </td>
+
                             <td>{{ activity.date|date('d/m/Y H:i') }}</td>
                             <td class="text-center">
                                 <!-- Bouton Modifier -->

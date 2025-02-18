@@ -11,17 +11,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use App\Service\PdfService;
 
 class TransactionController extends AbstractController
 {
-
     #[Route('/transaction/create/{id}', name: 'app_transaction_create')]
-    public function createTransaction(Request $request, EntityManagerInterface $em, $id)
+    public function createTransaction(Request $request, EntityManagerInterface $em, PdfService $pdfService, $id): Response
     {
-        // Trouver tous les clients
-        $clients = $em->getRepository(Utilisateur::class)->findAll();
-        
-        // Trouver le terrain avec l'ID passé dans l'URL
+        // Trouver le terrain
         $terrain = $em->getRepository(Terrain::class)->find($id);
         if (!$terrain) {
             throw $this->createNotFoundException('Terrain non trouvé.');
@@ -32,30 +29,37 @@ class TransactionController extends AbstractController
         $form = $this->createForm(TransactionType::class, $transaction);
         $form->handleRequest($request);
     
-        // Vérification si le formulaire est soumis et valide
         if ($form->isSubmitted() && $form->isValid()) {
             $transaction->setDateTransaction(new \DateTime());
     
-            // Récupérer l'agriculteur connecté
-            $user = $this->getUser();
-            $transaction->setAgriculteur($user);  // Utilisateur connecté (agriculteur)
+            // Récupérer l'utilisateur connecté (agriculteur/vendeur)
+            $agriculteur = $this->getUser();
+            $transaction->setAgriculteur($agriculteur);
             
-            // Assigner le terrain à la transaction
+            // Définir le terrain et récupérer son propriétaire
             $transaction->setTerrain($terrain);
+            
+            // Assigner le client (acheteur)
+            $client = $transaction->getClient();
+            if (!$client) {
+                throw new \Exception("Aucun client n'est défini pour cette transaction.");
+            }
     
             $em->persist($transaction);
             $em->flush();
     
-            $this->addFlash('success', 'Transaction créée avec succès!');
-            return $this->redirectToRoute('app_terrain_front_crud');
+            // Générer le PDF avec les données mises à jour
+            $fileName = 'contrat_' . strtolower($transaction->getType()) . '_' . $transaction->getId() . '.pdf';
+            return $pdfService->generatePdf('transaction/contrat.html.twig', [
+                'transaction' => $transaction
+            ], $fileName);
         }
     
-        // Passer le formulaire et la liste des clients au template
         return $this->render('transaction/transac.html.twig', [
-            'form' => $form->createView(),
-            'clients' => $clients,
+            'form' => $form->createView()
         ]);
     }
+    
     
     
 

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Contrat de {{ transaction.type }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .header { text-align: center; font-size: 18px; font-weight: bold; }
+        .content { margin: 20px; }
+        .signature { margin-top: 50px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <div class="header">Contrat de {{ transaction.type }}</div>
+    <div class="content">
+        <p><strong>Terrain :</strong> {{ transaction.terrain.adresse }}</p>
+        <p><strong>Surface :</strong> {{ transaction.terrain.surface }} m²</p>
+        <p><strong>Prix :</strong> {{ transaction.terrain.prix }} €</p>
+        <p><strong>Date :</strong> {{ transaction.dateTransaction|date('d/m/Y') }}</p>
+        
+        <p><strong>Vendeur :</strong> 
+            {{ transaction.agriculteur ? transaction.agriculteur.firstName ~ ' ' ~ transaction.agriculteur.lastName : 'Non défini' }}
+        </p>
+        <p><strong>Acheteur :</strong> 
+            {{ transaction.client ? transaction.client.firstName ~ ' ' ~ transaction.client.lastName : 'Non défini' }}
+        </p>
+
+        <p>Ce contrat établit que le terrain mentionné ci-dessus est {{ transaction.type }} par 
+        {{ transaction.agriculteur ? transaction.agriculteur.firstName : 'le vendeur' }} à 
+        {{ transaction.client ? transaction.client.firstName : 'l’acheteur' }}.</p>
+    </div>
+    <div class="signature">
+        <p>Signature du Vendeur</p>
+        <p>Signature de l'Acheteur</p>
+    </div>
+</body>
+</html>

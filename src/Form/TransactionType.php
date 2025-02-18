@@ -47,10 +47,8 @@ class TransactionType extends AbstractType
             ->add('montant', MoneyType::class, [
                 'label' => 'Montant de la transaction',
                 'currency' => 'EUR', // Optionnel : pour définir la devise
-            ])
+            ]);
 
-            // Bouton pour soumettre le formulaire
-            ->add('save', SubmitType::class, ['label' => 'Créer la transaction']);
     }
 
     public function configureOptions(OptionsResolver $resolver)

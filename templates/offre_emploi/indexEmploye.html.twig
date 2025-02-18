@@ -65,7 +65,7 @@
 
                     
                     <div class="card-body" style="padding-top: 30px;">
-                    <h5 class="card-title fw-bold">{{ offre.titre|capitalize }}</h5>
+                    <h5 class="card-title fw-bold">🌱{{ offre.titre|capitalize }}</h5>
 
                         <!-- Dates -->
                         <p class="mb-1"><strong>Date de début:</strong> {{ offre.dateDebut|date('d/m/Y') }}</p>
@@ -126,58 +126,87 @@
         {% endfor %}
     </div>
 	<!-- Modals pour Détails et postulation -->
-	{% for offre in offres %}
-	<!-- Modal Détails -->
-	<div class="modal fade" id="offreModal{{ offre.id }}" tabindex="-1" aria-labelledby="offreModalLabel{{ offre.id }}" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title fw-bold" id="offreModalLabel{{ offre.id }}">{{ offre.titre }}</h5>
-				</div>
-				<div class="modal-body">
-                    <!-- Date de publication -->
-                    <div class="position-absolute top-0 start-0 m-2 text-muted small" style="margin-bottom: 10px;">
-                        {% set now = date() %}
-                        {% set diff = now.diff(offre.datePublication) %}
-                        {% set days = diff.days %}
+	  {% for offre in offres %}
+<!-- Modal Détails -->
+<div class="modal fade" id="offreModal{{ offre.id }}" tabindex="-1" aria-labelledby="offreModalLabel{{ offre.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> <!-- Agrandir le modal -->
+        <div class="modal-content shadow-lg rounded-4">
+            <!-- En-tête -->
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold text-white" id="offreModalLabel{{ offre.id }}">
+                <i class="fas fa-briefcase"></i> {{ offre.titre }}
+            </h5>
 
-                        Publié :
-                        {% if days == 0 %}
-                                Aujourd'hui
-                        {% elseif days == 1 %}
-                                Hier
-                        {% elseif days <= 7 %}
-                                Il y a {{ days }} jours
-                        {% else %}
-                                {{ offre.datePublication|date('d/m/Y') }}
-                        {% endif %}
-                        </div>
-                        <br> <!-- Saut de ligne pour espacer -->
-					<p><strong>Description :</strong></p>
-					<p>{{ offre.description }}</p>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
 
-					<p><strong>Nombre de postes :</strong> {{ offre.nombrePostes }}</p>
+            <!-- Corps du modal -->
+            <div class="modal-body p-4">
+                <!-- Date de publication -->
+                <div class="text-muted small mb-3">
+                    {% set now = date() %}
+                    {% set diff = now.diff(offre.datePublication) %}
+                    {% set days = diff.days %}
+                    <i class="far fa-calendar-alt"></i> Publié :
+                    {% if days == 0 %}
+                        Aujourd'hui
+                    {% elseif days == 1 %}
+                        Hier
+                    {% elseif days <= 7 %}
+                        Il y a {{ days }} jours
+                    {% else %}
+                        {{ offre.datePublication|date('d/m/Y') }}
+                    {% endif %}
+                </div>
 
-					<p><strong>Date de début :</strong> {{ offre.dateDebut|date('d/m/Y H:i') }}</p> <!-- Date avec heure -->
+                <!-- Description -->
+                <p><strong><i class="fas fa-align-left"></i> Description :</strong></p>
+                <p class="text-justify">{{ offre.description }}</p>
 
-					<p><strong>Date de fin estimée :</strong> {{ offre.dateFinEstimee|date('d/m/Y') }}</p> <!-- Date sans heure -->
-
-                    <p><strong>Compétences Requises:</strong></p>
-                    <div class="mt-2">
-                        <div class="d-flex flex-wrap gap-2">
-                            {% for competence in offre.competencesRequises|split(',') %}
-                                <span class="badge" style="background-color: #f5f5dc; color: black; padding: 0.25rem 0.75rem; border-radius: 50px;">{{ competence|trim }}</span>
-                            {% endfor %}
-                        </div>
+                <div class="row">
+                    <!-- Nombre de postes -->
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-users"></i> Nombre de postes :</strong> {{ offre.nombrePostes }}</p>
                     </div>
 
-					<p class="mt-4"><strong>Salaire :</strong> {{ offre.salaire }} TND</p>
+                    <!-- Salaire -->
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-dollar-sign"></i> Salaire :</strong> {{ offre.salaire }} TND</p>
+                    </div>
+                </div>
 
-					<p><strong>Localisation :</strong> {{ offre.localisation }}</p>
-				</div>
-			</div>
-		</div>
-	</div>
+                <div class="row">
+                    <!-- Date de début -->
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-calendar-day"></i> Date de début :</strong> {{ offre.dateDebut|date('d/m/Y H:i') }}</p>
+                    </div>
+
+                    <!-- Date de fin estimée -->
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-calendar-check"></i> Date de fin estimée :</strong> {{ offre.dateFinEstimee|date('d/m/Y') }}</p>
+                    </div>
+                </div>
+
+                <!-- Localisation -->
+                <p><strong><i class="fas fa-map-marker-alt"></i> Localisation :</strong> {{ offre.localisation }}</p>
+
+                <!-- Compétences requises -->
+                <p><strong><i class="fas fa-tools"></i> Compétences Requises :</strong></p>
+                <div class="mt-2">
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for competence in offre.competencesRequises|split(',') %}
+                            <span class="badge bg-light text-dark border shadow-sm px-3 py-2">{{ competence|trim }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+          
+        </div>
+    </div>
+</div>
+
+
     <!-- Modal Postuler -->
     <div class="modal fade" id="postulerModal{{ offre.id }}" tabindex="-1" aria-labelledby="postulerModalLabel{{ offre.id }}" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">

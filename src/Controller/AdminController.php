@@ -212,7 +212,10 @@ final class AdminController extends AbstractController{
     {
         $user->setStatus('désactivé');
         $em->flush();
+        $this->addFlash('error', 'Le compte est desactivé.');
         return $this->redirectToRoute('admin_users');
+       
+
     }
 
     #[Route('/admin/user/{id}/enable', name: 'user_enable', requirements: ['id' => '\d+'])]
@@ -220,7 +223,10 @@ final class AdminController extends AbstractController{
     {
         $user->setStatus('actif');
         $em->flush();
+        $this->addFlash('success', 'Le compte est activé.');
         return $this->redirectToRoute('admin_users'); // Assurez-vous que 'user_list' existe
+       
+
     }
 
 }
