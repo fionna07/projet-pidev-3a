@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Les événements{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+
+    <h1>Les événements</h1>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <div class="row">
+    {% if app.user %}
+     <!-- Bouton Les candidatures -->
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ path('app_user_reservations') }}" class="btn btn-primary">
+            Voir les réservations
+        </a>
+    </div> 
+      <div class="d-flex justify-content-end mb-3">
+
+        <a href="{{ path('app_events_new') }}" class="btn btn-primary">Créer un nouvel événement</a>
+    </div> 
+
+    
+   
+{% endif %}
+
+        {% for evenement in evenements %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ evenement.titre }}</h5>
+                        <p class="card-text">{{ evenement.description }}</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>Date de début:</strong> {{ evenement.dateDebut ? evenement.dateDebut|date('Y-m-d H:i:s') : '' }}</li>
+                            <li class="list-group-item"><strong>Type de visite:</strong> {{ evenement.typeVisite }}</li>
+                            <li class="list-group-item"><strong>Localisation:</strong> {{ evenement.localisation }}</li>
+                            <li class="list-group-item"><strong>Prix:</strong> {{ evenement.prix }}</li>
+                        </ul>
+                        <div class="card-body">
+                            <a href="{{ path('app_events_show', {'id': evenement.id}) }}" class="btn btn-light btn-sm"><i class="fas fa-eye"></i>Voir</a>
+
+                            {% if evenement.agriculteur == app.user %}
+                                <a href="{{ path('app_events_edit', {'id': evenement.id}) }}" class="btn btn-success btn-sm"><i class="fas fa-edit"></i>Modifier</a>
+
+                                <!-- Bouton pour ouvrir le modal de suppression -->
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ evenement.id }}">
+                                   <i class="fas fa-trash"></i>  Supprimer
+                                </button>
+
+                                <!-- Modal de confirmation de suppression -->
+                                <div class="modal fade" id="deleteModal{{ evenement.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ evenement.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel{{ evenement.id }}">Confirmer la suppression</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Êtes-vous sûr de vouloir supprimer cet événement ?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                <!-- Formulaire de suppression -->
+                                                <form action="{{ path('app_events_delete', {'id': evenement.id}) }}" method="post">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evenement.id) }}">
+                                                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <p>Aucun événement trouvé.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- JavaScript pour faire disparaître les messages flash après un délai -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Sélectionner les messages de succès et d'erreur
+            const successMessages = document.querySelectorAll('.alert-success');
+            const errorMessages = document.querySelectorAll('.alert-danger');
+
+            // Fonction pour faire disparaître les messages après 3 secondes
+            successMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+
+            errorMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+        });
+    </script>
+    </div>
+{% endblock %}

@@ -30,7 +30,7 @@
     </style>
 {% endblock %}
 
-{% block content %}
+{% block body %}
 <div class="container-fluid">
     <!-- Titre de la page -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -38,6 +38,7 @@
     </div>
 
     <!-- Carte contenant le formulaire -->
+   <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card shadow mb-4 animate__animated animate__fadeIn">
@@ -45,76 +46,101 @@
                     <h6 class="m-0 font-weight-bold text-primary">Formulaire de modification</h6>
                 </div>
                 <div class="card-body">
-                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+                    
+                    <div class="row">
+                         <div class="mb-4 text-center">
+                    <label class="form-label fw-bold">Image du terrain</label>
+                    <div class="d-flex justify-content-center">
+                        <img id="previewImage" src="{{ asset('img/default-terrain.jpeg') }}" class="pill border" width="190" height="120" alt="Aperçu de l'image">
+                    </div>
+                    <div class="mt-2">
+                        {{ form_widget(form.photos, {'attr': {'class': 'form-control', 'onchange': 'previewFile(this)'}}) }}
+                    </div>
+                </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 {{ form_label(form.adresse, 'Adresse') }}
                                 {{ form_widget(form.adresse, {'attr': {'class': 'form-control', 'placeholder': 'Adresse du terrain'}}) }}
                                 {{ form_errors(form.adresse) }}
                             </div>
-                            <div class="form-group col-md-6">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 {{ form_label(form.surface, 'Surface (m²)') }}
                                 {{ form_widget(form.surface, {'attr': {'class': 'form-control', 'placeholder': 'Surface en m²'}}) }}
                                 {{ form_errors(form.surface) }}
                             </div>
                         </div>
+                    </div>
 
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 {{ form_label(form.typeSol, 'Type de sol') }}
                                 {{ form_widget(form.typeSol, {'attr': {'class': 'form-control'}}) }}
                                 {{ form_errors(form.typeSol) }}
                             </div>
-                            <div class="form-group col-md-6">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 {{ form_label(form.prix, 'Prix') }}
                                 {{ form_widget(form.prix, {'attr': {'class': 'form-control', 'placeholder': 'Prix en TND'}}) }}
                                 {{ form_errors(form.prix) }}
                             </div>
                         </div>
+                    </div>
 
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 {{ form_label(form.status, 'Statut') }}
                                 {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
                                 {{ form_errors(form.status) }}
                             </div>
-                            <div class="form-group col-md-6">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 {{ form_label(form.description, 'Description') }}
                                 {{ form_widget(form.description, {'attr': {'class': 'form-control', 'placeholder': 'Description du terrain'}}) }}
                                 {{ form_errors(form.description) }}
                             </div>
                         </div>
+                    </div>
 
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 {{ form_label(form.latitude, 'Latitude') }}
                                 {{ form_widget(form.latitude, {'attr': {'class': 'form-control', 'placeholder': 'Latitude'}}) }}
                                 {{ form_errors(form.latitude) }}
                             </div>
-                            <div class="form-group col-md-6">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 {{ form_label(form.longitude, 'Longitude') }}
                                 {{ form_widget(form.longitude, {'attr': {'class': 'form-control', 'placeholder': 'Longitude'}}) }}
                                 {{ form_errors(form.longitude) }}
                             </div>
                         </div>
+                    </div>
+                    
+                  
 
-                        <!-- Bouton de soumission -->
-                        <div class="form-group text-center">
-                            <button type="submit" class="btn btn-primary btn-lg animate__animated animate__pulse">
-                                <i class="fas fa-save mr-2"></i>Modifier
-                            </button>
-                            <a href="{{ path('app_terrain_index') }}" class="btn btn-secondary btn-lg ml-3">
-                                <i class="fas fa-times mr-2"></i>Annuler
-                            </a>
-                        </div>
+
                     {{ form_end(form) }}
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
+    </div>
+</div>
+   </div>
+</div>
+{% endblock %}
 {% block javascripts %}
     {{ parent() }}
     <!-- Animation au chargement de la page -->
@@ -126,4 +152,19 @@
             });
         });
     </script>
+      <script>
+        function previewFile(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
 {% endblock %}
+
+   
+  

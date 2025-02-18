@@ -4,7 +4,6 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Offres d'Emploi</h1>
     {% for message in app.flashes('success') %}
         <div class="alert alert-success">
             {{ message }}
@@ -18,7 +17,8 @@
     {% endfor %}
     
     <!-- Bouton Ajouter Offre -->
-    <div class="d-flex justify-content-end mb-3">
+        <div class="text-center mb-4">
+        <h2 class="fw-bold">Gestion des offres d'emploi</h2>
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addOffreModal">
             <i class="fas fa-plus"></i> Ajouter une Offre
         </button>
@@ -112,20 +112,20 @@
         </div>
     </div>
     <!-- Liste des offres -->
-    <div class="table-responsive">
-        <table class="table">
-            <thead class="thead-light">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
                 <tr>
                     <th scope="col">ID</th>
                     <th scope="col">Titre</th>
                     <th scope="col">Localisation</th> <!-- Nouvelle colonne -->
-                    <th scope="col">Date de Publication</th>
                     <th scope="col">Statut</th>
-                    <th scope="col">Date de Début</th>
-                    <th scope="col">Date de Fin Estimée</th>
-                    <th scope="col">Compétences Requises</th>
+                    <th scope="col">Début</th>
+                    <th scope="col">Fin</th>
+                    <th scope="col">Compétences</th>
                     <th scope="col">Salaire (TND)</th>
-                    <th scope="col">Nombre de postes disponibles</th>
+                    <th scope="col">Postes</th>
                     <th scope="col">Actions</th>
                 </tr>
             </thead>
@@ -135,21 +135,7 @@
                         <td>{{ offre.id }}</td>
                         <td>{{ offre.titre|capitalize }}</td>
                         <td>{{ offre.localisation }}</td> <!-- Affichage de la localisation -->
-                        <td>
-                            {% set now = date() %}
-                            {% set diff = now.diff(offre.datePublication) %}
-                            {% set days = diff.days %}
-
-                            {% if days == 0 %}
-                                Aujourd'hui
-                            {% elseif days == 1 %}
-                                Hier
-                            {% elseif days <= 7 %}
-                                Il y a {{ days }} jours
-                            {% else %}
-                                {{ offre.datePublication|date('d/m/Y') }}
-                            {% endif %}
-                        </td>
+                        
                         <td>
                             {% if offre.status == 'actif' %}
                                 <span class="badge badge-success">Actif</span>
@@ -167,20 +153,21 @@
                         <td>{{ offre.salaire }}</td>
                         <td>{{ offre.nombrePostes }}</td>
                         <td>
+                        <div class="btn-group">
                         <!-- Bouton Modifier (icône orange sans fond) -->
-                        <a href="#" class="text-warning me-2" data-bs-toggle="modal" data-bs-target="#editOffreModal{{ offre.id }}">
+                        <a href="#" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editOffreModal{{ offre.id }}">
                             <i class="fas fa-edit"></i>
                         </a>
 
                         <!-- Bouton Voir les candidatures (icône bleue sans fond) -->
-                        <a href="{{ path('offre_candidatures_back', {'id': offre.id}) }}" class="text-primary me-2">
+                        <a href="{{ path('offre_candidatures_back', {'id': offre.id}) }}" class="btn btn-outline-primary btn-sm ">
                             <i class="fas fa-file-alt"></i>
                         </a>
 
                         <!-- Bouton Supprimer (icône rouge sans fond) pour ouvrir le modal -->
                         <form method="post" action="#" style="display: inline;" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
-                            <button type="button" class="btn btn-link text-danger p-0 border-0">
-                                <i class="fas fa-trash"></i>
+                            <button type="button" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-trash-alt"></i>
                             </button>
                         </form>
                         <!-- Modal de confirmation de suppression -->
@@ -204,7 +191,7 @@
                             </div>
                         </div>
                         </div>
-
+                        </div>
                         </td>
                     </tr>
                 {% endfor %}

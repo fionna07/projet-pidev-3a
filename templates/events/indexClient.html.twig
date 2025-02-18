@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Evenement index{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+{% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+    <h1>Evenement </h1>
+    <!-- Bouton "Voir mes réservations" -->
+        <div class="d-flex justify-content-end mb-3">
+
+            <a href="{{ path('app_mes_reservations') }}" class="btn btn-primary">
+                <i class="fas fa-calendar-check"></i> Voir mes réservations
+            </a>
+            </div>
+
+    <div class="row">
+        {% for evenement in evenements %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ evenement.titre }}</h5>
+                        <p class="card-text">{{ evenement.description }}</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>Date de début:</strong> {{ evenement.dateDebut ? evenement.dateDebut|date('Y-m-d H:i:s') : '' }}</li>
+                            <li class="list-group-item"><strong>Type de visite:</strong> {{ evenement.typeVisite }}</li>
+                            <li class="list-group-item"><strong>Localisation:</strong> {{ evenement.localisation }}</li>
+                            <li class="list-group-item"><strong>Prix:</strong> {{ evenement.prix }}</li>
+                        </ul>
+                        <div class="card-body">
+                            <a href="{{ path('app_events_show_client', {'id': evenement.id}) }}" class="btn btn-primary">Voir</a>
+                            <!-- Bouton Réserver -->
+                            <a href="{{ path('app_reservation_new', {'id': evenement.id}) }}" class="btn btn-success">Réserver</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <p>Aucun événement trouvé.</p>
+            </div>
+        {% endfor %}
+    </div>
+    <!-- JavaScript pour faire disparaître les messages flash après un délai -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Sélectionner les messages de succès et d'erreur
+            const successMessages = document.querySelectorAll('.alert-success');
+            const errorMessages = document.querySelectorAll('.alert-danger');
+
+            // Fonction pour faire disparaître les messages après 3 secondes
+            successMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+
+            errorMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+        });
+    </script>
+    </div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Evenement{% endblock %}
+
+{% block body %}
+    <h1>Modifier l'événement</h1>
+
+    {{ include('events/_form.html.twig', {'button_label': 'Update'}) }}
+
+
+{% endblock %}

@@ -46,7 +46,7 @@
                         </p>
                     </div>
                     <div class="card-footer text-center">
-                        <a href="{{ path('app_terrain_edit', {'id': terrain.id}) }}" class="btn btn-primary btn-sm">
+                        <a href="{{ path('app_terrain_editFront', {'id': terrain.id}) }}" class="btn btn-primary btn-sm">
                             Modifier
                         </a>
                         <form method="post" action="{{ path('app_terrain_delete', {'id': terrain.id}) }}" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce terrain ?');">
@@ -55,13 +55,7 @@
                         </form>
                         <!-- Bouton pour rediriger vers la page de transaction -->
                         <a href="{{ path('app_transaction_create', {'id': terrain.id}) }}" class="btn btn-success btn-sm">
-<<<<<<< HEAD
-                      
-                             Faire une Transaction
-=======
-                            Faire une Transaction
->>>>>>> GestionOffresEmploi
-                        </a>
+                       créer transaction </a>
                     </div>
                 </div>
             </div>

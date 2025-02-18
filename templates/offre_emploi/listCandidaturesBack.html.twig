@@ -3,8 +3,10 @@
 {% block title %}Candidatures pour {{ offre.titre }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="mb-4">Candidatures pour l'offre : {{ offre.titre }}</h1>
+<div class="container">
+    <div class="card shadow-lg p-4 rounded-4">
+        <h1 class="mb-4 text-center">📝 Candidatures pour l'offre : {{ offre.titre }} </h1>
+
 
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
@@ -101,6 +103,7 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
     </div>
 </div>
 {% endblock %}

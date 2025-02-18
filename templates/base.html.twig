@@ -100,7 +100,18 @@
                           Offres d'emploi
                       </a>
                   {% endif %}
-                      <a href="events.html" class="dropdown-item">Événements</a>
+                      {% if app.user is not null %}
+                      <a href="{% if 'ROLE_AGRICULTEUR' in app.user.roles %}
+                                  {{ path('app_events') }}
+                              {% elseif 'ROLE_CLIENT' in app.user.roles %}
+                                  {{ path('app_events_client') }}
+                              {% else %}
+                                  {{ path('app_front') }}
+                              {% endif %}" 
+                        class="dropdown-item">
+                          Événements
+                      </a>
+                  {% endif %}
 
                        
                        {% if app.user is not null %}

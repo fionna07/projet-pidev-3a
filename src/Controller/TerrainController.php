@@ -64,7 +64,7 @@ class TerrainController extends AbstractController
                 $this->addFlash('warning', 'Les coordonnées n\'ont pas été choisies, valeurs par défaut (Paris) utilisées.');
             }
             $user = $utilisateurRepository->findOneBy(['username' => $this->getUser()->getUserIdentifier()]);
-            $this->dump($user);
+           // $this->dump($user);
             // Gestion de l'upload d'image
             $photoFile = $form->get('photos')->getData();
             if ($photoFile) {
@@ -127,6 +127,36 @@ class TerrainController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+    
+    // Édition d'un terrain
+    #[Route('/editFront/{id}', name: 'app_terrain_editFront', methods: ['GET', 'POST'])]
+    public function editFront(Request $request, Terrain $terrain, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(TerrainType::class, $terrain);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $photoFile = $form->get('photos')->getData();
+            if ($photoFile) {
+                $uploadsDirectory = $this->getParameter('terrain_images_directory');
+                $newFilename = uniqid().'.'.$photoFile->guessExtension();
+
+                try {
+                    $photoFile->move($uploadsDirectory, $newFilename);
+                    $terrain->setPhotos($newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('error', "L'upload de la photo a échoué.");
+                }
+            }
+
+            $em->flush();
+            return $this->redirectToRoute('app_terrain_front_crud');
+        }
+
+        return $this->render('terrain/editfront.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
 
     // Suppression d'un terrain
     #[Route('/delete/{id}', name: 'app_terrain_delete', methods: ['POST'])]
@@ -140,7 +170,7 @@ class TerrainController extends AbstractController
         return $this->redirectToRoute('app_terrain_index');
     }
 
-    // Affichage des terrains dans le front-office
+    // Affichage des terrains dans le front-office//client
     #[Route('/front', name: 'terrain_front', methods: ['GET'])]
     public function front(TerrainRepository $terrainRepository): Response
     {
@@ -159,7 +189,7 @@ class TerrainController extends AbstractController
     }
 
 
-
+  //agriculteur
     #[Route('/frontcrud', name: 'app_terrain_front_crud', methods: ['GET'])]
     public function frontCrud(TerrainRepository $terrainRepository): Response
     {

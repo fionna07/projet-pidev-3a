@@ -45,7 +45,7 @@
                 </div>
                 <div class="card-body">
                    {{ form_start(form, {'attr': {'data-turbo': 'false','enctype': 'multipart/form-data','novalidate':'novalidate'}}) }} 
-
+              
 
                     {# Affichage global des erreurs si le formulaire a été soumis et n'est pas valide #}
                     {% if form.vars.submitted and not form.vars.valid %}
@@ -55,6 +55,15 @@
                     {% endif %}
 
                     <div class="row">
+                          <div class="mb-4 text-center">
+                    <label class="form-label fw-bold">Image du terrain</label>
+                    <div class="d-flex justify-content-center">
+                        <img id="previewImage" src="{{ asset('img/default-terrain.jpeg') }}" class="pill border" width="190" height="120" alt="Aperçu de l'image">
+                    </div>
+                    <div class="mt-2">
+                        {{ form_widget(form.photos, {'attr': {'class': 'form-control', 'onchange': 'previewFile(this)'}}) }}
+                    </div>
+                </div>
                         <div class="col-md-6">
                             <div class="form-group animate__animated animate__fadeInLeft">
                                 {{ form_label(form.adresse) }}
@@ -106,13 +115,7 @@
                                 {{ form_errors(form.typeSol) }}
                             </div>
                         </div>
-                        <div class="col-md-6 animate__animated animate__fadeInRight">
-                            <div class="form-group">
-                                {{ form_label(form.photos) }}
-                                {{ form_widget(form.photos, {'attr': {'class': 'form-control-file'}}) }}
-                                {{ form_errors(form.photos) }}
-                            </div>
-                        </div>
+                     
                     </div>
 
                     {# Champ Description #}
@@ -245,5 +248,17 @@
             // S'assurer que la carte s'ajuste après l'ouverture du modal
             map.invalidateSize();
         });
+    </script>
+         <script>
+        function previewFile(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
     </script>
 {% endblock %}

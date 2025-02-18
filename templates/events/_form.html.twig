@@ -1,0 +1,52 @@
+{{ form_start(form, {'attr': {'class': 'form-horizontal', 'novalidate': 'novalidate'}}) }}
+<div class="form-group mb-3">
+    {{ form_label(form.titre, 'Titre de l\'événement', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.titre, {'attr': {'class': 'form-control', 'placeholder': 'Entrez le titre ici'}}) }}
+    <div class="text-danger">
+    {{ form_errors(form.titre) }}
+    </div>
+</div>
+
+<div class="form-group mb-3">
+    {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': '5', 'placeholder': 'Détaillez l\'événement'}}) }}
+    <div class="text-danger">
+    {{ form_errors(form.description) }}
+    </div>
+</div>
+
+<div class="form-group mb-3">
+    {{ form_label(form.dateDebut, 'Date de début', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+    <div class="text-danger">
+    {{ form_errors(form.dateDebut) }}
+    </div>
+</div>
+
+<div class="form-group mb-3">
+    {{ form_label(form.typeVisite, 'Type de visite', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.typeVisite, {'attr': {'class': 'form-control'}}) }}
+    <div class="text-danger">
+    {{ form_errors(form.typeVisite) }}
+    </div>
+</div>
+
+<div class="form-group mb-3">
+    {{ form_label(form.localisation, 'Localisation', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.localisation, {'attr': {'class': 'form-control', 'placeholder': 'Adresse complète de l\'événement'}}) }}
+    <div class="text-danger">
+    {{ form_errors(form.localisation) }}
+    </div>
+</div>
+
+<div class="form-group mb-3">
+    {{ form_label(form.prix, 'Prix', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.prix, {'attr': {'class': 'form-control'}}) }}
+    <div class="text-danger">
+    {{ form_errors(form.prix) }}
+    </div>
+</div>
+
+<button type="submit" class="btn btn-success">{{ button_label|default('Enregistrer') }}</button>
+
+{{ form_end(form) }}

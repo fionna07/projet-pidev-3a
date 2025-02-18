@@ -15,9 +15,20 @@ use App\Entity\Candidature;
 use App\Form\CandidatureType;
 use App\Entity\Utilisateur;
 use App\Repository\CandidatureRepository;
+use App\Repository\EvenementRepository;
+use App\Entity\Evenement;
+use App\Service\ActivityLoggerService;
 
 class FrontPagesController extends AbstractController
 {
+    private ActivityLoggerService $activityLogger;
+    public function __construct(ActivityLoggerService $activityLogger)
+    {
+       
+        $this->activityLogger = $activityLogger;
+        
+
+    }
     #[Route('/front/pages', name: 'app_front')]
     public function index(): Response
     {
@@ -53,7 +64,8 @@ class FrontPagesController extends AbstractController
         OffreEmploiRepository $offreEmploiRepository, 
         Request $request, 
         EntityManagerInterface $entityManager, 
-        Security $security
+        Security $security,
+        ActivityLoggerService $activityLogger
     ): Response {
         $offre = new OffreEmploi();
         $offre->setDatePublication(new \DateTime());
@@ -78,6 +90,7 @@ class FrontPagesController extends AbstractController
 
                 // Affichage du message de succès
                 $this->addFlash('success', 'L\'offre d\'emploi a été ajoutée avec succès.');
+                $activityLogger->log('Ajout d\'une offre',$user);
 
                 return $this->redirectToRoute('app_offreEmploi'); 
             }
@@ -186,5 +199,22 @@ class FrontPagesController extends AbstractController
             'candidatures' => $candidatures,
         ]);
     }
+    //Evénement interface Agriculteur
+    #[Route(name: 'app_events', methods: ['GET'])]
+    public function events (EvenementRepository $evenementRepository): Response
+    {
+        return $this->render('events/index.html.twig', [
+            'evenements' => $evenementRepository->findAll(),
+        ]);
+    }
+    //Evénement interface Client
+    #[Route('/event/client', name: 'app_events_client')]
+    public function eventsClient (EvenementRepository $evenementRepository): Response
+    {
+        return $this->render('events/indexClient.html.twig', [
+            'evenements' => $evenementRepository->findAll(),
+        ]);
+    }
+
     
 }

@@ -64,7 +64,11 @@ class TerrainType extends AbstractType
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'Enregistrer',
-            ]);
+                'attr' => ['class' => 'btn btn-success']
+            ])
+            
+            
+          ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

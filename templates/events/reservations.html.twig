@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes réservations{% endblock %}
+
+{% block body %}
+    <h1>Mes réservations</h1>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    
+
+    {% if reservations is empty %}
+        <p>Aucune réservation trouvée.</p>
+    {% else %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nom du client</th>
+                    <th>Prénom du client</th>
+                    <th>Titre de l'événement</th>
+                    <th>Date de réservation</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations %}
+                    <tr>
+                        <td>{{ reservation.client.firstName }}</td>
+                        <td>{{ reservation.client.lastName }}</td>
+                        <td>{{ reservation.evenement.titre }}</td>
+                        <td>{{ reservation.dateReservation|date('Y-m-d H:i') }}</td>
+                        <td>{{ reservation.etat }}</td>
+                        <td>
+                            <!-- Bouton pour modifier l'état -->
+                            <form action="{{ path('app_reservation_update_status', {'id': reservation.id}) }}" method="POST">
+                                <select name="etat" class="form-select" required>
+                                    <option value="en_attente" {% if reservation.etat == 'en_attente' %}selected{% endif %}>En attente</option>
+                                    <option value="refuse" {% if reservation.etat == 'refusée' %}selected{% endif %}>Refusé</option>
+                                    <option value="confirme" {% if reservation.etat == 'confirmée' %}selected{% endif %}>Confirmé</option>
+                                </select>
+                                <button type="submit" class="btn btn-warning btn-sm mt-2">Modifier l'état</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Sélectionner les messages de succès et d'erreur
+            const successMessages = document.querySelectorAll('.alert-success');
+            const errorMessages = document.querySelectorAll('.alert-danger');
+
+            // Fonction pour faire disparaître les messages après 3 secondes
+            successMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+
+            errorMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Réservations pour {{ evenement.titre }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card shadow-lg p-4 rounded-4">
+        <h1 class="mb-4 text-center">📅 Réservations pour l'événement : {{ evenement.titre }} </h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Titre de l'événement</th>
+                <th>Date de réservation</th>
+                <th>État</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for reservation in reservations %}
+            <tr>
+                <td>{{ reservation.client.lastName }}</td>
+                <td>{{ reservation.client.firstName }}</td>
+                <td>{{ reservation.evenement.titre }}</td>
+                <td>{{ reservation.dateReservation|date('Y-m-d H:i:s') }}</td>
+                <td>{{ reservation.etat }}</td>
+                <td>
+                    <!-- Bouton pour ouvrir la modal -->
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ reservation.id }}">
+                        Supprimer
+                    </button>
+
+                    <!-- Modal de confirmation -->
+                    <div class="modal fade" id="deleteModal{{ reservation.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ reservation.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel{{ reservation.id }}">Confirmation de suppression</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Êtes-vous sûr de vouloir supprimer cette réservation ?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <form action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" method="POST">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
+                                        <button type="submit" class="btn btn-danger">Confirmer</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">Aucune réservation trouvée pour cet événement.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

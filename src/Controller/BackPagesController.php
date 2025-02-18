@@ -11,8 +11,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\OffreEmploi;
 use App\Form\OffreEmploiType;
 use App\Entity\Utilisateur;
-
-
+use App\Repository\EvenementRepository;
+use App\Entity\Evenement;
 class BackPagesController extends AbstractController
 {
     #[Route('/back/pages', name: 'app_back_pages')]
@@ -61,5 +61,14 @@ class BackPagesController extends AbstractController
             'modal_open' => $modalOpen, // On passe la variable au template
         ]);
     }
+    //Evénement
+    #[Route('/back/events', name: 'back_events', methods: ['GET'])]
+    public function events (EvenementRepository $evenementRepository): Response
+    {
+        return $this->render('events/indexBack.html.twig', [
+            'evenements' => $evenementRepository->findAll(),
+        ]);
+    }
+
 }
 
