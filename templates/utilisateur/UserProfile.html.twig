@@ -69,9 +69,32 @@
                     </button>
 
                     <!-- Bouton Supprimer avec couleur orange -->
-                    <a href="{{ path('app_delete_account') }}" class="btn btn-outline-warning ms-2">
-                        <i class="fas fa-trash"></i> Supprimer
-                    </a>
+                   <!-- Bouton pour ouvrir la modale -->
+<button type="button" class="btn btn-outline-warning ms-2" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+    <i class="fas fa-trash"></i> Supprimer
+</button>
+
+<!-- Modale de confirmation -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmation de suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{{ path('app_delete_account') }}" method="post">
+                    <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
                 </div>
 
                     </div>

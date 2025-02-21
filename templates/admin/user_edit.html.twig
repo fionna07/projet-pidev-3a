@@ -4,6 +4,17 @@
 
 {% block content %}
     <div class="container mt-5">
+        {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
         <div class="card shadow-lg p-4 mx-auto" style="max-width: 600px;">
             <div class="card-header text-white text-center py-3" style="background-color: #4CAF50; border-top-left-radius: 10px; border-top-right-radius: 10px;">
                 <h2><i class="bi bi-person-plus-fill me-2"></i>Modifier un utilisateur</h2>
@@ -175,5 +186,31 @@
                 reader.readAsDataURL(file);
             }
         }
+    </script>
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Sélectionner les messages de succès et d'erreur
+            const successMessages = document.querySelectorAll('.alert-success');
+            const errorMessages = document.querySelectorAll('.alert-danger');
+
+            // Fonction pour faire disparaître les messages après 3 secondes
+            successMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+
+            errorMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+        });
     </script>
 {% endblock %}

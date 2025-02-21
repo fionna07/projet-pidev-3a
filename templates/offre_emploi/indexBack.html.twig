@@ -133,7 +133,7 @@
                 {% for offre in offres|sort((a, b) => a.id <=> b.id) %} <!-- Tri par ID croissant -->
                     <tr>
                         <td>{{ offre.id }}</td>
-                        <td>{{ offre.titre|capitalize }}</td>
+                        <td>🌱{{ offre.titre|capitalize }}</td>
                         <td>{{ offre.localisation }}</td> <!-- Affichage de la localisation -->
                         
                         <td>
