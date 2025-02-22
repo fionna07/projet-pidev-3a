@@ -21,6 +21,8 @@ class Conversation
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'conversation', cascade: ['remove'])]
     private Collection $messages;
 
+    
+
     public function __construct()
     {
         $this->participants = new ArrayCollection();

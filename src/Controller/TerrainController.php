@@ -200,46 +200,54 @@ class TerrainController extends AbstractController
 
 
 
-    // ...
-#[Route('/newfront', name: 'app_terrain_newfront', methods: ['GET', 'POST'])]
-public function newFront(Request $request, EntityManagerInterface $em): Response
-{
-    $terrain = new Terrain();
-    $form = $this->createForm(TerrainType::class, $terrain);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Vérification des coordonnées
-        if (!$terrain->getLatitude() || !$terrain->getLongitude()) {
-            $terrain->setLatitude(48.8566);
-            $terrain->setLongitude(2.3522);
-            $this->addFlash('warning', 'Les coordonnées n\'ont pas été choisies, valeurs par défaut (Paris) utilisées.');
-        }
-
-        // Gestion de l'upload d'image
-        $photoFile = $form->get('photos')->getData();
-        if ($photoFile) {
-            $uploadsDirectory = $this->getParameter('terrain_images_directory');
-            $newFilename = uniqid().'.'.$photoFile->guessExtension();
-
-            try {
-                $photoFile->move($uploadsDirectory, $newFilename);
-                $terrain->setPhotos($newFilename);
-            } catch (FileException $e) {
-                $this->addFlash('error', "L'upload de la photo a échoué.");
+    #[Route('/newfront', name: 'app_terrain_newfront', methods: ['GET', 'POST'])]
+    public function newFront(Request $request, EntityManagerInterface $em): Response
+    {
+        $terrain = new Terrain();
+        $form = $this->createForm(TerrainType::class, $terrain);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Vérification des coordonnées
+            if (!$terrain->getLatitude() || !$terrain->getLongitude()) {
+                $terrain->setLatitude(48.8566);
+                $terrain->setLongitude(2.3522);
+                $this->addFlash('warning', 'Les coordonnées n\'ont pas été choisies, valeurs par défaut (Paris) utilisées.');
             }
+    
+            // Gestion de l'upload d'image
+            $photoFile = $form->get('photos')->getData();
+            if ($photoFile) {
+                $uploadsDirectory = $this->getParameter('terrain_images_directory');
+                $newFilename = uniqid() . '.' . $photoFile->guessExtension();
+    
+                try {
+                    $photoFile->move($uploadsDirectory, $newFilename);
+                    $terrain->setPhotos($newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('error', "L'upload de la photo a échoué.");
+                }
+            }
+    
+            // Récupérer l'agriculteur connecté et l'affecter comme propriétaire du terrain
+            $user = $this->getUser();
+            if (!$user) {
+                throw $this->createAccessDeniedException('Vous devez être connecté pour publier un terrain.');
+            }
+            $terrain->setOwn($user);
+    
+            $em->persist($terrain);
+            $em->flush();
+    
+            // On peut soit rediriger en passant l'id de l'agriculteur en paramètre, soit ajouter un flash message
+            $this->addFlash('success', 'Terrain ajouté avec succès par l\'agriculteur (id: ' . $user->getId() . ').');
+    
+            return $this->redirectToRoute('app_terrain_front_crud', ['agriculteurId' => $user->getId()]);
         }
-
-        $em->persist($terrain);
-        $em->flush();
-        return $this->redirectToRoute('app_terrain_front_crud'); 
+    
+        return $this->render('terrain/newfront.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
-
-    return $this->render('terrain/newfront.html.twig', [
-        'form' => $form->createView(),
-    ]);
-}
-
-    
-    
+        
 }

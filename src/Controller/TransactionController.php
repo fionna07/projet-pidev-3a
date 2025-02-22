@@ -18,7 +18,6 @@ class TransactionController extends AbstractController
     #[Route('/transaction/create/{id}', name: 'app_transaction_create')]
     public function createTransaction(Request $request, EntityManagerInterface $em, $id)
     {
-        // Trouver tous les clients
         $clients = $em->getRepository(Utilisateur::class)->findAll();
         
         // Trouver le terrain avec l'ID passé dans l'URL
@@ -26,37 +25,46 @@ class TransactionController extends AbstractController
         if (!$terrain) {
             throw $this->createNotFoundException('Terrain non trouvé.');
         }
-        
+    
         // Création du formulaire
         $transaction = new Transaction();
         $form = $this->createForm(TransactionType::class, $transaction);
         $form->handleRequest($request);
     
-        // Vérification si le formulaire est soumis et valide
         if ($form->isSubmitted() && $form->isValid()) {
             $transaction->setDateTransaction(new \DateTime());
     
-            // Récupérer l'agriculteur connecté
-            $user = $this->getUser();
-            $transaction->setAgriculteur($user);  // Utilisateur connecté (agriculteur)
-            
-            // Assigner le terrain à la transaction
+            // Associer l'agriculteur (exemple avec ID fixe, à adapter selon ton système d'authentification)
+            $agriculteur = $em->getRepository(Utilisateur::class)->find(1);
+            $transaction->setAgriculteur($agriculteur);
+    
+            // Associer le terrain à la transaction
             $transaction->setTerrain($terrain);
     
+            // ✅ Vérifier si la transaction est une vente ou une location
+            if ($transaction->getType() === 'vente') {
+                $terrain->setStatus('vendu');
+            } elseif ($transaction->getType() === 'location') {
+                $terrain->setStatus('reserve');
+            }
+    
+            // Persister les entités
             $em->persist($transaction);
+            $em->persist($terrain);
             $em->flush();
     
-            $this->addFlash('success', 'Transaction créée avec succès!');
-            return $this->redirectToRoute('app_terrain_front_crud');
+            $this->addFlash('success', 'Transaction créée avec succès! Le terrain est maintenant ' . $terrain->getStatus() . '.');
+            return $this->redirectToRoute('app_terrain_index');
         }
     
-        // Passer le formulaire et la liste des clients au template
+        // Affichage du formulaire avec les variables
         return $this->render('transaction/transac.html.twig', [
             'form' => $form->createView(),
             'clients' => $clients,
         ]);
     }
     
+ 
     
 
     // Route pour afficher les transactions d'un agriculteur

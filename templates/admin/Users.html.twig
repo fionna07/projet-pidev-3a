@@ -2,6 +2,17 @@
 
 {% block content %}
 <div class="container mt-4">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
     <div class="text-center mb-4">
         <h2 class="fw-bold">Gestion des utilisateurs</h2>
         <a href="{{ path('user_add') }}" class="btn btn-success">
@@ -15,6 +26,7 @@
                 <thead class="table-light">
                     <tr>
                         <th>Identifiant</th>
+                        <th>Photo</th>
                         <th>Prénom</th>
                         <th>Nom</th>
                         <th>Email</th>
@@ -28,6 +40,15 @@
         {% if user.email != 'wefarmapplication@gmail.com' %}
             <tr>
                 <td>{{ user.id }}</td>
+                <td>
+                 {% if user.image %}
+                    <img src="{{ asset(user.image) }}" alt="Photo de profil"
+                         class="rounded-circle border border-primary shadow-lg mb-4" width="70" height="70">
+                {% else %}
+                    <img src="{{ asset('uploads/default-profile.png') }}" alt="Photo par défaut"
+                         class="rounded-circle border border-primary shadow-lg mb-4" width="200" height="200">
+                {% endif %}
+                </td>
                 <td>{{ user.lastName }}</td>
                 <td>{{ user.firstName }}</td>
                 <td>{{ user.email }}</td>
@@ -57,12 +78,33 @@
                         <a href="{{ path('user_edit', { 'id': user.id }) }}" class="btn btn-outline-warning btn-sm" title="Modifier">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <form action="{{ path('user_delete', { 'id': user.id }) }}" method="post" style="display:inline;">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer" onclick="return confirm('Voulez-vous vraiment supprimer cet utilisateur ?');">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </form>
+                    <button type="button" class="btn btn-outline-danger btn-sm" title="Supprimer"
+        data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+        data-url="{{ path('user_delete', { 'id': user.id }) }}"
+        data-token="{{ csrf_token('delete' ~ user.id) }}">
+    <i class="fas fa-trash-alt"></i>
+</button>
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmation de suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer cet utilisateur ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form id="deleteUserForm" method="post" style="display:inline;">
+                    <input type="hidden" name="_token" id="deleteUserToken">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
                         {% if user.status == 'actif' %}
                             <a href="{{ path('user_disable', { 'id': user.id }) }}" class="btn btn-outline-secondary btn-sm" title="Désactiver">
                                 <i class="fas fa-user-slash"></i>
@@ -83,4 +125,48 @@
         </div>
     </div>
 </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Sélectionner les messages de succès et d'erreur
+            const successMessages = document.querySelectorAll('.alert-success');
+            const errorMessages = document.querySelectorAll('.alert-danger');
+
+            // Fonction pour faire disparaître les messages après 3 secondes
+            successMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+
+            errorMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+        });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var confirmDeleteModal = document.getElementById("confirmDeleteModal");
+        
+        confirmDeleteModal.addEventListener("show.bs.modal", function (event) {
+            var button = event.relatedTarget; // Bouton qui a ouvert le modal
+            var deleteUrl = button.getAttribute("data-url"); // Récupération de l'URL de suppression
+            var csrfToken = button.getAttribute("data-token"); // Récupération du token CSRF
+            
+            var form = document.getElementById("deleteUserForm");
+            form.action = deleteUrl;
+
+            var tokenInput = document.getElementById("deleteUserToken");
+            tokenInput.value = csrfToken;
+        });
+    });
+</script>
+
 {% endblock %}

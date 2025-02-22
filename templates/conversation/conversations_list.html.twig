@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes conversations{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4">Mes conversations</h1>
+
+    {% if conversations is empty %}
+        <div class="alert alert-info">
+            Aucune conversation trouvée.
+        </div>
+    {% else %}
+        <!-- Grille Bootstrap : 2 colonnes sur écrans md et plus -->
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for conversation in conversations %}
+                <div class="col">
+                    <!-- Carte Bootstrap -->
+                    <div class="card h-100 position-relative">
+                        <!-- En-tête de la carte -->
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">
+                                {% for participant in conversation.participants %}
+                                    {% if participant != app.user %}
+                                        {{ participant.firstname }} {{ participant.lastname }}
+                                    {% endif %}
+                                {% endfor %}
+                            </h5>
+                        </div>
+                        
+                        <!-- Corps de la carte -->
+                        <div class="card-body">
+                            {% if conversation.messages|length > 0 %}
+                                <p class="card-text">
+                                    <strong>{{ conversation.messages|last.sender.firstname }} :</strong>
+                                    {{ conversation.messages|last.content|slice(0, 50) ~ '...' }}
+                                </p>
+                            {% else %}
+                                <p class="card-text">Aucun message</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Pied de la carte -->
+                        <div class="card-footer text-muted">
+                            {% if conversation.messages|length > 0 %}
+                                Dernier message : 
+                                {{ conversation.messages|last.createdAt|date('d/m/Y H:i') }}
+                            {% else %}
+                                Aucune date
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Lien qui rend toute la carte cliquable -->
+                        <a href="{{ path('conversation_view', {'id': conversation.id}) }}" class="stretched-link"></a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -3,7 +3,6 @@
 {% block title %}Liste des terrains{% endblock %}
 
 {% block body %}
- 
     <div class="container mt-5">
         <h1 class="text-center">Nos Terrains</h1>
         <div class="row">
@@ -16,6 +15,13 @@
                             <p class="card-text">Prix: {{ terrain.prix }} DT</p>
                             <p class="card-text">Surface: {{ terrain.surface }} m²</p>
                             <a href="{{ path('terrain_detail', {'id': terrain.id}) }}" class="btn btn-primary">Voir Détails</a>
+                            
+                            {% if terrain.own %}
+                                <!-- Bouton pour ouvrir le modal -->
+                                <button class="btn btn-secondary mt-2" data-bs-toggle="modal" data-bs-target="#conversationModal" onclick="openConversationModal({{ terrain.own.id }})">
+                                    Contacter l'agriculteur
+                                </button>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -24,4 +30,118 @@
             {% endfor %}
         </div>
     </div>
+
+    <!-- Modal de conversation -->
+    <div class="modal fade" id="conversationModal" tabindex="-1" aria-labelledby="conversationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="conversationModalLabel">Envoyer un message</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Conteneur des messages -->
+                    <div id="messagesContainer" class="mb-3" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Les messages apparaîtront ici -->
+                    </div>
+
+                    <textarea id="messageContent" class="form-control" placeholder="Écrivez votre message..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-primary" onclick="sendMessage()">Envoyer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script JavaScript -->
+    <script>
+        let conversationId = null;
+
+        function openConversationModal(ownerId) {
+            fetch(`/conversation/start/${ownerId}`, {
+                method: "POST",
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.conversationId) {
+                    conversationId = data.conversationId;
+                    loadMessages(); // Charger les messages dès l'ouverture du modal
+                }
+            })
+            .catch(error => console.error("Erreur :", error));
+        }
+
+        function loadMessages() {
+            if (!conversationId) return;
+
+            fetch(`/conversation/${conversationId}/messages`) // Nouvelle route pour récupérer les messages
+                .then(response => response.json())
+                .then(data => {
+                    const messageContainer = document.getElementById("messagesContainer");
+                    messageContainer.innerHTML = ''; // Vider l'ancien contenu des messages
+
+                    // Ajouter tous les messages à l'interface
+                    data.messages.forEach(message => {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.classList.add('message');
+                        messageDiv.innerHTML = `<strong>${message.sender}</strong>: ${message.content} <br><small>${message.createdAt}</small>`;
+                        messageContainer.appendChild(messageDiv);
+                    });
+
+                    // Faire défiler vers le bas
+                    messageContainer.scrollTop = messageContainer.scrollHeight;
+                })
+                .catch(error => console.error("Erreur lors du chargement des messages:", error));
+        }
+
+        function sendMessage() {
+            const messageContent = document.getElementById("messageContent").value;
+
+            if (!messageContent.trim()) {
+                alert("Le message ne peut pas être vide.");
+                return;
+            }
+
+            if (conversationId == null || isNaN(conversationId)) {
+                console.error("conversationId est invalide:", conversationId);
+                alert("Erreur : conversation introuvable.");
+                return;
+            }
+
+            fetch(`/message/send/${conversationId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: JSON.stringify({ content: messageContent })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Fermer le modal après l'envoi du message
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('conversationModal'));
+                    modal.hide();
+                    
+                    // Vider le champ de message
+                    document.getElementById("messageContent").value = '';
+
+                    // Ajouter le message à l'interface du modal
+                    const messageContainer = document.getElementById("messagesContainer");
+                    const newMessage = document.createElement("div");
+                    newMessage.classList.add("message");
+                    newMessage.innerHTML = `<strong>Vous</strong>: ${messageContent} <br><small>Juste maintenant</small>`;
+
+                    messageContainer.appendChild(newMessage); // Ajouter le message à la conversation affichée
+                    messageContainer.scrollTop = messageContainer.scrollHeight; // Faire défiler vers le bas
+                } else {
+                    alert("Erreur: " + data.error);
+                }
+            })
+            .catch(error => console.error("Erreur lors de l'envoi du message:", error));
+        }
+    </script>
 {% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4">Conversation avec {{ conversation.participants|map(u => u.firstname)|join(', ') }}</h1>
+
+    <div id="messagesContainer" class="mb-3">
+        {% for message in messages %}
+            <div class="message border p-2 mb-2">
+                <strong>{{ message.sender.firstname }} :</strong>
+                <p>{{ message.content }}</p>
+            </div>
+        {% else %}
+            <p class="text-muted">Aucun message.</p>
+        {% endfor %}
+    </div>
+
+    {# Formulaire d'envoi de message avec AJAX #}
+    <form id="messageForm" data-conversation-id="{{ conversation.id }}">
+        <div class="mb-3">
+            <textarea id="messageContent" class="form-control" placeholder="Écrivez votre message..." rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Envoyer</button>
+    </form>
+</div>
+{% endblock %}
+
+
+{% block javascripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+  const messageForm = document.getElementById('messageForm');
+  messageForm.addEventListener('submit', async (e) => {
+    e.preventDefault();  // Empêche la soumission traditionnelle du formulaire
+    const conversationId = messageForm.dataset.conversationId; // Récupère l'ID de la conversation
+    const messageContent = document.getElementById('messageContent').value.trim();  // Récupère le contenu du message
+    if (!messageContent) {
+      alert("Veuillez saisir un message.");
+      return;
+    }
+    try {
+      // Envoi du message via AJAX
+      const response = await fetch(`/message/send/farmer/${conversationId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ content: messageContent })
+      });
+      
+      // Traitement de la réponse
+      const data = await response.json();
+      if (data.success) {
+        alert("Message envoyé !");
+        // Optionnel : mettre à jour dynamiquement le conteneur des messages
+        const messagesContainer = document.getElementById('messagesContainer');
+        const newMessageDiv = document.createElement('div');
+        newMessageDiv.classList.add('message', 'border', 'p-2', 'mb-2');
+        newMessageDiv.innerHTML = `<strong>{{ app.user.firstname }} :</strong>
+                                   <p>${messageContent}</p>`;
+        messagesContainer.appendChild(newMessageDiv);
+        document.getElementById('messageContent').value = ""; // Réinitialise le champ de texte
+      } else {
+        alert("Erreur : " + data.error);
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du message :", error);
+      alert("Une erreur est survenue lors de l'envoi du message.");
+    }
+  });
+});
+
+</script>
+
+{% endblock %}

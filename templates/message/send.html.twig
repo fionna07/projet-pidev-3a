@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Envoyer un Message{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="text-center">Envoyer un Message</h1>
+    
+    <form action="{{ path('message_send', {'id': conversation.id}) }}" method="POST">
+        <textarea name="content" class="form-control" placeholder="Écrivez votre message..."></textarea>
+        <button type="submit" class="btn btn-primary mt-2">Envoyer</button>
+    </form>
+</div>
+{% endblock %}

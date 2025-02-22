@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du Message{% endblock %}
+
+{% block body %}
+  <h1>Détails du Message</h1>
+  <p>{{ message.content }}</p>
+  <p>Envoyé par : {{ message.sender.username }} le {{ message.createdAt|date('d/m/Y H:i') }}</p>
+  <a href="{{ path('conversation_show', {'id': message.conversation.id}) }}">Retour à la conversation</a>
+{% endblock %}
