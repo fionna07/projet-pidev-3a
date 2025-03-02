@@ -1,0 +1,154 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Statistiques des Équipements{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .chart-container {
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .stats-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: white;
+        }
+        .bg-low-stock {
+            background-color: #dc3545;
+        }
+        .bg-medium-stock {
+            background-color: #ffc107;
+        }
+        .bg-high-stock {
+            background-color: #28a745;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Statistiques des Équipements</h1>
+        <a href="{{ path('app_equipement') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+    
+    <!-- Summary Stats -->
+    <div class="stats-summary">
+        {% set lowStock = 0 %}
+        {% set mediumStock = 0 %}
+        {% set highStock = 0 %}
+        {% set totalStock = 0 %}
+        
+        {% for equipement in equipements %}
+            {% set qty = equipement.quantiteDisponible %}
+            {% set totalStock = totalStock + qty %}
+            
+            {% if qty <= 10 %}
+                {% set lowStock = lowStock + 1 %}
+            {% elseif qty <= 50 %}
+                {% set mediumStock = mediumStock + 1 %}
+            {% else %}
+                {% set highStock = highStock + 1 %}
+            {% endif %}
+        {% endfor %}
+        
+        <div class="stat-card bg-low-stock">
+            <h3>Stock Faible</h3>
+            <div class="stat-number">{{ lowStock }}</div>
+            <p>Équipements avec ≤ 10 unités</p>
+        </div>
+        
+        <div class="stat-card bg-medium-stock">
+            <h3>Stock Moyen</h3>
+            <div class="stat-number">{{ mediumStock }}</div>
+            <p>Équipements avec 11-50 unités</p>
+        </div>
+        
+        <div class="stat-card bg-high-stock">
+            <h3>Stock Élevé</h3>
+            <div class="stat-number">{{ highStock }}</div>
+            <p>Équipements avec > 50 unités</p>
+        </div>
+        
+        <div class="stat-card" style="background-color: #17a2b8;">
+            <h3>Total des Unités</h3>
+            <div class="stat-number">{{ totalStock }}</div>
+            <p>Toutes catégories confondues</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Bar Chart -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    Distribution des Équipements par Quantité Disponible
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="quantityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Equipment -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    Top 5 Équipements (Quantité)
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for equipement in equipements|sort((a, b) => b.quantiteDisponible <=> a.quantiteDisponible)|slice(0, 5) %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ equipement.nom|capitalize }}
+                                <span class="badge bg-primary rounded-pill">{{ equipement.quantiteDisponible }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/equipement-stats.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const categories = {{ categories|raw }};
+            const quantities = {{ quantities|raw }};
+            
+            initQuantityChart('quantityChart', categories, quantities);
+        });
+    </script>
+{% endblock %}

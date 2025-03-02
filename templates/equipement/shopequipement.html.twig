@@ -1,0 +1,177 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Shop Equipement{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+        }
+        .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .cart-dropdown {
+            min-width: 300px;
+            padding: 15px;
+        }
+        .cart-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        .category-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+        }
+        .shop-container {
+            margin-top: 30px;
+            margin-bottom: 50px;
+        }
+        .filter-section {
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container shop-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Boutique d'Équipements</h1>
+            <div class="d-flex align-items-center">
+                <!-- Recommendation System Icon -->
+                <div class="me-3">
+                    <a href="{{ path('app_equipement_recommandation') }}" class="text-decoration-none">
+                        <i class="fas fa-robot fa-2x text-success" title="Système de recommandation IA"></i>
+                    </a>
+                </div>
+                <!-- Shopping Cart Icon -->
+                <div class="cart-icon dropdown">
+                    <i class="fas fa-shopping-cart fa-2x" data-bs-toggle="dropdown" aria-expanded="false"></i>
+                    <span class="cart-count" id="cart-count">0</span>
+                    <div class="dropdown-menu dropdown-menu-end cart-dropdown" id="cart-dropdown">
+                        <h6 class="dropdown-header">Votre Panier</h6>
+                        <div id="cart-items">
+                            <p class="text-center text-muted">Votre panier est vide</p>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="d-flex justify-content-between">
+                            <strong>Total:</strong>
+                            <strong id="cart-total">0.00 €</strong>
+                        </div>
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-outline-danger btn-sm" id="clear-cart-btn">Vider le panier</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="search-input" placeholder="Rechercher un équipement...">
+                        <button class="btn btn-outline-secondary" type="button" id="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" id="category-filter">
+                        <option value="">Toutes les catégories</option>
+                        {% set categories = [] %}
+                        {% for equipement in equipements %}
+                            {% if equipement.categorie not in categories %}
+                                {% set categories = categories|merge([equipement.categorie]) %}
+                                <option value="{{ equipement.categorie }}">{{ equipement.categorie }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" id="sort-by">
+                        <option value="default">Trier par</option>
+                        <option value="price-asc">Prix croissant</option>
+                        <option value="price-desc">Prix décroissant</option>
+                        <option value="name-asc">Nom (A-Z)</option>
+                        <option value="name-desc">Nom (Z-A)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="equipements-container">
+            {% for equipement in equipements %}
+                <div class="col-md-4 mb-4 equipement-card" 
+                     data-name="{{ equipement.nom|lower }}" 
+                     data-category="{{ equipement.categorie|lower }}" 
+                     data-price="{{ equipement.prix }}">
+                    <div class="card h-100">
+                        <span class="badge bg-info category-badge">{{ equipement.categorie }}</span>
+                        {% if equipement.image %}
+                            <img src="{{ asset('uploads/equipements/' ~ equipement.image) }}" class="card-img-top" alt="{{ equipement.nom }}">
+                        {% else %}
+                            <img src="{{ asset('images/no-image.jpg') }}" class="card-img-top" alt="Image non disponible">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ equipement.nom }}</h5>
+                            <p class="card-text">
+                                <strong>Catégorie:</strong> {{ equipement.categorie }}<br>
+                                <strong>Prix:</strong> {{ equipement.prix }} €<br>
+                                <strong>Disponible:</strong> {{ equipement.quantiteDisponible }} unité(s)
+                            </p>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <span class="text-primary fw-bold">{{ equipement.prix }} €</span>
+                            <button class="btn btn-primary add-to-cart" 
+                                    data-id="{{ equipement.id }}" 
+                                    data-name="{{ equipement.nom }}" 
+                                    data-price="{{ equipement.prix }}"
+                                    data-image="{% if equipement.image %}{{ equipement.image }}{% else %}no-image.jpg{% endif %}"
+                                    {% if equipement.quantiteDisponible <= 0 %}disabled{% endif %}>
+                                {% if equipement.quantiteDisponible > 0 %}
+                                    <i class="fas fa-cart-plus"></i> Acheter
+                                {% else %}
+                                    Indisponible
+                                {% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        {% if equipements|length == 0 %}
+            <div class="alert alert-info text-center">
+                Aucun équipement disponible pour le moment.
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('front/front.js') }}"></script>
+{% endblock %}

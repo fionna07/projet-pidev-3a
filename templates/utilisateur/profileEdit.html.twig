@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le profil{% endblock %}
+
+{% block body %}
+    <h1>Modifier le profil de {{ user.firstName }} {{ user.lastName }}</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.email) }}
+        {{ form_row(form.firstName) }}
+        {{ form_row(form.lastName) }}
+        {{ form_row(form.dateNaissance) }}
+        {{ form_row(form.adresse) }}
+        {{ form_row(form.numTel) }}
+        {{ form_row(form.image) }}
+        {{ form_row(form.roles) }}
+        {{ form_row(form.password) }}
+        <button class="btn btn-primary">Mettre à jour le profil</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('app_delete_account') }}" class="btn btn-danger">Supprimer mon compte</a>
+    <a href="{{ path('app_disable_account') }}" class="btn btn-warning">Désactiver mon compte temporairement</a>
+{% endblock %}

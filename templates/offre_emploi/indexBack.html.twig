@@ -1,0 +1,358 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Offres d'Emploi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Offres d'Emploi</h1>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+    
+    <!-- Bouton Ajouter Offre -->
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addOffreModal">
+            <i class="fas fa-plus"></i> Ajouter une Offre
+        </button>
+    </div>
+    
+    <!-- Modal d'ajout -->
+    <div class="modal fade" id="addOffreModal" tabindex="-1" aria-labelledby="addOffreModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="addOffreModalLabel">Ajouter une Offre</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+    <!-- Formulaire d'ajout -->
+    {{ form_start(form, {'attr': {'class': 'form-horizontal', 'novalidate': 'novalidate'}}) }}
+
+    <div class="mb-3">
+        {{ form_label(form.titre) }}
+        {{ form_widget(form.titre, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
+        {{ form_errors(form.titre) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.description) }}
+        {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
+        {{ form_errors(form.description) }}
+        </div>
+
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.nombrePostes) }}
+        {{ form_widget(form.nombrePostes, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
+        {{ form_errors(form.nombrePostes) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.dateDebut) }}
+        {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
+        {{ form_errors(form.dateDebut) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.dateFinEstimee) }}
+        {{ form_widget(form.dateFinEstimee, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
+        {{ form_errors(form.dateFinEstimee) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.localisation) }}
+        {{ form_widget(form.localisation, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
+        {{ form_errors(form.localisation) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.competencesRequises) }}
+        {{ form_widget(form.competencesRequises, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
+        {{ form_errors(form.competencesRequises) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.salaire) }}
+        {{ form_widget(form.salaire, {'attr': {'class': 'form-control'}}) }}
+        <div class="text-danger">
+        {{ form_errors(form.salaire) }}
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="submit" class="btn btn-success">Ajouter</button>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+            </div>
+        </div>
+    </div>
+    <!-- Liste des offres -->
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Titre</th>
+                    <th scope="col">Localisation</th> <!-- Nouvelle colonne -->
+                    <th scope="col">Date de Publication</th>
+                    <th scope="col">Statut</th>
+                    <th scope="col">Date de Début</th>
+                    <th scope="col">Date de Fin Estimée</th>
+                    <th scope="col">Compétences Requises</th>
+                    <th scope="col">Salaire (TND)</th>
+                    <th scope="col">Nombre de postes disponibles</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for offre in offres|sort((a, b) => a.id <=> b.id) %} <!-- Tri par ID croissant -->
+                    <tr>
+                        <td>{{ offre.id }}</td>
+                        <td>{{ offre.titre|capitalize }}</td>
+                        <td>{{ offre.localisation }}</td> <!-- Affichage de la localisation -->
+                        <td>
+                            {% set now = date() %}
+                            {% set diff = now.diff(offre.datePublication) %}
+                            {% set days = diff.days %}
+
+                            {% if days == 0 %}
+                                Aujourd'hui
+                            {% elseif days == 1 %}
+                                Hier
+                            {% elseif days <= 7 %}
+                                Il y a {{ days }} jours
+                            {% else %}
+                                {{ offre.datePublication|date('d/m/Y') }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if offre.status == 'actif' %}
+                                <span class="badge badge-success">Actif</span>
+                            {% else %}
+                                <span class="badge badge-danger">Non Actif</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ offre.dateDebut|date('d/m/Y') }}</td>
+                        <td>{{ offre.dateFinEstimee|date('d/m/Y') }}</td>
+                        <td>
+                            {% for competence in offre.competencesRequises|split(',') %}
+                                <span class="badge badge-light">{{ competence|trim }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ offre.salaire }}</td>
+                        <td>{{ offre.nombrePostes }}</td>
+                        <td>
+                        <!-- Bouton Modifier (icône orange sans fond) -->
+                        <a href="#" class="text-warning me-2" data-bs-toggle="modal" data-bs-target="#editOffreModal{{ offre.id }}">
+                            <i class="fas fa-edit"></i>
+                        </a>
+
+                        <!-- Bouton Voir les candidatures (icône bleue sans fond) -->
+                        <a href="{{ path('offre_candidatures_back', {'id': offre.id}) }}" class="text-primary me-2">
+                            <i class="fas fa-file-alt"></i>
+                        </a>
+
+                        <!-- Bouton Supprimer (icône rouge sans fond) pour ouvrir le modal -->
+                        <form method="post" action="#" style="display: inline;" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">
+                            <button type="button" class="btn btn-link text-danger p-0 border-0">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                        <!-- Modal de confirmation de suppression -->
+                        <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirmation de Suppression</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Êtes-vous sûr de vouloir supprimer cette offre ?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <!-- Formulaire de suppression -->
+                                <form method="post" action="{{ path('offre_supprimer_back', {'id': offre.id}) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger">Confirmer</button>
+                                </form>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+	<!-- Modals pour  Modification -->
+	{% for offre in offres %}
+	
+    <!-- Modal Modification -->
+	<div class="modal fade" id="editOffreModal{{ offre.id }}" tabindex="-1" aria-labelledby="editOffreModalLabel{{ offre.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="editOffreModalLabel{{ offre.id }}">Modifier l'Offre</h5>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{{ path('offre_edit_back', {'id': offre.id}) }}">
+                    <!-- Titre -->
+                    <div class="mb-3">
+                        <label for="titre{{ offre.id }}" class="form-label">Titre</label>
+                        <input type="text" class="form-control" id="titre{{ offre.id }}" name="titre" value="{{ offre.titre }}" required>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="description{{ offre.id }}" class="form-label">Description</label>
+                        <textarea class="form-control" id="description{{ offre.id }}" name="description" rows="3" required>{{ offre.description }}</textarea>
+                    </div>
+
+                    <!-- Nombre de postes -->
+                    <div class="mb-3">
+                        <label for="nombrePostes{{ offre.id }}" class="form-label">Nombre de Postes</label>
+                        <input type="number" class="form-control" id="nombrePostes{{ offre.id }}" name="nombrePostes" value="{{ offre.nombrePostes }}" required>
+                    </div>
+
+                    <!-- Date de début -->
+                    <div class="mb-3">
+                        <label for="dateDebut{{ offre.id }}" class="form-label">Date de Début</label>
+                        <input type="datetime" class="form-control" id="dateDebut{{ offre.id }}" name="dateDebut" value="{{ offre.dateDebut|date('Y-m-d') }}" required>
+                    </div>
+
+                    <!-- Date de fin estimée -->
+                    <div class="mb-3">
+                        <label for="dateFinEstimee{{ offre.id }}" class="form-label">Date de Fin Estimée</label>
+                        <input type="date" class="form-control" id="dateFinEstimee{{ offre.id }}" name="dateFinEstimee" value="{{ offre.dateFinEstimee|date('Y-m-d') }}" required>
+                    </div>
+
+                    <!-- Compétences Requises -->
+                    <div class="mb-3">
+                        <label for="competencesRequises{{ offre.id }}" class="form-label">Compétences Requises (séparées par des virgules)</label>
+                        <input type="text" class="form-control" id="competencesRequises{{ offre.id }}" name="competencesRequises" value="{{ offre.competencesRequises }}">
+                    </div>
+
+                    <!-- Salaire -->
+                    <div class="mb-3">
+                        <label for="salaire{{ offre.id }}" class="form-label">Salaire</label>
+                        <input type="number" class="form-control" id="salaire{{ offre.id }}" name="salaire" value="{{ offre.salaire }}" required>
+                    </div>
+
+                    <!-- Localisation -->
+                    <div class="mb-3">
+                        <label for="localisation{{ offre.id }}" class="form-label">Localisation</label>
+                        <select class="form-control" id="localisation{{ offre.id }}" name="localisation" required>
+                            <option value="" disabled selected>Choisir un gouvernorat</option>
+                            <option value="Ariana" {% if offre.localisation == 'Ariana' %}selected{% endif %}>Ariana</option>
+                            <option value="Béja" {% if offre.localisation == 'Béja' %}selected{% endif %}>Béja</option>
+                            <option value="Ben Arous" {% if offre.localisation == 'Ben Arous' %}selected{% endif %}>Ben Arous</option>
+                            <option value="Bizerte" {% if offre.localisation == 'Bizerte' %}selected{% endif %}>Bizerte</option>
+                            <option value="Gabès" {% if offre.localisation == 'Gabès' %}selected{% endif %}>Gabès</option>
+                            <option value="Gafsa" {% if offre.localisation == 'Gafsa' %}selected{% endif %}>Gafsa</option>
+                            <option value="Jendouba" {% if offre.localisation == 'Jendouba' %}selected{% endif %}>Jendouba</option>
+                            <option value="Kairouan" {% if offre.localisation == 'Kairouan' %}selected{% endif %}>Kairouan</option>
+                            <option value="Kasserine" {% if offre.localisation == 'Kasserine' %}selected{% endif %}>Kasserine</option>
+                            <option value="Kébili" {% if offre.localisation == 'Kébili' %}selected{% endif %}>Kébili</option>
+                            <option value="Kef" {% if offre.localisation == 'Kef' %}selected{% endif %}>Kef</option>
+                            <option value="Mahdia" {% if offre.localisation == 'Mahdia' %}selected{% endif %}>Mahdia</option>
+                            <option value="Manouba" {% if offre.localisation == 'Manouba' %}selected{% endif %}>Manouba</option>
+                            <option value="Médenine" {% if offre.localisation == 'Médenine' %}selected{% endif %}>Médenine</option>
+                            <option value="Monastir" {% if offre.localisation == 'Monastir' %}selected{% endif %}>Monastir</option>
+                            <option value="Nabeul" {% if offre.localisation == 'Nabeul' %}selected{% endif %}>Nabeul</option>
+                            <option value="Sfax" {% if offre.localisation == 'Sfax' %}selected{% endif %}>Sfax</option>
+                            <option value="Sidi Bouzid" {% if offre.localisation == 'Sidi Bouzid' %}selected{% endif %}>Sidi Bouzid</option>
+                            <option value="Siliana" {% if offre.localisation == 'Siliana' %}selected{% endif %}>Siliana</option>
+                            <option value="Sousse" {% if offre.localisation == 'Sousse' %}selected{% endif %}>Sousse</option>
+                            <option value="Tataouine" {% if offre.localisation == 'Tataouine' %}selected{% endif %}>Tataouine</option>
+                            <option value="Tozeur" {% if offre.localisation == 'Tozeur' %}selected{% endif %}>Tozeur</option>
+                            <option value="Tunis" {% if offre.localisation == 'Tunis' %}selected{% endif %}>Tunis</option>
+                            <option value="Zaghouan" {% if offre.localisation == 'Zaghouan' %}selected{% endif %}>Zaghouan</option>
+                        </select>
+                    </div>
+
+
+                    <!-- Statut -->
+                    <div class="mb-3">
+                        <label for="status{{ offre.id }}" class="form-label">Statut</label>
+                        <select class="form-control" id="status{{ offre.id }}" name="status" required>
+                            <option value="actif" {% if offre.status == 'actif' %}selected{% endif %}>Actif</option>
+                            <option value="inactif" {% if offre.status == 'inactif' %}selected{% endif %}>Inactif</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-warning">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+	{% endfor %}
+
+    {% if modal_open %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addOffreModal'));
+            myModal.show();
+        });
+    </script>
+    {% endif %}
+    <!-- JavaScript pour faire disparaître les messages flash après un délai -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Sélectionner les messages de succès et d'erreur
+            const successMessages = document.querySelectorAll('.alert-success');
+            const errorMessages = document.querySelectorAll('.alert-danger');
+
+            // Fonction pour faire disparaître les messages après 3 secondes
+            successMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+
+            errorMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+        });
+    </script>
+</div>
+{% endblock %}

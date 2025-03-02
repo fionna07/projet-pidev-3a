@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ UserDetail.firstName }} {{ UserDetail.lastName }}{% endblock %}
+
+{% block body %}
+    <h1>Profil de {{ UserDetail.firstName }} {{ UserDetail.lastName }}</h1>
+
+    <div class="profile-info">
+        <p><strong>Email :</strong> {{ UserDetail.email }}</p>
+        <p><strong>Prénom :</strong> {{ UserDetail.firstName }}</p>
+        <p><strong>Nom :</strong> {{ UserDetail.lastName }}</p>
+        <p><strong>Date de naissance :</strong> {{ UserDetail.dateNaissance|date('d-m-Y') }}</p>
+        <p><strong>Adresse :</strong> {{ UserDetail.adresse }}</p>
+        <p><strong>Numéro de téléphone :</strong> {{ UserDetail.numTel }}</p>
+        
+        {% if UserDetail.image %}
+            <p><strong>Image :</strong><br><img src="{{ asset('images/' ~ UserDetail.image) }}" alt="Image de profil" style="width: 150px; height: 150px;"></p>
+        {% else %}
+            <p><strong>Image :</strong> Aucun profil image disponible.</p>
+        {% endif %}
+    </div>
+
+    <a href="{{ path('app_edit_profile') }}" class="btn btn-primary">Modifier le profil</a>
+{% endblock %}
