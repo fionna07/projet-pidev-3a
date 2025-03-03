@@ -17,100 +17,20 @@
     {% endfor %}
     
     <!-- Bouton Ajouter Offre -->
-        <div class="text-center mb-4">
+    <div class="text-center mb-4">
         <h2 class="fw-bold">Gestion des offres d'emploi</h2>
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addOffreModal">
+        <a href="{{ path('app_offreEmploi_ajouter_back') }}" class="btn btn-success">
             <i class="fas fa-plus"></i> Ajouter une Offre
-        </button>
+        </a>
     </div>
+
+    <!-- Bouton statistiques -->
+        <div class="text-end mb-3">
+            <a href="{{ path('emploi_statistiques') }}" class="btn btn-success btn-sm">
+                <i class="fas fa-chart-bar"></i> Statistiques
+            </a>
+        </div>
     
-    <!-- Modal d'ajout -->
-    <div class="modal fade" id="addOffreModal" tabindex="-1" aria-labelledby="addOffreModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="addOffreModalLabel">Ajouter une Offre</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-    <!-- Formulaire d'ajout -->
-    {{ form_start(form, {'attr': {'class': 'form-horizontal', 'novalidate': 'novalidate'}}) }}
-
-    <div class="mb-3">
-        {{ form_label(form.titre) }}
-        {{ form_widget(form.titre, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.titre) }}
-        </div>
-    </div>
-
-    <div class="mb-3">
-        {{ form_label(form.description) }}
-        {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.description) }}
-        </div>
-
-    </div>
-
-    <div class="mb-3">
-        {{ form_label(form.nombrePostes) }}
-        {{ form_widget(form.nombrePostes, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.nombrePostes) }}
-        </div>
-    </div>
-
-    <div class="mb-3">
-        {{ form_label(form.dateDebut) }}
-        {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.dateDebut) }}
-        </div>
-    </div>
-
-    <div class="mb-3">
-        {{ form_label(form.dateFinEstimee) }}
-        {{ form_widget(form.dateFinEstimee, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.dateFinEstimee) }}
-        </div>
-    </div>
-
-    <div class="mb-3">
-        {{ form_label(form.localisation) }}
-        {{ form_widget(form.localisation, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.localisation) }}
-        </div>
-    </div>
-
-    <div class="mb-3">
-        {{ form_label(form.competencesRequises) }}
-        {{ form_widget(form.competencesRequises, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.competencesRequises) }}
-        </div>
-    </div>
-
-    <div class="mb-3">
-        {{ form_label(form.salaire) }}
-        {{ form_widget(form.salaire, {'attr': {'class': 'form-control'}}) }}
-        <div class="text-danger">
-        {{ form_errors(form.salaire) }}
-        </div>
-    </div>
-
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="submit" class="btn btn-success">Ajouter</button>
-    </div>
-
-    {{ form_end(form) }}
-</div>
-            </div>
-        </div>
-    </div>
     <!-- Liste des offres -->
     <div class="card shadow-sm">
         <div class="card-body">
@@ -133,7 +53,7 @@
                 {% for offre in offres|sort((a, b) => a.id <=> b.id) %} <!-- Tri par ID croissant -->
                     <tr>
                         <td>{{ offre.id }}</td>
-                        <td>{{ offre.titre|capitalize }}</td>
+                        <td>🌱{{ offre.titre|capitalize }}</td>
                         <td>{{ offre.localisation }}</td> <!-- Affichage de la localisation -->
                         
                         <td>
@@ -305,15 +225,6 @@
 </div>
 
 	{% endfor %}
-
-    {% if modal_open %}
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var myModal = new bootstrap.Modal(document.getElementById('addOffreModal'));
-            myModal.show();
-        });
-    </script>
-    {% endif %}
     <!-- JavaScript pour faire disparaître les messages flash après un délai -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {

@@ -32,6 +32,50 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
     }
+         // Compter le nombre total d'utilisateurs
+    public function countTotalUsers(): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    // Compter les utilisateurs par statut
+    public function countUsersByStatus(string $status): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.status = :status')
+            ->setParameter('status', $status)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    // Compter les utilisateurs créés depuis une date donnée
+    public function countUsersCreatedSince(\DateTime $since): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.dateCreation >= :since')
+            ->setParameter('since', $since)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+    public function searchUsers(?string $search): array
+    {
+        $qb = $this->createQueryBuilder('u');
+
+        if (!empty($search)) {
+            $qb->where('LOWER(u.firstName) LIKE :search')
+               ->orWhere('LOWER(u.lastName) LIKE :search')
+               ->orWhere('LOWER(u.email) LIKE :search')
+               ->setParameter('search', '%' . strtolower($search) . '%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+   
 
 //    /**
 //     * @return Utilisateur[] Returns an array of Utilisateur objects

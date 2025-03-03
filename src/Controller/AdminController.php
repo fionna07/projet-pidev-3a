@@ -15,6 +15,12 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Service\ImageUploader;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+use App\Repository\ActivitesRepository;
+use App\Repository\UtilisateurRepository;
+use DateTime;
+use DateInterval;
+use Symfony\Component\HttpFoundation\JsonResponse;
 final class AdminController extends AbstractController{
 
     #[Route('/admin/profile', name: 'app_profile_admin')]
@@ -222,5 +228,72 @@ final class AdminController extends AbstractController{
         $em->flush();
         return $this->redirectToRoute('admin_users'); // Assurez-vous que 'user_list' existe
     }
+    #[Route('/admin/activities/stats/data', name: 'activities_stats', methods: ['GET'])]
+    public function getActivityStats(ActivitesRepository $activityRepository): JsonResponse
+    {
+        $stats = $activityRepository->getStatsByActivityType();
 
+        $formattedStats = [
+            'weekly' => [],
+            'monthly' => [],
+            'categories' => [],
+        ];
+
+        foreach ($stats as $stat) {
+            $formattedStats['weekly'][$stat['type']] = $stat['weekly'];
+            $formattedStats['monthly'][$stat['type']] = $stat['monthly'];
+            $formattedStats['categories'][$stat['type']] = [
+                'weekly' => $stat['weekly'],
+                'monthly' => $stat['monthly'],
+            ];
+        }
+
+        return new JsonResponse($formattedStats);
+    }
+    #[Route('/user/stats-page', name: 'user_stats')]
+    public function showUserStats(UtilisateurRepository $userRepository): Response
+    {
+        // Récupérer le nombre total d'utilisateurs
+        $totalUsers = $userRepository->countTotalUsers();
+        $activeUsers = $userRepository->countUsersByStatus('actif');
+        $inactiveUsers = $userRepository->countUsersByStatus('désactivé');
+
+        // Définir la période pour une semaine et un mois
+        $oneWeekAgo = new \DateTime('-7 days');
+        $oneMonthAgo = new \DateTime('-1 month');
+
+        // Utiliser le bon nom de méthode ici !
+        $totalUsersWeek = $userRepository->countUsersCreatedSince($oneWeekAgo);
+        $totalUsersMonth = $userRepository->countUsersCreatedSince($oneMonthAgo);
+
+        return $this->render('admin/user_stats.html.twig', [
+            'totalUsers' => $totalUsers,
+            'activeUsers' => $activeUsers,
+            'inactiveUsers' => $inactiveUsers,
+            'totalUsersWeek' => $totalUsersWeek,
+            'totalUsersMonth' => $totalUsersMonth
+        ]);
+    }
+    
+    #[Route('/admin/users/search', name: 'admin_users_search')]
+public function searchUsers(Request $request, UtilisateurRepository $utilisateurRepository): Response
+{
+    $query = $request->query->get('query', ''); // Récupérer la valeur du champ de recherche
+
+    // Vérifier si une recherche a été effectuée
+    if (!empty($query)) {
+        $users = $utilisateurRepository->searchByUsernameOrEmail($query);
+    } else {
+        $users = $utilisateurRepository->findAll(); // Retourner tous les utilisateurs si pas de recherche
+    }
+
+    return $this->render('admin/users.html.twig', [
+        'users' => $users,
+        'query' => $query,
+    ]);
+}
+
+
+
+    
 }

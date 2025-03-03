@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <body class="bg-light">
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="card shadow-lg p-4 w-50">
+            <div class="text-center mb-4">
+                <img src="{{ asset('img/logo.png') }}" alt="Logo WeFarm" style="width: 150px; height: auto;">
+                <h2 class="mt-3">Connexion par Reconnaissance Faciale</h2>
+                <p class="text-muted">Prenez une photo pour vous connecter</p>
+            </div>
+
+            {# Display flash messages #}
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+
+            {# Camera preview and capture button #}
+            <div id="camera-preview" class="text-center" style="display: none;">
+                <video id="camera-feed" autoplay class="img-fluid rounded"></video>
+                <button type="button" id="capture-button" class="btn btn-primary w-100 mt-3">Prendre une photo</button>
+            </div>
+
+            {# Form to submit the captured image #}
+            <form id="face-login-form" method="post" action="{{ path('app_face_login') }}">
+                <input type="hidden" id="face-image-data" name="face_image_data">
+            </form>
+
+            {# Back to regular login #}
+            <div class="text-center mt-4">
+                <a href="{{ path('app_login') }}" class="btn btn-outline-secondary">Retour à la connexion par email/mot de passe</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cameraPreview = document.getElementById('camera-preview');
+        const cameraFeed = document.getElementById('camera-feed');
+        const captureButton = document.getElementById('capture-button');
+        const faceImageData = document.getElementById('face-image-data');
+        const faceLoginForm = document.getElementById('face-login-form');
+
+        // Access the camera when the page loads
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                cameraFeed.srcObject = stream;
+                cameraPreview.style.display = 'block'; // Show the camera preview
+            } catch (error) {
+                alert('Erreur: Impossible d\'accéder à la caméra. Veuillez autoriser l\'accès.');
+                console.error(error);
+            }
+        }
+
+        // Capture the photo
+        captureButton.addEventListener('click', () => {
+            // Create a canvas to capture the image
+            const canvas = document.createElement('canvas');
+            canvas.width = cameraFeed.videoWidth;
+            canvas.height = cameraFeed.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
+
+            // Convert the canvas image to a data URL
+            const imageData = canvas.toDataURL('image/jpeg');
+            faceImageData.value = imageData; // Store the image data in the hidden input
+
+            // Stop the camera stream
+            const stream = cameraFeed.srcObject;
+            stream.getTracks().forEach(track => track.stop());
+
+            // Hide the camera preview
+            cameraPreview.style.display = 'none';
+
+            // Submit the form
+            faceLoginForm.submit();
+        });
+
+        // Start the camera when the page loads
+        startCamera();
+    </script>
+    </body>
+{% endblock %}

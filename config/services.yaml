@@ -1,5 +1,6 @@
 parameters:
- terrain_images_directory: '%kernel.project_dir%/public/uploads/terrains'
+    google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
+ #terrain_images_directory: '%kernel.project_dir%/public/uploads/terrains'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -19,4 +20,8 @@ services:
     App\Service\EmailService:
         arguments:
             $mailer: '@mailer.mailer' # Injecte le service Mailer
-            
+
+    App\Service\FaceAPIService:
+        arguments:
+            $apiKey: '%env(FACEPP_API_KEY)%'
+            $apiSecret: '%env(FACEPP_API_SECRET)%'        

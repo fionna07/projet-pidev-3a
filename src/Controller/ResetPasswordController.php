@@ -50,7 +50,7 @@ final class ResetPasswordController extends AbstractController
 
 //        envoi d'email'
 
-        $transport = Transport::fromDsn('smtp://benharbfarah85@gmail.com:usvjuzoqaluwufif@smtp.gmail.com:587?encryption=tls&auth_mode=login');
+        $transport = Transport::fromDsn('smtp://benharbfarah85@gmail.com:vevilsdkhkwqczbq@smtp.gmail.com:587?encryption=tls&auth_mode=login');
         $mailer = new Mailer($transport);
 
         $emailOTP = (new Email())
@@ -155,7 +155,7 @@ final class ResetPasswordController extends AbstractController
         $userId = $user->getId();
         $OTP = rand(1000, 9999);
 
-        $transport = Transport::fromDsn('smtp://benharbfarah85@gmail.com:usvjuzoqaluwufif@smtp.gmail.com:587?encryption=tls&auth_mode=login');
+        $transport = Transport::fromDsn('smtp://benharbfarah85@gmail.com:vevilsdkhkwqczbq@smtp.gmail.com:587?encryption=tls&auth_mode=login');
         $mailer = new Mailer($transport);
 
         $emailOTP = (new Email())

@@ -1,0 +1,90 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block content %}
+    <h2 class="text-center text-primary"><i class="fas fa-chart-bar"></i> Statistiques des Comptes Créés</h2>
+
+    <div class="container mt-4">
+        <!-- Section des statistiques -->
+        <div class="row justify-content-center">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="fas fa-users"></i> Total Utilisateurs</h5>
+                        <p class="card-text fs-3">{{ totalUsers }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="fas fa-user-check"></i> Utilisateurs Actifs</h5>
+                        <p class="card-text fs-3">{{ activeUsers }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-white bg-danger mb-3">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><i class="fas fa-user-slash"></i> Utilisateurs Inactifs</h5>
+                        <p class="card-text fs-3">{{ inactiveUsers }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sélecteur de période -->
+        <div class="text-center my-3">
+            <label for="timePeriod" class="form-label"><strong>Afficher par :</strong></label>
+            <select id="timePeriod" class="form-select w-auto d-inline-block">
+                <option value="week">7 derniers jours</option>
+                <option value="month">1 dernier mois</option>
+            </select>
+        </div>
+
+        <!-- Graphique -->
+        <div class="card p-4 shadow-sm">
+            <canvas id="userChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Importation de Chart.js et FontAwesome -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var ctx = document.getElementById('userChart').getContext('2d');
+
+            var chartData = {
+                labels: ['Total', 'Actifs', 'Inactifs'],
+                datasets: [{
+                    label: 'Utilisateurs',
+                    data: [{{ totalUsers }}, {{ activeUsers }}, {{ inactiveUsers }}],
+                    backgroundColor: ['#007bff', '#28a745', '#dc3545']
+                }]
+            };
+
+            var userChart = new Chart(ctx, {
+                type: 'bar',
+                data: chartData
+            });
+
+            // Changer les données selon la période sélectionnée
+            document.getElementById('timePeriod').addEventListener('change', function () {
+                let selectedPeriod = this.value;
+
+                let newData;
+                if (selectedPeriod === 'week') {
+                    newData = [{{ totalUsersWeek }}, "{{ totalUsersWeek - inactiveUsers }}", "{{ inactiveUsers }}"];
+                } else {
+                    newData = [{{ totalUsersMonth }}, "{{ totalUsersMonth - inactiveUsers }}", "{{ inactiveUsers }}"];
+                }
+
+                userChart.data.datasets[0].data = newData;
+                userChart.update();
+            });
+        });
+    </script>
+{% endblock %}

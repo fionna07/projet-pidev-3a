@@ -3,39 +3,65 @@
 {% block title %}Détails de l'Offre{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
+<div class="container mt-5">
     <!-- Card Container for the offer details -->
-    <div class="card shadow-lg p-4 rounded">
-        <h1 class="mb-4 text-center text-primary" style="font-size: 2.5rem;">{{ offre.titre }}</h1>
+    <div class="card shadow-lg p-4 rounded border-0">
+        <h1 class="mb-4 text-center text-primary" style="font-size: 2.5rem;">
+            <i class="fas fa-briefcase"></i> {{ offre.titre }}
+        </h1>
+
+        <hr class="my-4">
 
         <!-- Description Section -->
-        <p><strong class="fs-5">Description:</strong> <span class="fs-6">{{ offre.description }}</span></p>
+        <p>
+            <strong class="fs-5"><i class="fas fa-file-alt"></i> Description:</strong> 
+            <span class="fs-6">{{ offre.description }}</span>
+        </p>
         
         <!-- Competences Section -->
-        <p><strong class="fs-5">Compétences requises:</strong></p>
-        <ul class="fs-6">
+        <p><strong class="fs-5"><i class="fas fa-tools"></i> Compétences requises:</strong></p>
+        <ul class="fs-6 list-group list-group-flush">
             {% for competence in offre.competencesRequises|split(',') %}
-                <li>{{ competence|trim }}</li>
+                <li class="list-group-item"><i class="fas fa-check-circle text-success"></i> {{ competence|trim }}</li>
             {% endfor %}
         </ul>
+
+        <hr class="my-4">
         
         <!-- Dates Section -->
-        <p><strong class="fs-5">Date de début:</strong> <span class="fs-6">{{ offre.dateDebut|date('d/m/Y') }}</span></p>
-        <p><strong class="fs-5">Date de fin estimée:</strong> <span class="fs-6">{{ offre.dateFinEstimee|date('d/m/Y') }}</span></p>
-        
+        <p>
+            <strong class="fs-5"><i class="fas fa-calendar-alt"></i> Date de début:</strong> 
+            <span class="fs-6">{{ offre.dateDebut|date('d/m/Y') }}</span>
+        </p>
+        <p>
+            <strong class="fs-5"><i class="fas fa-calendar-check"></i> Date de fin estimée:</strong> 
+            <span class="fs-6">{{ offre.dateFinEstimee|date('d/m/Y') }}</span>
+        </p>
+
         <!-- Salary Section -->
-        <p><strong class="fs-5">Salaire:</strong> <span class="fs-6">{{ offre.salaire }} TND</span></p>
+        <p>
+            <strong class="fs-5"><i class="fas fa-money-bill-wave"></i> Salaire:</strong> 
+            <span class="fs-6">{{ offre.salaire }} TND</span>
+        </p>
 
         <!-- Location Section -->
-        <p><strong class="fs-5">Localisation:</strong> <span class="fs-6">{{ offre.localisation }}</span></p>
-        
-        <!-- New Section for Number of Available Positions -->
-        <p><strong class="fs-5">Nombre de places disponibles:</strong> <span class="fs-6">{{ offre.nombrePostes }}</span></p>
+        <p>
+            <strong class="fs-5"><i class="fas fa-map-marker-alt"></i> Localisation:</strong> 
+            <span class="fs-6">{{ offre.localisation }}</span>
+        </p>
+
+        <!-- Number of Available Positions -->
+        <p>
+            <strong class="fs-5"><i class="fas fa-users"></i> Nombre de places disponibles:</strong> 
+            <span class="fs-6">{{ offre.nombrePostes }}</span>
+        </p>
     </div>
-    
+
     <!-- Back Button Positioned at the Bottom -->
     <div class="d-flex justify-content-center mt-4">
-        <a href="{{ path('app_offreEmploiEmploye') }}" class="btn btn-success btn-lg shadow-lg">Retour aux offres</a>
+        <a href="{{ path('app_offreEmploiEmploye') }}" class="btn btn-success btn-lg shadow-lg">
+            <i class="fas fa-arrow-left"></i> Retour aux offres
+        </a>
     </div>
 </div>
 

@@ -1,0 +1,235 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Calendrier des offres{% endblock %}
+
+{% block body %}
+    <h1 class="calendar-title">Calendrier de mes postes {{ 'now'|date('Y') }}</h1>
+
+    <div class="calendar-container">
+        <div class="months-row">
+            {% set monthsInFrench = [
+                'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+            ] %}
+
+            {% for month in months %}
+                <div class="month-section">
+                    <h2 class="month-title">
+                        <i class="fas fa-calendar-month"></i> {{ monthsInFrench[loop.index0] }}
+                    </h2>
+
+                    <table class="calendar">
+                        <thead>
+                            <tr>
+                                <th class="weekend">Dim</th>
+                                <th>Lun</th>
+                                <th>Mar</th>
+                                <th>Mer</th>
+                                <th>Jeu</th>
+                                <th>Ven</th>
+                                <th class="weekend">Sam</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set dayCounter = 0 %}
+                            {% set startDay = month.firstDayOfWeek %}
+
+                            {# Première ligne de la semaine #}
+                            <tr>
+                                {% for i in 0..6 %}
+                                    {% if i < startDay %}
+                                        <td></td>
+                                    {% else %}
+                                        {% set day = month.daysInMonth[dayCounter] %}
+                                        <td class="calendar-day {% if i == 0 or i == 6 %}weekend{% endif %}">
+                                            {{ day|date('d') }}
+                                            {% for event in month.events %}
+                                                {% if event.date == day|date('Y-m-d') %}
+                                                    <a href="{{ path('app_details_offre', {'offreId': event.offreId}) }}" class="event">
+                                                    🧑‍🌾</a>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        {% set dayCounter = dayCounter + 1 %}
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+
+                            {# Autres lignes de semaines #}
+                            {% for week in 0..(month.daysInMonth|length / 7)|round(0, 'ceil') - 1 %}
+                                <tr>
+                                    {% for i in 0..6 %}
+                                        {% if dayCounter < month.daysInMonth|length %}
+                                            <td class="calendar-day {% if i == 0 or i == 6 %}weekend{% endif %}">
+                                                {{ month.daysInMonth[dayCounter]|date('d') }}
+                                                {% for event in month.events %}
+                                                    {% if event.date == month.daysInMonth[dayCounter]|date('Y-m-d') %}
+                                                        <a href="{{ path('app_details_offre', {'offreId': event.offreId}) }}" class="event">🧑‍🌾</a>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            {% set dayCounter = dayCounter + 1 %}
+                                        {% else %}
+                                            <td></td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <style>
+        .calendar-container {
+            width: 100%;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+
+        .calendar-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color:rgb(137, 130, 130);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .months-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeInUp 1s ease-in-out forwards;
+        }
+
+        .month-section {
+            width: 30%;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            background-color: #f9f9f9;
+            opacity: 0;
+            animation: fadeInUp 1s ease-in-out forwards;
+            animation-delay: 0.3s;
+        }
+
+        .month-title {
+            text-align: center;
+            font-size: 1.4rem;
+            background-color:rgb(255, 212, 56);
+            color: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            animation: bounceIn 1s ease-out;
+        }
+
+        .calendar {
+            width: 100%;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+        .calendar th, .calendar td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+            vertical-align: top;
+            font-size: 14px;
+        }
+
+        .calendar th {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .calendar-day {
+            min-width: 50px;
+            height: 50px;
+            position: relative;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .calendar-day:hover {
+            background-color: #f8f9fa;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transform: scale(1.1);
+        }
+
+        .calendar-day:hover .event {
+            background-color: #f8b400;
+        }
+
+        .event {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color:rgb(72, 236, 146);
+            color: white;
+            padding: 5px;
+            border-radius: 50%;
+            font-size: 14px;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInEvent 0.3s ease-in-out forwards;
+        }
+
+        .calendar td {
+            border: 1px solid #ddd;
+        }
+
+        /* Colorie les jours de week-end (Dim et Sam) */
+        .calendar .weekend {
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(50px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            60% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeInEvent {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            .calendar {
+                font-size: 12px;
+            }
+
+            .calendar-title {
+                font-size: 1.5rem;
+            }
+
+            .calendar th, .calendar td {
+                padding: 8px;
+            }
+
+            .event {
+                font-size: 12px;
+                padding: 3px;
+            }
+        }
+    </style>
+
+{% endblock %}

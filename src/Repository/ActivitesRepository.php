@@ -15,6 +15,24 @@ class ActivitesRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Activites::class);
     }
+    public function getStatsByActivityType()
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            "SELECT a.type, 
+                    COUNT(a.id) as total,
+                    SUM(CASE WHEN a.date >= :weekStart THEN 1 ELSE 0 END) as weekly,
+                    SUM(CASE WHEN a.date >= :monthStart THEN 1 ELSE 0 END) as monthly
+             FROM App\Entity\Activity a
+             WHERE a.date >= :monthStart
+             GROUP BY a.type"
+        );
+
+        $query->setParameter('weekStart', new \DateTime('-7 days'));
+        $query->setParameter('monthStart', new \DateTime('-30 days'));
+
+        return $query->getResult();
+    }
 
 //    /**
 //     * @return Activites[] Returns an array of Activites objects

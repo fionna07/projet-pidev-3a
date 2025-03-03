@@ -42,23 +42,42 @@
                         <tr>
                             <td>{{ activity.id }}</td>
                             <td>{{ activity.user.email }}</td>
-                            <td>
-                                <span class="badge bg-info text-dark">
-                                    <i class="fas fa-edit"></i> {{ activity.action }}
-                                </span>
-                            </td>
+                           <td>
+                            <span class="badge text-dark" style="background-color: #c0c0c0;">
+                                <i class="fas fa-edit"></i> {{ activity.action }}
+                            </span>
+                        </td>
+
                             <td>{{ activity.date|date('d/m/Y H:i') }}</td>
                             <td class="text-center">
                                 <!-- Bouton Modifier -->
-                                <a href="{{ path('admin_activity_edit', {id: activity.id}) }}" class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit"></i>
-                                </a>
+                            
 
-                                <!-- Bouton Supprimer -->
-                                <a href="{{ path('admin_activity_delete', {id: activity.id}) }}" class="btn btn-danger btn-sm"
-                                   onclick="return confirm('Voulez-vous vraiment supprimer cette activité ?');">
-                                    <i class="fas fa-trash"></i>
-                                </a>
+                              <!-- Bouton Supprimer -->
+<button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" 
+        data-url="{{ path('admin_activity_delete', {id: activity.id}) }}">
+    <i class="fas fa-trash"></i>
+</button>
+
+<!-- Modal de confirmation -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmation de suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                Voulez-vous vraiment supprimer cette activité ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <a id="confirmDeleteButton" href="#" class="btn btn-danger">Supprimer</a>
+            </div>
+        </div>
+    </div>
+</div>
+
                             </td>
                         </tr>
                     {% else %}
@@ -71,4 +90,18 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var confirmDeleteModal = document.getElementById("confirmDeleteModal");
+        var confirmDeleteButton = document.getElementById("confirmDeleteButton");
+
+        confirmDeleteModal.addEventListener("show.bs.modal", function(event) {
+            var button = event.relatedTarget; // Le bouton qui a déclenché le modal
+            var deleteUrl = button.getAttribute("data-url"); // Récupère l'URL
+
+            confirmDeleteButton.setAttribute("href", deleteUrl); // Met à jour le lien de suppression
+        });
+    });
+</script>
+
 {% endblock %}

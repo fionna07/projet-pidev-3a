@@ -18,6 +18,8 @@ use App\Repository\CandidatureRepository;
 use App\Repository\EvenementRepository;
 use App\Entity\Evenement;
 use App\Service\ActivityLoggerService;
+use Symfony\Component\HttpFoundation\RequestStack;
+
 
 class FrontPagesController extends AbstractController
 {
@@ -115,8 +117,13 @@ class FrontPagesController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         Security $security,
-        CandidatureRepository $candidatureRepository 
+        CandidatureRepository $candidatureRepository,
+        RequestStack $requestStack // Ajout de RequestStack pour récupérer la locale
     ): Response {
+        // Récupérer la locale active (par défaut 'fr')
+        $locale = $requestStack->getCurrentRequest()->getLocale();  // Récupère la langue active
+        $traduction_active = $locale;  // Assigner la locale active à la variable
+
         // Récupérer toutes les offres d'emploi
         $offres = $offreEmploiRepository->findAll();
 
@@ -184,7 +191,8 @@ class FrontPagesController extends AbstractController
         return $this->render('offre_emploi/indexEmploye.html.twig', [
             'offres' => $offres,
             'formulaireOffres' => $formulaireOffres, 
-            'modal_open' => $modalOpen, 
+            'modal_open' => $modalOpen,
+            'traduction_active' => $traduction_active, // Passer la variable à la vue
         ]);
     }
     //Affichage des candidatures pour les offres de l'agriculteur connecté
@@ -200,7 +208,7 @@ class FrontPagesController extends AbstractController
         ]);
     }
     //Evénement interface Agriculteur
-    #[Route(name: 'app_events', methods: ['GET'])]
+    #[Route('/event/agriculteur',name: 'app_events', methods: ['GET'])]
     public function events (EvenementRepository $evenementRepository): Response
     {
         return $this->render('events/index.html.twig', [

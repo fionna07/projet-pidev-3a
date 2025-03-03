@@ -7,7 +7,6 @@
         <h1 class="text-center mb-4">📊 Statistiques des Activités</h1>
 
         <div class="row">
-            <!-- Cadre des Graphiques -->
             <div class="col-md-7">
                 <div class="card shadow-lg p-10">
                     <h4 class="text-center mb-3">Graphique des Activités</h4>
@@ -15,45 +14,37 @@
                 </div>
             </div>
 
-         <!-- Cadre des Filtres -->
-<div class="col-md-5">
-    <div class="card shadow-lg p-4 rounded">
-        <h4 class="mb-3 text-center">Filtres</h4>
+            <div class="col-md-5">
+                <div class="card shadow-lg p-4 rounded">
+                    <h4 class="mb-3 text-center">Filtres</h4>
 
-        <!-- Type de Graphique -->
-        <h5 class="mt-1">Type de graphique</h5>
-        <div class="btn-group d-flex gap-2">
-            <input class="btn-check" type="radio" name="chartType" value="bar" id="chartBar" checked>
-            <label class="btn btn-outline-primary flex-fill rounded" for="chartBar">📊 Histogramme</label>
+                    <h5 class="mt-1">Type de graphique</h5>
+                    <div class="btn-group d-flex gap-2">
+                        <input class="btn-check" type="radio" name="chartType" value="bar" id="chartBar" checked>
+                        <label class="btn btn-outline-primary flex-fill rounded" for="chartBar">📊 Histogramme</label>
 
-            <input class="btn-check" type="radio" name="chartType" value="pie" id="chartPie">
-            <label class="btn btn-outline-primary flex-fill rounded" for="chartPie">🥧 Camembert</label>
+                        <input class="btn-check" type="radio" name="chartType" value="pie" id="chartPie">
+                        <label class="btn btn-outline-primary flex-fill rounded" for="chartPie">🥧 Camembert</label>
 
-            <input class="btn-check" type="radio" name="chartType" value="line" id="chartLine">
-            <label class="btn btn-outline-primary flex-fill rounded" for="chartLine">📈 Courbe</label>
-        </div>
+                        <input class="btn-check" type="radio" name="chartType" value="line" id="chartLine">
+                        <label class="btn btn-outline-primary flex-fill rounded" for="chartLine">📈 Courbe</label>
+                    </div>
 
-        <!-- Statistiques par -->
-        <h5 class="mt-3">Statistiques par</h5>
-        <div class="btn-group d-flex gap-2">
-            <input class="btn-check" type="radio" name="statType" value="weekly" id="statWeekly">
-            <label class="btn btn-outline-secondary flex-fill rounded" for="statWeekly">📅 Semaine</label>
+                    <h5 class="mt-3">Période</h5>
+                    <div class="btn-group d-flex gap-2">
+                        <input class="btn-check" type="radio" name="statType" value="weekly" id="statWeekly">
+                        <label class="btn btn-outline-secondary flex-fill rounded" for="statWeekly">📅 Semaine</label>
 
-            <input class="btn-check" type="radio" name="statType" value="monthly" id="statMonthly" checked>
-            <label class="btn btn-outline-secondary flex-fill rounded" for="statMonthly">📆 Mois</label>
+                        <input class="btn-check" type="radio" name="statType" value="monthly" id="statMonthly" checked>
+                        <label class="btn btn-outline-secondary flex-fill rounded" for="statMonthly">📆 Mois</label>
+                    </div>
 
-            <input class="btn-check" type="radio" name="statType" value="yearly" id="statYearly">
-            <label class="btn btn-outline-secondary flex-fill rounded" for="statYearly">🗓 Année</label>
-        </div>
-
-        <!-- Filtre par Catégorie -->
-        <h5 class="mt-3">Filtrer par catégorie</h5>
-        <select id="categoryFilter" class="form-select shadow-sm rounded">
-            <option value="all" selected>Toutes les catégories</option>
-        </select>
-    </div>
-</div>
-
+                    <h5 class="mt-3">Filtrer par Type</h5>
+                    <select id="categoryFilter" class="form-select shadow-sm rounded">
+                        <option value="all" selected>Tous les types</option>
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -71,8 +62,8 @@
                 .then(data => {
                     statsData = data;
                     populateCategoryFilter(data.categories);
-                    initializeChart(data);
-                    setupEventListeners(data);
+                    initializeChart();
+                    setupEventListeners();
                 });
         });
 
@@ -86,21 +77,21 @@
             });
         }
 
-        function initializeChart(data) {
+        function initializeChart() {
             const ctx = document.getElementById('statsChart').getContext('2d');
             chart = new Chart(ctx, {
                 type: currentChartType,
-                data: getChartData(data, currentStatType, currentCategory)
+                data: getChartData()
             });
         }
 
-        function getChartData(data, statType, category) {
-            let stats = category === 'all' ? data[statType] : data.categories[category][statType];
+        function getChartData() {
+            let stats = currentCategory === 'all' ? statsData[currentStatType] : statsData.categories[currentCategory][currentStatType];
 
             return {
                 labels: Object.keys(stats),
                 datasets: [{
-                    label: 'Activités par ' + (statType === 'weekly' ? 'Semaine' : statType === 'monthly' ? 'Mois' : 'Année'),
+                    label: 'Activités par ' + (currentStatType === 'weekly' ? 'Semaine' : 'Mois'),
                     data: Object.values(stats),
                     backgroundColor: currentChartType === 'pie' ? [
                         'rgba(255, 99, 132, 0.5)',
@@ -140,24 +131,8 @@
             chart.destroy();
             chart = new Chart(document.getElementById('statsChart').getContext('2d'), {
                 type: currentChartType,
-                data: getChartData(statsData, currentStatType, currentCategory)
+                data: getChartData()
             });
         }
     </script>
-
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .btn-group .btn {
-            font-size: 14px;
-            font-weight: 500;
-        }
-    </style>
 {% endblock %}

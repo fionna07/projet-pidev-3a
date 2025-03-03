@@ -18,116 +18,22 @@
 
     <h1 class="mb-2 fs-3">Les offres d'Emploi</h1>
     <!-- Barre de recherche -->
-    <div class="mb-4">
+    <form method="GET" action="{{ path('offres_recherche') }}" class="mb-4" data-turbo-action="replace" data-turbo-frame="search-results">
     <div class="input-group">
-        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher une offre par titre..." aria-label="Recherche">
-        <button class="btn btn-outline-secondary text-success" type="button" id="searchButton">
+        <input type="text" name="search" id="searchInput" class="form-control" placeholder="Rechercher une offre par titre..." value="{{ searchTerm ?? '' }}" aria-label="Recherche" aria-describedby="loadingIndicator">
+        <button class="btn btn-outline-secondary text-success" type="submit" id="searchBtn">
             <i class="fas fa-search" style="color: #28a745;"></i>
         </button>
     </div>
+    <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+        <i class="fas fa-spinner fa-spin"></i> Chargement...
     </div>
-
-    <!-- Bouton Les candidatures -->
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{{ path('app_candidatures') }}" class="btn btn-primary">
-            <i class="fas fa-users"></i> Les candidatures
-        </a>
-    </div>
-
+    </form>
     <!-- Bouton Ajouter Offre -->
     <div class="d-flex justify-content-end mb-3">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOffreModal">
+        <a href="{{ path('app_offreEmploi_ajouter') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Ajouter une Offre
-        </button>
-    </div>
-    
-    <!-- Modal d'ajout -->
-    <div class="modal fade" id="addOffreModal" tabindex="-1" aria-labelledby="addOffreModalLabel" aria-hidden="true"
-    data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="addOffreModalLabel">Ajouter une Offre</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                <!-- Formulaire d'ajout -->
-                {{ form_start(form, {'attr': {'class': 'form-horizontal', 'novalidate': 'novalidate'}}) }}
-
-                <div class="mb-3">
-                    {{ form_label(form.titre) }}
-                    {{ form_widget(form.titre, {'attr': {'class': 'form-control'}}) }}
-                    <div class="text-danger">
-                    {{ form_errors(form.titre) }}
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    {{ form_label(form.description) }}
-                    {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
-                    <div class="text-danger">
-                    {{ form_errors(form.description) }}
-                    </div>
-
-                </div>
-
-                <div class="mb-3">
-                    {{ form_label(form.nombrePostes) }}
-                    {{ form_widget(form.nombrePostes, {'attr': {'class': 'form-control'}}) }}
-                    <div class="text-danger">
-                    {{ form_errors(form.nombrePostes) }}
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    {{ form_label(form.dateDebut) }}
-                    {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
-                    <div class="text-danger">
-                    {{ form_errors(form.dateDebut) }}
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    {{ form_label(form.dateFinEstimee) }}
-                    {{ form_widget(form.dateFinEstimee, {'attr': {'class': 'form-control'}}) }}
-                    <div class="text-danger">
-                    {{ form_errors(form.dateFinEstimee) }}
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    {{ form_label(form.localisation) }}
-                    {{ form_widget(form.localisation, {'attr': {'class': 'form-control'}}) }}
-                    <div class="text-danger">
-                    {{ form_errors(form.localisation) }}
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    {{ form_label(form.competencesRequises) }}
-                    {{ form_widget(form.competencesRequises, {'attr': {'class': 'form-control'}}) }}
-                    <div class="text-danger">
-                    {{ form_errors(form.competencesRequises) }}
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    {{ form_label(form.salaire) }}
-                    {{ form_widget(form.salaire, {'attr': {'class': 'form-control'}}) }}
-                    <div class="text-danger">
-                    {{ form_errors(form.salaire) }}
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Ajouter</button>
-                </div>
-
-                {{ form_end(form) }}
-            </div>
-            </div>
-        </div>
+        </a>
     </div>
 
     <!-- Liste des offres -->
@@ -164,7 +70,7 @@
 
                     <!-- Corps de la carte -->
                     <div class="card-body" style="padding-top: 30px; flex-grow: 1;">
-                        <h5 class="card-title fw-bold">{{ offre.titre|capitalize }}</h5>
+                        <h5 class="card-title fw-bold">🌱{{ offre.titre|capitalize }}</h5>
 
                         <!-- Dates -->
                         <p class="mb-1"><strong>Date de début:</strong> {{ offre.dateDebut|date('d/m/Y') }}</p>
@@ -192,6 +98,10 @@
                         </button>
 
                         {% if app.user and offre.user is not null and app.user.id == offre.user.id %}
+                            <!-- Bouton Voir les candidatures -->
+                            <a href="{{ path('app_candidatures_offre', {'id': offre.id}) }}" class="text-success">
+                                <i class="fas fa-users"></i>
+                            </a>
                             <!-- Bouton Modifier -->
                             <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#editOffreModal{{ offre.id }}">
                                 <i class="fas fa-edit"></i> Modifier
@@ -228,60 +138,87 @@
             </div>
         {% endfor %}
     </div>
-                
-	<!-- Modals pour Détails et Modification -->
-	{% for offre in offres %}
-	<!-- Modal Détails -->
-	<div class="modal fade" id="offreModal{{ offre.id }}" tabindex="-1" aria-labelledby="offreModalLabel{{ offre.id }}" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title fw-bold" id="offreModalLabel{{ offre.id }}">{{ offre.titre }}</h5>
-				</div>
-				<div class="modal-body">
-                    <!-- Date de publication -->
-                    <div class="position-absolute top-0 start-0 m-2 text-muted small" style="margin-bottom: 10px;">
-                        {% set now = date() %}
-                        {% set diff = now.diff(offre.datePublication) %}
-                        {% set days = diff.days %}
+  {% for offre in offres %}
+<!-- Modal Détails -->
+<div class="modal fade" id="offreModal{{ offre.id }}" tabindex="-1" aria-labelledby="offreModalLabel{{ offre.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> <!-- Agrandir le modal -->
+        <div class="modal-content shadow-lg rounded-4">
+            <!-- En-tête -->
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold text-white" id="offreModalLabel{{ offre.id }}">
+                <i class="fas fa-briefcase"></i> {{ offre.titre }}
+            </h5>
 
-                        Publié :
-                        {% if days == 0 %}
-                                Aujourd'hui
-                        {% elseif days == 1 %}
-                                Hier
-                        {% elseif days <= 7 %}
-                                Il y a {{ days }} jours
-                        {% else %}
-                                {{ offre.datePublication|date('d/m/Y') }}
-                        {% endif %}
-                        </div>
-                        <br> <!-- Saut de ligne pour espacer -->
-					<p><strong>Description :</strong></p>
-					<p>{{ offre.description }}</p>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
 
-					<p><strong>Nombre de postes :</strong> {{ offre.nombrePostes }}</p>
+            <!-- Corps du modal -->
+            <div class="modal-body p-4">
+                <!-- Date de publication -->
+                <div class="text-muted small mb-3">
+                    {% set now = date() %}
+                    {% set diff = now.diff(offre.datePublication) %}
+                    {% set days = diff.days %}
+                    <i class="far fa-calendar-alt"></i> Publié :
+                    {% if days == 0 %}
+                        Aujourd'hui
+                    {% elseif days == 1 %}
+                        Hier
+                    {% elseif days <= 7 %}
+                        Il y a {{ days }} jours
+                    {% else %}
+                        {{ offre.datePublication|date('d/m/Y') }}
+                    {% endif %}
+                </div>
 
-					<p><strong>Date de début :</strong> {{ offre.dateDebut|date('d/m/Y H:i') }}</p> <!-- Date avec heure -->
+                <!-- Description -->
+                <p><strong><i class="fas fa-align-left"></i> Description :</strong></p>
+                <p class="text-justify">{{ offre.description }}</p>
 
-					<p><strong>Date de fin estimée :</strong> {{ offre.dateFinEstimee|date('d/m/Y') }}</p> <!-- Date sans heure -->
-
-                    <p><strong>Compétences Requises:</strong></p>
-                    <div class="mt-2">
-                        <div class="d-flex flex-wrap gap-2">
-                            {% for competence in offre.competencesRequises|split(',') %}
-                                <span class="badge" style="background-color: #f5f5dc; color: black; padding: 0.25rem 0.75rem; border-radius: 50px;">{{ competence|trim }}</span>
-                            {% endfor %}
-                        </div>
+                <div class="row">
+                    <!-- Nombre de postes -->
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-users"></i> Nombre de postes :</strong> {{ offre.nombrePostes }}</p>
                     </div>
 
-					<p class="mt-4"><strong>Salaire :</strong> {{ offre.salaire }} TND</p>
+                    <!-- Salaire -->
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-money-bill-wave"></i></i> Salaire :</strong> {{ offre.salaire }} TND</p>
+                    </div>
+                </div>
 
-					<p><strong>Localisation :</strong> {{ offre.localisation }}</p>
-				</div>
-			</div>
-		</div>
-	</div>
+                <div class="row">
+                    <!-- Date de début -->
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-calendar-day"></i> Date de début :</strong> {{ offre.dateDebut|date('d/m/Y H:i') }}</p>
+                    </div>
+
+                    <!-- Date de fin estimée -->
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-calendar-check"></i> Date de fin estimée :</strong> {{ offre.dateFinEstimee|date('d/m/Y') }}</p>
+                    </div>
+                </div>
+
+                <!-- Localisation -->
+                <p><strong><i class="fas fa-map-marker-alt"></i> Localisation :</strong> {{ offre.localisation }}</p>
+
+                <!-- Compétences requises -->
+                <p><strong><i class="fas fa-tools"></i> Compétences Requises :</strong></p>
+                <div class="mt-2">
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for competence in offre.competencesRequises|split(',') %}
+                            <span class="badge bg-light text-dark border shadow-sm px-3 py-2">{{ competence|trim }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+          
+        </div>
+    </div>
+</div>
+
+
     <!-- Modal Modification -->
 	<div class="modal fade" id="editOffreModal{{ offre.id }}" tabindex="-1" aria-labelledby="editOffreModalLabel{{ offre.id }}" aria-hidden="true">
     <div class="modal-dialog">
@@ -386,15 +323,6 @@
 </div>
 
 	{% endfor %}
-
-    {% if modal_open %}
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var myModal = new bootstrap.Modal(document.getElementById('addOffreModal'));
-            myModal.show();
-        });
-    </script>
-    {% endif %}
     <!-- JavaScript pour faire disparaître les messages flash après un délai -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -422,45 +350,27 @@
             });
         });
     </script>
-    <!-- JavaScript pour la recherche -->
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
-        const offresList = document.getElementById('offresList');
-        const offreCards = document.querySelectorAll('.offre-card');
-
-        // Fonction pour normaliser les accents
-        function normalizeString(str) {
-            return str
-                .normalize("NFD") // Décompose les caractères accentués en base + diacritique
-                .replace(/[\u0300-\u036f]/g, ""); // Supprime les diacritiques
-        }
-
-        // Fonction de filtrage insensible à la casse et aux accents
-        function filterOffres() {
-            const searchTerm = normalizeString(searchInput.value.trim().toLowerCase()); // Normaliser et convertir en minuscules
-
-            offreCards.forEach(card => {
-                const competences = normalizeString(card.getAttribute('data-titre').toLowerCase()); // Normaliser et convertir en minuscules
-                if (competences.includes(searchTerm)) {
-                    card.style.display = 'block'; // Afficher la carte si la compétence correspond
-                } else {
-                    card.style.display = 'none'; // Masquer la carte si la compétence ne correspond pas
-                }
-            });
-        }
-
-        // Écouteur d'événement pour le bouton de recherche
-        searchButton.addEventListener('click', filterOffres);
-
-        // Écouteur d'événement pour la touche "Entrée"
-        searchInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                filterOffres();
-            }
-        });
-    });
-    </script>
 </div>
+<script>
+    // Lors de la soumission du formulaire, afficher l'indicateur de chargement
+    document.querySelector('form').addEventListener('turbo:submit-start', function() {
+        document.getElementById('loadingIndicator').style.display = 'inline-block';
+        document.getElementById('searchBtn').disabled = true; // Désactiver le bouton pour éviter plusieurs soumissions
+    });
+
+    // Lorsque la réponse est reçue, masquer l'indicateur de chargement
+    document.addEventListener('turbo:load', function() {
+        document.getElementById('loadingIndicator').style.display = 'none';
+        document.getElementById('searchBtn').disabled = false; // Réactiver le bouton
+    });
+</script>
+
+<style>
+    /* Style pour l'indicateur de chargement */
+    .loading-indicator {
+        font-size: 14px;
+        margin-left: 10px;
+        color: #28a745;
+    }
+</style>
 {% endblock %}

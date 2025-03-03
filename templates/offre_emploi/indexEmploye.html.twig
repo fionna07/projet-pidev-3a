@@ -14,45 +14,81 @@
                 {{ message }}
             </div>
         {% endfor %}
+        
+
     <div class="container mt-4">
+    <!--Bouton Traduction-->
+        <div class="d-flex justify-content-end align-items-center">
+            <!-- Bouton pour traduire en arabe avec police arabe -->
+            <a href="{{ path('liste_offres', {'traduire': 'ar'}) }}" class="btn btn-sm btn-primary mx-2" aria-label="Traduire en Arabe" style="font-family: 'Cairo', sans-serif;">
+                Ar <!-- Texte en police arabe -->
+            </a>
+
+            <!-- Bouton pour traduire en français -->
+            <a href="{{ path('liste_offres', {'traduire': 'fr'}) }}" class="btn btn-sm btn-primary mx-2" aria-label="Traduire en Français">
+                🇫🇷 <!-- Emoji représentant la langue française -->
+            </a>
+        </div>
         <!-- Barre de recherche -->
-        <div class="mb-4">
+        <form method="GET" action="{{ path('offres_recherche_employe') }}" class="mb-4" data-turbo-action="replace" data-turbo-frame="search-results">
         <div class="input-group">
-            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher une offre par compétence..." aria-label="Recherche">
-            <button class="btn btn-outline-secondary text-success" type="button" id="searchButton">
+            <input type="text" name="search" id="searchInput" class="form-control" placeholder="Rechercher une offre par compétences..." value="{{ searchTerm ?? '' }}" aria-label="Recherche" aria-describedby="loadingIndicator">
+            <button class="btn btn-outline-secondary text-success" type="submit" id="searchBtn">
                 <i class="fas fa-search" style="color: #28a745;"></i>
             </button>
         </div>
-    </div>
-    <!-- Bouton Afficher Candidatures -->
-        <div class="d-flex justify-content-end mb-3">
-        <a href="{{ path('app_mesCandidatures') }}" class="btn btn-success">
-            Mes candidatures <i class="fas fa-clipboard-list ms-2"></i>
-        </a>
+        <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i> Chargement...
         </div>
+        </form>
+    <!-- Bouton Afficher Candidatures -->
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ path('app_mesCandidatures') }}" class="btn btn-primary btn-sm d-flex align-items-center mx-2">
+            <i class="fas fa-clipboard-list me-2"></i>
+            Mes candidatures
+        </a>
+    </div>
+
+        
     <!-- Liste des offres -->
     <div class="row" id="offresList">
         {% for offre in offres %}
             <div class="col-md-6 col-lg-4 mb-4 offre-card" data-competences="{{ offre.competencesRequises }}">
                 <div class="card position-relative shadow-lg border-light rounded-3" style="height: 100%; display: flex; flex-direction: column;"> <!-- Ajout de l'ombrage et flex pour la hauteur -->
                       <!-- Date de publication -->
-                        <div class="position-absolute top-0 start-0 m-2 text-muted small" style="margin-bottom: 10px;">
-                            {% set now = date() %}
-                            {% set diff = now.diff(offre.datePublication) %}
-                            {% set days = diff.days %}
+                    <div class="position-absolute top-0 start-0 m-2 text-muted small" style="margin-bottom: 10px;">
+                        {% set now = date() %}
+                        {% set diff = now.diff(offre.datePublication) %}
+                        {% set days = diff.days %}
 
-                            Publié :
-                            {% if days == 0 %}
-                                Aujourd'hui
-                            {% elseif days == 1 %}
-                                Hier
-                            {% elseif days <= 7 %}
-                                Il y a {{ days }} jours
+                        {% if traduction_active == 'ar' %}
+                            {{ 'published'|trans({}, 'messages', 'ar') }} :
+                        {% else %}
+                            {{ 'published'|trans({}, 'messages', 'fr') }} :
+                        {% endif %}
+
+                        {% if days == 0 %}
+                            {% if traduction_active == 'ar' %}
+                                {{ 'today'|trans({}, 'messages', 'ar') }}
                             {% else %}
-                                {{ offre.datePublication|date('d/m/Y') }}
+                                {{ 'today'|trans({}, 'messages', 'fr') }}
                             {% endif %}
-                        </div>
-
+                        {% elseif days == 1 %}
+                            {% if traduction_active == 'ar' %}
+                                {{ 'yesterday'|trans({}, 'messages', 'ar') }}
+                            {% else %}
+                                {{ 'yesterday'|trans({}, 'messages', 'fr') }}
+                            {% endif %}
+                        {% elseif days <= 7 %}
+                            {% if traduction_active == 'ar' %}
+                                {{ 'days_ago'|trans({'%days%': days}, 'messages', 'ar') }}
+                            {% else %}
+                                {{ 'days_ago'|trans({'%days%': days}, 'messages', 'fr') }}
+                            {% endif %}
+                        {% else %}
+                            {{ offre.datePublication|date('d/m/Y') }}
+                        {% endif %}
+                    </div>
                     
                     <!-- Statut -->
                     <div class="position-absolute top-0 end-0 m-2">
@@ -65,125 +101,259 @@
 
                     
                     <div class="card-body" style="padding-top: 30px;">
-                    <h5 class="card-title fw-bold">{{ offre.titre|capitalize }}</h5>
+                    <h5 class="card-title fw-bold">🌱{{ offre.titre|capitalize }}</h5>
 
                         <!-- Dates -->
-                        <p class="mb-1"><strong>Date de début:</strong> {{ offre.dateDebut|date('d/m/Y') }}</p>
-                        <p class="mb-1"><strong>Date de fin estimée:</strong> {{ offre.dateFinEstimee|date('d/m/Y') }}</p>
+                        <p class="mb-1">
+                            <strong>
+                                {% if traduction_active == 'ar' %}
+                                    {{ 'date_debut'|trans({}, 'messages', 'ar') }}:
+                                {% else %}
+                                    {{ 'date_debut'|trans({}, 'messages', 'fr') }}:
+                                {% endif %}
+                            </strong> {{ offre.dateDebut|date('d/m/Y') }}
+                        </p>
+
+                        <p class="mb-1">
+                            <strong>
+                                {% if traduction_active == 'ar' %}
+                                    {{ 'date_fin_estimee'|trans({}, 'messages', 'ar') }}:
+                                {% else %}
+                                    {{ 'date_fin_estimee'|trans({}, 'messages', 'fr') }}:
+                                {% endif %}
+                            </strong> {{ offre.dateFinEstimee|date('d/m/Y') }}
+                        </p>
                         
                         <!-- Compétences requises -->
-                        <p><strong>Compétences Requises:</strong></p>
+                        <p>
+                            <strong>
+                                {% if traduction_active == 'ar' %}
+                                    {{ 'required_skills'|trans({}, 'messages', 'ar') }}:
+                                {% else %}
+                                    {{ 'required_skills'|trans({}, 'messages', 'fr') }}:
+                                {% endif %}
+                            </strong>
+                        </p>
                         <div class="mt-1">
                             <div class="d-flex flex-wrap gap-2">
                                 {% for competence in offre.competencesRequises|split(',') %}
-                                    <span class="badge" style="background-color: #f5f5dc; color: black; padding: 0.25rem 0.75rem; border-radius: 50px;">{{ competence|trim }}</span>
+                                    <span class="badge" style="background-color: #f5f5dc; color: black; padding: 0.25rem 0.75rem; border-radius: 50px;">
+                                        {{ competence|trim }}
+                                    </span>
                                 {% endfor %}
                             </div>
                         </div>
                         
                         <!-- Salaire -->
-                        <p class="mt-4"><strong>Salaire:</strong> {{ offre.salaire }} TND</p>
+                        <p class="mt-4">
+                            <strong>
+                                {% if traduction_active == 'ar' %}
+                                    {{ 'salary'|trans({}, 'messages', 'ar') }}:
+                                {% else %}
+                                    {{ 'salary'|trans({}, 'messages', 'fr') }}:
+                                {% endif %}
+                            </strong> {{ offre.salaire }} 
+                        </p>
                     </div>
                     
                     <!-- Actions -->
                     <div class="card-footer d-flex justify-content-between">
-                    <!-- Bouton Détails (Beige Clair) -->
-                    <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#offreModal{{ offre.id }}">
-                        <i class="fas fa-eye"></i> Détails
-                    </button>
-                    <!-- Bouton Postuler -->
-                    <button type="button" class="btn btn-sm" 
-                            {% if offre.status != 'actif' %} 
-                                disabled 
-                                style="background-color: #d6e8d7; border-color: #d6e8d7;" 
+                        <!-- Bouton Détails (Beige Clair) -->
+                        <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#offreModal{{ offre.id }}">
+                            <i class="fas fa-eye"></i> 
+                            {% if traduction_active == 'ar' %}
+                                {{ 'details'|trans({}, 'messages', 'ar') }}
                             {% else %}
-                                class="btn btn-success" 
-                                style="background-color: #28a745; border-color: #28a745;" 
-                            {% endif %} 
-                            data-bs-toggle="modal" data-bs-target="#postulerModal{{ offre.id }}">
-                        <!-- Icône et texte Postuler : Blanc si actif, sinon couleur originale -->
-                        <i class="fas fa-paper-plane" 
-                            {% if offre.status != 'actif' %} 
-                                style="color: #000;" 
-                            {% else %}
-                                style="color: white;" 
-                            {% endif %}>
-                        </i> 
-                        <span 
-                            {% if offre.status != 'actif' %} 
-                                style="color: #000;" 
-                            {% else %}
-                                style="color: white;" 
-                            {% endif %}>
-                            Postuler
-                        </span>
-                    </button>
+                                {{ 'details'|trans({}, 'messages', 'fr') }}
+                            {% endif %}
+                        </button>
 
-
+                        <!-- Bouton Postuler -->
+                        <button type="button" class="btn btn-sm" 
+                                {% if offre.status != 'actif' %} 
+                                    disabled 
+                                    style="background-color: #d6e8d7; border-color: #d6e8d7;" 
+                                {% else %}
+                                    class="btn btn-success" 
+                                    style="background-color: #28a745; border-color: #28a745;" 
+                                {% endif %} 
+                                data-bs-toggle="modal" data-bs-target="#postulerModal{{ offre.id }}">
+                            <i class="fas fa-paper-plane" 
+                                {% if offre.status != 'actif' %} 
+                                    style="color: #000;" 
+                                {% else %}
+                                    style="color: white;" 
+                                {% endif %}>
+                            </i> 
+                            <span 
+                                {% if offre.status != 'actif' %} 
+                                    style="color: #000;" 
+                                {% else %}
+                                    style="color: white;" 
+                                {% endif %}>
+                                {% if traduction_active == 'ar' %}
+                                    {{ 'apply'|trans({}, 'messages', 'ar') }}
+                                {% else %}
+                                    {{ 'apply'|trans({}, 'messages', 'fr') }}
+                                {% endif %}
+                            </span>
+                        </button>
                     </div>
                 </div>
             </div>
         {% endfor %}
     </div>
 	<!-- Modals pour Détails et postulation -->
-	{% for offre in offres %}
-	<!-- Modal Détails -->
-	<div class="modal fade" id="offreModal{{ offre.id }}" tabindex="-1" aria-labelledby="offreModalLabel{{ offre.id }}" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title fw-bold" id="offreModalLabel{{ offre.id }}">{{ offre.titre }}</h5>
-				</div>
-				<div class="modal-body">
+	  {% for offre in offres %}
+    <!-- Modal Détails -->
+    <div class="modal fade" id="offreModal{{ offre.id }}" tabindex="-1" aria-labelledby="offreModalLabel{{ offre.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg"> <!-- Agrandir le modal -->
+            <div class="modal-content shadow-lg rounded-4">
+                <!-- En-tête -->
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold text-white" id="offreModalLabel{{ offre.id }}">
+                    <i class="fas fa-briefcase"></i> {{ offre.titre }}
+                </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Corps du modal -->
+                <div class="modal-body p-4">
                     <!-- Date de publication -->
-                    <div class="position-absolute top-0 start-0 m-2 text-muted small" style="margin-bottom: 10px;">
+                    <div class="text-muted small mb-3">
                         {% set now = date() %}
                         {% set diff = now.diff(offre.datePublication) %}
                         {% set days = diff.days %}
-
-                        Publié :
-                        {% if days == 0 %}
-                                Aujourd'hui
-                        {% elseif days == 1 %}
-                                Hier
-                        {% elseif days <= 7 %}
-                                Il y a {{ days }} jours
+                        <i class="far fa-calendar-alt"></i> 
+                        {% if traduction_active == 'ar' %}
+                            {{ 'published'|trans({}, 'messages', 'ar') }} :
                         {% else %}
-                                {{ offre.datePublication|date('d/m/Y') }}
+                            {{ 'published'|trans({}, 'messages', 'fr') }} :
                         {% endif %}
+                        {% if days == 0 %}
+                            {% if traduction_active == 'ar' %}
+                                {{ 'today'|trans({}, 'messages', 'ar') }}
+                            {% else %}
+                                {{ 'today'|trans({}, 'messages', 'fr') }}
+                            {% endif %}
+                        {% elseif days == 1 %}
+                            {% if traduction_active == 'ar' %}
+                                {{ 'yesterday'|trans({}, 'messages', 'ar') }}
+                            {% else %}
+                                {{ 'yesterday'|trans({}, 'messages', 'fr') }}
+                            {% endif %}
+                        {% elseif days <= 7 %}
+                            {% if traduction_active == 'ar' %}
+                                {{ 'days_ago'|trans({'%days%': days}, 'messages', 'ar') }}
+                            {% else %}
+                                {{ 'days_ago'|trans({'%days%': days}, 'messages', 'fr') }}
+                            {% endif %}
+                        {% else %}
+                            {{ offre.datePublication|date('d/m/Y') }}
+                        {% endif %}
+                    </div>
+
+                    <!-- Description -->
+                    <p><strong><i class="fas fa-align-left"></i> 
+                        {% if traduction_active == 'ar' %}
+                            {{ 'description'|trans({}, 'messages', 'ar') }} :
+                        {% else %}
+                            {{ 'description'|trans({}, 'messages', 'fr') }} :
+                        {% endif %}
+                    </strong></p>
+                    <p class="text-justify">{{ offre.description }}</p>
+
+                    <div class="row">
+                        <!-- Nombre de postes -->
+                        <div class="col-md-6">
+                            <p><strong><i class="fas fa-users"></i> 
+                                {% if traduction_active == 'ar' %}
+                                    {{ 'number_of_postes'|trans({}, 'messages', 'ar') }} :
+                                {% else %}
+                                    {{ 'number_of_postes'|trans({}, 'messages', 'fr') }} :
+                                {% endif %}
+                            </strong> {{ offre.nombrePostes }}</p>
                         </div>
-                        <br> <!-- Saut de ligne pour espacer -->
-					<p><strong>Description :</strong></p>
-					<p>{{ offre.description }}</p>
 
-					<p><strong>Nombre de postes :</strong> {{ offre.nombrePostes }}</p>
-
-					<p><strong>Date de début :</strong> {{ offre.dateDebut|date('d/m/Y H:i') }}</p> <!-- Date avec heure -->
-
-					<p><strong>Date de fin estimée :</strong> {{ offre.dateFinEstimee|date('d/m/Y') }}</p> <!-- Date sans heure -->
-
-                    <p><strong>Compétences Requises:</strong></p>
-                    <div class="mt-2">
-                        <div class="d-flex flex-wrap gap-2">
-                            {% for competence in offre.competencesRequises|split(',') %}
-                                <span class="badge" style="background-color: #f5f5dc; color: black; padding: 0.25rem 0.75rem; border-radius: 50px;">{{ competence|trim }}</span>
-                            {% endfor %}
+                        <!-- Salaire -->
+                        <div class="col-md-6">
+                            <p><strong>
+                                {% if traduction_active == 'ar' %}
+                                    {{ 'salary'|trans({}, 'messages', 'ar') }} :
+                                {% else %}
+                                    {{ 'salary'|trans({}, 'messages', 'fr') }} :
+                                {% endif %}
+                            </strong> {{ offre.salaire }}</p>
                         </div>
                     </div>
 
-					<p class="mt-4"><strong>Salaire :</strong> {{ offre.salaire }} TND</p>
+                    <div class="row">
+                        <!-- Date de début -->
+                        <div class="col-md-6">
+                            <p><strong><i class="fas fa-calendar-day"></i> 
+                                {% if traduction_active == 'ar' %}
+                                    {{ 'date_debut'|trans({}, 'messages', 'ar') }} :
+                                {% else %}
+                                    {{ 'date_debut'|trans({}, 'messages', 'fr') }} :
+                                {% endif %}
+                            </strong> {{ offre.dateDebut|date('d/m/Y H:i') }}</p>
+                        </div>
 
-					<p><strong>Localisation :</strong> {{ offre.localisation }}</p>
-				</div>
-			</div>
-		</div>
-	</div>
+                        <!-- Date de fin estimée -->
+                        <div class="col-md-6">
+                            <p><strong><i class="fas fa-calendar-check"></i> 
+                                {% if traduction_active == 'ar' %}
+                                    {{ 'date_fin_estimee'|trans({}, 'messages', 'ar') }} :
+                                {% else %}
+                                    {{ 'date_fin_estimee'|trans({}, 'messages', 'fr') }} :
+                                {% endif %}
+                            </strong> {{ offre.dateFinEstimee|date('d/m/Y') }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Localisation -->
+                    <p><strong><i class="fas fa-map-marker-alt"></i> 
+                        {% if traduction_active == 'ar' %}
+                            {{ 'localisation'|trans({}, 'messages', 'ar') }} :
+                        {% else %}
+                            {{ 'localisation'|trans({}, 'messages', 'fr') }} :
+                        {% endif %}
+                    </strong> {{ offre.localisation }}</p>
+
+                    <!-- Compétences requises -->
+                    <p><strong><i class="fas fa-tools"></i> 
+                        {% if traduction_active == 'ar' %}
+                            {{ 'required_skills'|trans({}, 'messages', 'ar') }} :
+                        {% else %}
+                            {{ 'required_skills'|trans({}, 'messages', 'fr') }} :
+                        {% endif %}
+                    </strong></p>
+                    <div class="mt-2">
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for competence in offre.competencesRequises|split(',') %}
+                                <span class="badge bg-light text-dark border shadow-sm px-3 py-2">{{ competence|trim }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Postuler -->
     <div class="modal fade" id="postulerModal{{ offre.id }}" tabindex="-1" aria-labelledby="postulerModalLabel{{ offre.id }}" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="postulerModalLabel{{ offre.id }}">Postuler à {{ offre.titre }}</h5>
+                    <h5 class="modal-title fw-bold" id="postulerModalLabel{{ offre.id }}">
+                        {% if traduction_active == 'ar' %}
+                            التقديم على {{ offre.titre }}
+                        {% else %}
+                            Postuler à {{ offre.titre }}
+                        {% endif %}
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -199,14 +369,27 @@
                         <!-- Champ caché pour l'ID de l'offre -->
                         <input type="hidden" name="offre_id" value="{{ offre.id }}">
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                            <button type="submit" class="btn btn-primary">Envoyer</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                {% if traduction_active == 'ar' %}
+                                    إغلاق
+                                {% else %}
+                                    Fermer
+                                {% endif %}
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                {% if traduction_active == 'ar' %}
+                                    إرسال
+                                {% else %}
+                                    Envoyer
+                                {% endif %}
+                            </button>
                         </div>
                     {{ form_end(formulaireOffres[offre.id]) }}
                 </div>
             </div>
         </div>
     </div>
+    
     <!-- Script pour Modal -->
     {% if modal_open %}
     <script>
@@ -228,43 +411,26 @@
         }, 3000); // 3000 ms = 3 secondes
     </script>
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
-        const offresList = document.getElementById('offresList');
-        const offreCards = document.querySelectorAll('.offre-card');
-
-        // Fonction pour normaliser les accents
-        function normalizeString(str) {
-            return str
-                .normalize("NFD") // Décompose les caractères accentués en base + diacritique
-                .replace(/[\u0300-\u036f]/g, ""); // Supprime les diacritiques
-        }
-
-        // Fonction de filtrage insensible à la casse et aux accents
-        function filterOffres() {
-            const searchTerm = normalizeString(searchInput.value.trim().toLowerCase()); // Normaliser et convertir en minuscules
-
-            offreCards.forEach(card => {
-                const competences = normalizeString(card.getAttribute('data-competences').toLowerCase()); // Normaliser et convertir en minuscules
-                if (competences.includes(searchTerm)) {
-                    card.style.display = 'block'; // Afficher la carte si la compétence correspond
-                } else {
-                    card.style.display = 'none'; // Masquer la carte si la compétence ne correspond pas
-                }
-            });
-        }
-
-        // Écouteur d'événement pour le bouton de recherche
-        searchButton.addEventListener('click', filterOffres);
-
-        // Écouteur d'événement pour la touche "Entrée"
-        searchInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                filterOffres();
-            }
-        });
+    // Lors de la soumission du formulaire, afficher l'indicateur de chargement
+    document.querySelector('form').addEventListener('turbo:submit-start', function() {
+        document.getElementById('loadingIndicator').style.display = 'inline-block';
+        document.getElementById('searchBtn').disabled = true; // Désactiver le bouton pour éviter plusieurs soumissions
     });
-    </script>
+
+    // Lorsque la réponse est reçue, masquer l'indicateur de chargement
+    document.addEventListener('turbo:load', function() {
+        document.getElementById('loadingIndicator').style.display = 'none';
+        document.getElementById('searchBtn').disabled = false; // Réactiver le bouton
+    });
+</script>
+
+<style>
+    /* Style pour l'indicateur de chargement */
+    .loading-indicator {
+        font-size: 14px;
+        margin-left: 10px;
+        color: #28a745;
+    }
+</style>
 </div>
 {% endblock %}

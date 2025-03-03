@@ -1,0 +1,119 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block content %}
+    <h1 class="text-center" style="color: #2d6a4f; font-size: 1.8rem;">Statistiques des offres d'emploi 📊</h1>
+
+    <h2 class="text-center" style="color:rgb(45, 106, 79); font-size: 1.5rem;">Saisons/Gouvernorats</h2>
+
+    <!-- Conteneur flex pour aligner les graphiques côte à côte -->
+    <div class="d-flex justify-content-center" style="gap: 40px;">
+        <!-- Canvas pour le graphique en barres -->
+        <div class="text-center" style="max-width: 700px; margin: 0 auto;">
+            <canvas id="saisonChart" width="600" height="400"></canvas>
+        </div>
+
+        <!-- Canvas pour le graphique en camembert (pie) -->
+        <div class="text-center" style="max-width: 400px; margin: 0 auto;">
+            <canvas id="governoratPieChart" width="300" height="250"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Récupération des données du backend (les totaux par saison)
+        var totauxParSaison = {
+            spring: {{ totauxParSaison.spring|default(0) }},
+            summer: {{ totauxParSaison.summer|default(0) }},
+            autumn: {{ totauxParSaison.autumn|default(0) }},
+            winter: {{ totauxParSaison.winter|default(0) }}
+        };
+
+        // Configuration du graphique en barres
+        var ctx = document.getElementById('saisonChart').getContext('2d');
+        var saisonChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Printemps🌱', 'Été🍊', 'Automne🍂', 'Hiver❄️'],
+                datasets: [{
+                    label: 'Pourcentage des offres d\'emploi par saison',
+                    data: [
+                        totauxParSaison.spring,
+                        totauxParSaison.summer,
+                        totauxParSaison.autumn,
+                        totauxParSaison.winter
+                    ],
+                    backgroundColor: [
+                        'rgba(45, 106, 79, 0.2)',  // Vert printemps
+                        'rgba(252, 163, 17, 0.2)', // Orange été
+                        'rgba(255, 140, 0, 0.2)',   // Orange automne
+                        'rgba(0, 150, 136, 0.2)'    // Bleu hiver
+                    ],
+                    borderColor: [
+                        'rgba(45, 106, 79, 1)',
+                        'rgba(252, 163, 17, 1)',
+                        'rgba(255, 140, 0, 1)',
+                        'rgba(0, 150, 136, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: { size: 12 },
+                            color: '#333'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: { size: 14 },  // Réduction de la taille de la police pour les labels horizontaux
+                            color: '#333'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false // Désactiver la légende
+                    }
+                }
+            }
+        });
+
+        // Récupérer les données pour le pie chart
+        var percentageByGovernorat = {{ percentageByGovernorat|json_encode|raw }};
+        
+        // Configuration du graphique en camembert (pie chart)
+        var ctxPie = document.getElementById('governoratPieChart').getContext('2d');
+        var governoratPieChart = new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(percentageByGovernorat), // Gouvernorats
+                datasets: [{
+                    data: Object.values(percentageByGovernorat), // Pourcentages
+                    backgroundColor: [
+                        '#20c997', // Vert
+                        'rgba(246, 202, 119, 0.7)'  // Orange
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw.toFixed(2) + '%'; // Affichage avec 2 décimales
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

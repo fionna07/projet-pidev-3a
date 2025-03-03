@@ -20,17 +20,23 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use App\Repository\UtilisateurRepository;
 //email
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Email;
 use App\Service\EmailService;
-//ilage
+//image
 use App\Service\ImageUploader;
 //activity
 use App\Entity\Activites;
 use App\Service\ActivityLoggerService;
+//
+use Symfony\Component\HttpClient\HttpClient;
+
+
+
 class SecurityController extends AbstractController
 {
     private $emailService;
@@ -46,6 +52,8 @@ class SecurityController extends AbstractController
         
 
     }
+
+
    /* #[Route('/test-session', name: 'test_session')]
     public function testSession(Request $request): Response
     {
@@ -121,6 +129,7 @@ class SecurityController extends AbstractController
         $user = new Utilisateur();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
+ 
     
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var string $plainPassword */
@@ -129,6 +138,32 @@ class SecurityController extends AbstractController
             // Assigner le rôle sélectionné
             $user->setRoles($form->get('roles')->getData());
             dump($form->get('roles')->getData()); // Vérifie si c'est bien un tableau
+          // ✅ 1️⃣ Vérification du CAPTCHA Turnstile
+          $turnstileResponse = $request->request->get('cf-turnstile-response');
+
+          if (!$turnstileResponse) {
+              $this->addFlash('error', 'Veuillez valider le CAPTCHA.');
+              return $this->redirectToRoute('app_register');
+          }
+
+          $httpClient = HttpClient::create();
+          $response = $httpClient->request('POST', 'https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+              'body' => [
+                  'secret' => $_ENV['CLOUDFLARE_SECRET_KEY'],
+                  'response' => $turnstileResponse,
+              ],
+          ]);
+
+          $responseData = $response->toArray();
+
+          if (!$responseData['success']) {
+              $this->addFlash('error', 'Échec de la validation du CAPTCHA.');
+              return $this->redirectToRoute('app_register');
+          }
+
+              
+         
+            
 
         // Gérer l'upload d'image
  
@@ -175,7 +210,7 @@ class SecurityController extends AbstractController
               $entityManager->persist($user);
               $entityManager->flush();
   
-              $transport = Transport::fromDsn('smtp://benharbfarah85@gmail.com:usvjuzoqaluwufif@smtp.gmail.com:587?encryption=tls&auth_mode=login');
+              $transport = Transport::fromDsn('smtp://benharbfarah85@gmail.com:vevilsdkhkwqczbq@smtp.gmail.com:587?encryption=tls&auth_mode=login');
               $mailer = new Mailer($transport);
   
   
@@ -215,6 +250,8 @@ class SecurityController extends AbstractController
 
     return $this->render('security/register.html.twig', [
         'registrationForm' => $form,
+        'cloudflareSiteKey' => $_ENV['CLOUDFLARE_SITE_KEY'] ?? 'default_key' // Utilisation de $_ENV
+
     ]);
 }
     

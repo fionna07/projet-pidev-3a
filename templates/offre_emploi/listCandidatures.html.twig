@@ -1,77 +1,172 @@
+
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des Candidatures{% endblock %}
+{% block title %}Candidatures pour {{ offre.titre }}{% endblock %}
 
 {% block body %}
-{# Afficher les messages flash #}
-{% for type, messages in app.flashes %}
-    {% for message in messages %}
-        <div class="alert alert-{{ type }} alert-dismissible fade show flash-message" role="alert">
+    {# Messages flash #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
             {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {% endfor %}
-{% endfor %}
 
-<div class="container mt-4">
-    <h1 class="mb-2 fs-3">Liste des Candidatures</h1>
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">Nom et prénom de l'employé</th>
-                <th scope="col">Compétences</th>
-                <th scope="col">Date de candidature</th>
-                <th scope="col">Statut</th>
-                <th scope="col">Titre de l'offre</th>
-                <th scope="col">Actions</th> {# Nouvelle colonne pour le bouton Modifier #}
-            </tr>
-        </thead>
-        <tbody>
-            {% for candidature in candidatures %}
-                <tr>
-                    <td>{{ candidature.employe.lastName }} {{ candidature.employe.firstName }}</td>
-                    <td>
-                        {% for competence in candidature.competences|split(',') %}
-                            <span class="badge bg-success">{{ competence|trim }}</span> 
-                        {% endfor %}
-                    </td>
-                    <td>{{ candidature.dateCandidature|date('d/m/Y H:i') }}</td>
-                    <td>
-                        <form action="{{ path('candidature_update', {'id': candidature.id}) }}" method="post">
-                            <select class="form-select statut-select" name="statut">
-                                <option value="en attente" {% if candidature.etat == 'en attente' %}selected{% endif %}>En attente</option>
-                                <option value="acceptée" {% if candidature.etat == 'acceptée' %}selected{% endif %}>Acceptée</option>
-                                <option value="refusée" {% if candidature.etat == 'refusée' %}selected{% endif %}>Refusée</option>
-                            </select>
-                    </td>
-                    <td>{{ candidature.offre.titre }}</td>
-                    <td>
-                            <button type="submit" class="btn btn-primary">Modifier</button>
-                        </form>
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="6" class="text-center">Aucune candidature trouvée.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-center align-items-center mb-4">
+            <h1 class="mb-0 me-3">{{ offre.titre }}</h1>
+            <i class="bi bi-file-earmark-person h1 text-primary"></i> <!-- Icône centrée à côté du titre -->
+        </div>
 
-<script>
-    // Fermer automatiquement les messages flash après 3 secondes
-    document.addEventListener("DOMContentLoaded", function() {
-        setTimeout(function() {
-            document.querySelectorAll('.flash-message').forEach(function(flash) {
-                flash.classList.add('fade');
-                setTimeout(function() {
-                    flash.remove();
-                }, 500); // Délai pour la suppression après l'animation
+        {# Liste des candidatures #}
+        {% if candidatures|length > 0 %}
+            <div class="list-group">
+                {% for candidature in candidatures %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center 
+                        {% if candidature.etat == 'Acceptée' %}bg-light text-muted border-success shadow-sm rounded{% endif %}">
+                        <div>
+                            <h5 class="mb-1">{{ candidature.employe.firstName }} {{ candidature.employe.lastName }}</h5>
+                            <p class="mb-1"><i class="bi bi-envelope"></i> {{ candidature.employe.email }}</p>
+                            {% if candidature.etat == 'en attente' %}
+                            {# Pourcentage de correspondance avec couleur dynamique #}
+                            {% set matchColor = matchPercentages[candidature.id] >= 75 ? 'text-success' : (matchPercentages[candidature.id] >= 50 ? 'text-warning' : 'text-danger') %}
+                            <p class="mb-1">
+                                <i class="bi bi-percent"></i> Correspondance : 
+                            </p>
+
+                            {# Barre de progression animée #}
+                            <div class="progress mt-2" style="height: 20px;">
+                                <div class="progress-bar progress-bar-animated {{ matchColor == 'text-success' ? 'bg-success' : (matchColor == 'text-warning' ? 'bg-warning' : 'bg-danger') }}" 
+                                     role="progressbar" 
+                                     style="width: 0%;" 
+                                     data-width="{{ matchPercentages[candidature.id] }}"
+                                     aria-valuenow="0" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                    {{ matchPercentages[candidature.id]|number_format(2) }}%
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <p class="mb-1">
+                                <i class="bi {% if candidature.etat == 'Acceptée' %}bi-check-circle-fill text-success{% elseif candidature.etat == 'Refusée' %}bi-x-circle-fill text-danger{% else %}bi-question-circle text-warning{% endif %}"></i> 
+                                {{ candidature.etat }}
+                            </p>
+                            <small><i class="bi bi-calendar-event"></i> Postulé le : {{ candidature.dateCandidature|date('d/m/Y H:i') }}</small>
+
+                            {# Compétences #}
+                            <div class="mt-3">
+                                <h8 class="mb-1">Compétences :</h8>
+                                <div class="d-flex flex-wrap">
+                                    {% set competences = candidature.competences|split(',') %}
+                                    {% for competence in competences %}
+                                        <span class="badge bg-success text-white me-2 mb-2 d-flex align-items-center p-1">
+                                            <i class="bi bi-check-circle me-1" style="font-size: 1rem;"></i>
+                                            <span style="font-size: 0.875rem;">{{ competence|trim }}</span>
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Boutons Accepter/Refuser #}
+                        <div>
+                            {% if candidature.etat != 'Acceptée' %}
+                                <form action="{{ path('update_candidature_state', {'id': candidature.id}) }}" method="POST">
+                                    <button type="submit" name="etat" value="Acceptée" class="btn btn-success btn-sm">
+                                        <i class="bi bi-check-lg"></i> Accepter
+                                    </button>
+                                    <button type="submit" name="etat" value="Refusée" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-x-lg"></i> Refuser
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="text-success">
+                                    <i class="bi bi-check-circle-fill"></i> Acceptée
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-success">
+                Aucune candidature pour cette offre pour le moment.
+            </div>
+        {% endif %}
+    </div>
+
+    {# Styles CSS intégrés #}
+    <style>
+        .progress-bar-animated {
+            transition: width 1.5s ease-in-out;
+        }
+    </style>
+
+    {# JavaScript intégré #}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Animation des barres de progression
+            const progressBars = document.querySelectorAll('.progress-bar-animated');
+            progressBars.forEach(bar => {
+                const targetWidth = bar.getAttribute('data-width');
+                bar.style.width = targetWidth + '%';
+                bar.setAttribute('aria-valuenow', targetWidth);
             });
-        }, 3000); // Disparition après 3 secondes
-    });
-</script>
 
+            // Disparition des messages flash après 3 secondes
+            const successMessages = document.querySelectorAll('.alert-success');
+            const errorMessages = document.querySelectorAll('.alert-danger');
+
+            successMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500);
+                }, 3000);
+            });
+
+            errorMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500);
+                }, 3000);
+            });
+        });
+    </script>
+    <!-- JavaScript pour faire disparaître les messages flash après un délai -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Sélectionner les messages de succès et d'erreur
+            const successMessages = document.querySelectorAll('.alert-success');
+            const errorMessages = document.querySelectorAll('.alert-danger');
+
+            // Fonction pour faire disparaître les messages après 3 secondes
+            successMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+
+            errorMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = 0;
+                    setTimeout(function() {
+                        msg.style.display = 'none';
+                    }, 500); // Délai pour rendre le message invisible
+                }, 3000); // 3 secondes
+            });
+        });
+    </script>
 {% endblock %}
