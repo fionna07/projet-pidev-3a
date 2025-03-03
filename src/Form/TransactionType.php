@@ -50,7 +50,7 @@ class TransactionType extends AbstractType
             ])
 
             // Bouton pour soumettre le formulaire
-            ->add('save', SubmitType::class, ['label' => 'Créer la transaction']);
+           ;
     }
 
     public function configureOptions(OptionsResolver $resolver)

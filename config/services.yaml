@@ -1,6 +1,10 @@
 parameters:
  terrain_images_directory: '%kernel.project_dir%/public/uploads/terrains'
+
 services:
+
+    
+   
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
@@ -19,4 +23,10 @@ services:
     App\Service\EmailService:
         arguments:
             $mailer: '@mailer.mailer' # Injecte le service Mailer
-            
+
+
+
+    #prediction prix        
+    App\Service\predictService:
+        autowire: true
+        autoconfigure: true

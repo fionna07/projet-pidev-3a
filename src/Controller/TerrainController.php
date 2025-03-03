@@ -6,17 +6,25 @@ use App\Entity\Terrain;
 use App\Form\TerrainType;
 use App\Repository\TerrainRepository;
 use App\Repository\UtilisateurRepository;
-
+use App\Service\predictService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/terrain')]
 class TerrainController extends AbstractController
 {
+    private $predictService;
+
+    public function __construct(predictService $predictService)
+    {
+        $this->predictService = $predictService;
+    }
+
     // Afficher la liste des terrains (Back-office)
     #[Route('/affich', name: 'app_terrain_index', methods: ['GET'])]
     public function index(TerrainRepository $terrainRepository): Response
@@ -154,6 +162,7 @@ class TerrainController extends AbstractController
         }
 
         return $this->render('terrain/editfront.html.twig', [
+            'terrain'=> $terrain,
             'form' => $form->createView(),
         ]);
     }
@@ -167,15 +176,28 @@ class TerrainController extends AbstractController
             $em->flush();
         }
 
-        return $this->redirectToRoute('app_terrain_index');
+        return $this->redirectToRoute('app_terrain_front_crud');
     }
 
     // Affichage des terrains dans le front-office//client
     #[Route('/front', name: 'terrain_front', methods: ['GET'])]
-    public function front(TerrainRepository $terrainRepository): Response
+    public function front(Request $request, TerrainRepository $terrainRepository)
     {
+        // Récupérer le statut du filtre depuis la requête GET
+        $statusFilter = $request->query->get('status', null); // Valeur par défaut = null
+
+        // Si un statut est sélectionné, filtrer les terrains en fonction du statut
+        if ($statusFilter) {
+            $terrains = $terrainRepository->findBy(['status' => $statusFilter]);
+        } else {
+            // Si aucun filtre, afficher tous les terrains
+            $terrains = $terrainRepository->findAll();
+        }
+
+        // Passer 'statusFilter' et 'terrains' à la vue
         return $this->render('terrain/front.html.twig', [
-            'terrains' => $terrainRepository->findAll(),
+            'terrains' => $terrains,
+            'statusFilter' => $statusFilter,
         ]);
     }
 
@@ -189,7 +211,7 @@ class TerrainController extends AbstractController
     }
 
 
-  //agriculteur
+    //agriculteur
     #[Route('/frontcrud', name: 'app_terrain_front_crud', methods: ['GET'])]
     public function frontCrud(TerrainRepository $terrainRepository): Response
     {
@@ -197,7 +219,6 @@ class TerrainController extends AbstractController
             'terrains' => $terrainRepository->findAll(),
         ]);
     }
-
 
 
     #[Route('/newfront', name: 'app_terrain_newfront', methods: ['GET', 'POST'])]
@@ -249,5 +270,40 @@ class TerrainController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    #[Route('/predict-price', name: 'app_terrain_predict_price', methods: ['POST'])]
+    public function predictPrice(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        // Vérification des données reçues
+        if (!$data || !isset($data['terrain']['surface'], $data['terrain']['typeSol'], $data['terrain']['adresse'])) {
+            return new JsonResponse(['error' => 'Données invalides'], 400);
+        }
+
+        $surface = (float) $data['terrain']['surface'];
+        $typeSol = $data['terrain']['typeSol'];
+        $adresse = $data['terrain']['adresse']; 
+
+        try {
+            $predictedPrice = $this->predictService->predict($surface, $typeSol, $adresse);
+            return new JsonResponse(['predictedPrice' => $predictedPrice]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        }
+    }
+    //filtre
+    /*
+    #[Route('/filter', name: 'app_terrain_filter', methods: ['GET'])]
+    public function filter(Request $request, TerrainRepository $terrainRepository): Response
+    {
+        $status = $request->query->get('status', 'disponible'); // Valeur par défaut "disponible"
         
+        $terrains = $terrainRepository->findBy(['status' => $status]);
+
+        return $this->render('terrain/front.html.twig', [
+            'terrains' => $terrains,
+            'currentStatus' => $status,
+        ]);
+    }*/
 }

@@ -5,6 +5,19 @@
 {% block body %}
     <div class="container mt-5">
         <h1 class="text-center">Nos Terrains</h1>
+
+        <!-- Filtre des terrains -->
+        <form method="GET" action="{{ path('terrain_front') }}" class="mb-4">
+            <label for="status">Filtrer par statut :</label>
+            <select name="status" id="status" class="form-select" onchange="this.form.submit()">
+                <option value="disponible" {% if statusFilter == 'disponible' %}selected{% endif %}>Disponible</option>
+                <option value="vendu" {% if statusFilter == 'vendu' %}selected{% endif %}>Vendu</option>
+                <option value="reserve" {% if statusFilter == 'reserve' %}selected{% endif %}>Réservé</option>
+            </select>
+        </form>
+
+       
+
         <div class="row">
             {% for terrain in terrains %}
                 <div class="col-md-4 mb-4">
@@ -15,7 +28,7 @@
                             <p class="card-text">Prix: {{ terrain.prix }} DT</p>
                             <p class="card-text">Surface: {{ terrain.surface }} m²</p>
                             <a href="{{ path('terrain_detail', {'id': terrain.id}) }}" class="btn btn-primary">Voir Détails</a>
-                            
+
                             {% if terrain.own %}
                                 <!-- Bouton pour ouvrir le modal -->
                                 <button class="btn btn-secondary mt-2" data-bs-toggle="modal" data-bs-target="#conversationModal" onclick="openConversationModal({{ terrain.own.id }})">
@@ -144,8 +157,40 @@
             .catch(error => console.error("Erreur lors de l'envoi du message:", error));
         }
     </script>
-
+    <!-- Chatbase Script -->
     <script>
-(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="PNNrUMwSB6-1ltecea9jJ";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
-</script>
+        (function() {
+            if (!window.chatbase || window.chatbase("getState") !== "initialized") {
+                window.chatbase = (...arguments) => {
+                    if (!window.chatbase.q) {
+                        window.chatbase.q = [];
+                    }
+                    window.chatbase.q.push(arguments);
+                };
+                window.chatbase = new Proxy(window.chatbase, {
+                    get(target, prop) {
+                        if (prop === "q") {
+                            return target.q;
+                        }
+                        return (...args) => target(prop, ...args);
+                    }
+                });
+            }
+
+            const onLoad = function() {
+                const script = document.createElement("script");
+                script.src = "https://www.chatbase.co/embed.min.js";
+                script.id = "PNNrUMwSB6-1ltecea9jJ";
+                script.domain = "www.chatbase.co";
+                document.body.appendChild(script);
+            };
+
+            if (document.readyState === "complete") {
+                onLoad();
+            } else {
+                window.addEventListener("load", onLoad);
+            }
+        })();
+    </script>
+
 {% endblock %}

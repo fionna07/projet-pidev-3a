@@ -26,6 +26,10 @@
             height: 500px;
             width: 100%;
         }
+        .prix-estime {
+            background-color: #f8f9fa; /* Couleur de fond pour le champ prix estimé */
+            cursor: not-allowed; /* Curseur pour indiquer que le champ est en lecture seule */
+        }
     </style>
 {% endblock %}
 
@@ -44,8 +48,7 @@
                     </h6>
                 </div>
                 <div class="card-body">
-                   {{ form_start(form, {'attr': {'data-turbo': 'false','enctype': 'multipart/form-data','novalidate':'novalidate'}}) }} 
-              
+                   {{ form_start(form, {'attr': {'data-turbo': 'false','enctype': 'multipart/form-data','novalidate':'novalidate'}}) }}
 
                     {# Affichage global des erreurs si le formulaire a été soumis et n'est pas valide #}
                     {% if form.vars.submitted and not form.vars.valid %}
@@ -55,15 +58,15 @@
                     {% endif %}
 
                     <div class="row">
-                          <div class="mb-4 text-center">
-                    <label class="form-label fw-bold">Image du terrain</label>
-                    <div class="d-flex justify-content-center">
-                        <img id="previewImage" src="{{ asset('img/default-terrain.jpeg') }}" class="pill border" width="190" height="120" alt="Aperçu de l'image">
-                    </div>
-                    <div class="mt-2">
-                        {{ form_widget(form.photos, {'attr': {'class': 'form-control', 'onchange': 'previewFile(this)'}}) }}
-                    </div>
-                </div>
+                        <div class="mb-4 text-center">
+                            <label class="form-label fw-bold">Image du terrain</label>
+                            <div class="d-flex justify-content-center">
+                                <img id="previewImage" src="{{ asset('img/default-terrain.jpeg') }}" class="pill border" width="190" height="120" alt="Aperçu de l'image">
+                            </div>
+                            <div class="mt-2">
+                                {{ form_widget(form.photos, {'attr': {'class': 'form-control', 'onchange': 'previewFile(this)'}}) }}
+                            </div>
+                        </div>
                         <div class="col-md-6">
                             <div class="form-group animate__animated animate__fadeInLeft">
                                 {{ form_label(form.adresse) }}
@@ -101,8 +104,6 @@
                                 }}) }}
                                 {{ form_errors(form.status) }}
                             </div>
-
-                         
                         </div>
                     </div>
                     
@@ -115,7 +116,6 @@
                                 {{ form_errors(form.typeSol) }}
                             </div>
                         </div>
-                     
                     </div>
 
                     {# Champ Description #}
@@ -167,8 +167,27 @@
                         </div>
                     </div>
 
+                    {# Champ Prix Estimé (ajouté manuellement) #}
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="prixEstime">Prix Estimé</label>
+                                <input type="text" id="prixEstime" class="form-control prix-estime" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Bouton Estimer le prix (ajouté manuellement) #}
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <button type="button" id="predictPriceButton" class="btn btn-info">
+                                <i class="fas fa-chart-line mr-2"></i>Estimer le prix
+                            </button>
+                        </div>
+                    </div>
+
+                    {# Boutons #}
                     <div class="text-center mt-5">
-                        {# Utilisation du widget du bouton "save" défini dans le FormType #}
                         {{ form_widget(form.save, {'attr': {'class': 'btn btn-primary btn-lg animate__animated animate__pulse'}}) }}
                         <a href="{{ path('app_terrain_index') }}" class="btn btn-secondary btn-lg ml-3">
                             <i class="fas fa-times mr-2"></i>Annuler
@@ -213,43 +232,54 @@
             integrity="sha256-o9N1j7k+g9Z3xDx1Zd9ITG0N1FxQF3sT5Qlfu3rKk8M="
             crossorigin=""></script>
     <script>
-        // Lorsque le modal est affiché, initialiser la carte
-        $('#mapModal').on('shown.bs.modal', function () {
-            // Récupérer les valeurs actuelles ou définir des valeurs par défaut (ici, Paris)
-            var latVal = parseFloat($('#{{ form.latitude.vars.id }}').val()) || 48.8566;
-            var lngVal = parseFloat($('#{{ form.longitude.vars.id }}').val()) || 2.3522;
+        // Gestion de la prédiction du prix
+       document.addEventListener('DOMContentLoaded', function() {
+    const predictButton = document.getElementById('predictPriceButton');
+    const prixEstimeField = document.getElementById('prixEstime');
 
-            // Créer la carte dans le div "leaflet-map"
-            var map = L.map('leaflet-map').setView([latVal, lngVal], 13);
+    predictButton.addEventListener('click', function() {
+        const surface = document.getElementById('{{ form.surface.vars.id }}').value;
+        const typeSol = document.getElementById('{{ form.typeSol.vars.id }}').value;
+        const adresse = document.getElementById('{{ form.adresse.vars.id }}').value;
 
-            // Ajouter la couche OpenStreetMap
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
+        if (!surface || !typeSol || !adresse) {
+            alert('Veuillez remplir les champs Surface, Type de Sol et Adresse pour prédire le prix.');
+            return;
+        }
 
-            // Ajouter un marqueur draggable sur la position actuelle
-            var marker = L.marker([latVal, lngVal], {draggable: true}).addTo(map);
+        // Préparer les données dans le format attendu par Flask
+        const data = {
+            surface: parseFloat(surface), // Convertir en nombre
+            typeSol: typeSol,
+            adresse: adresse  // Utiliser "adresse" au lieu de "localisation"
+        };
 
-            // Mettre à jour les champs latitude/longitude quand le marqueur est déplacé
-            marker.on('dragend', function(e) {
-                var position = marker.getLatLng();
-                $('#{{ form.latitude.vars.id }}').val(position.lat.toFixed(6));
-                $('#{{ form.longitude.vars.id }}').val(position.lng.toFixed(6));
-            });
-
-            // Mettre à jour le marqueur et les champs lors d'un clic sur la carte
-            map.on('click', function(e) {
-                marker.setLatLng(e.latlng);
-                $('#{{ form.latitude.vars.id }}').val(e.latlng.lat.toFixed(6));
-                $('#{{ form.longitude.vars.id }}').val(e.latlng.lng.toFixed(6));
-            });
-
-            // S'assurer que la carte s'ajuste après l'ouverture du modal
-            map.invalidateSize();
+        fetch('{{ path('app_terrain_predict_price') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data); // Afficher la réponse dans la console
+            if (data.predictedPrice) {
+                prixEstimeField.value = data.predictedPrice;
+            } else if (data.error) {
+                alert('Erreur: ' + data.error);
+            } else {
+                alert('Erreur inconnue lors de la prédiction du prix.');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Erreur de communication avec le serveur. Veuillez réessayer plus tard.');
         });
-    </script>
-         <script>
+    });
+});
+
+        // Aperçu de l'image
         function previewFile(input) {
             const file = input.files[0];
             if (file) {

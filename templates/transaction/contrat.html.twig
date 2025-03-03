@@ -1,0 +1,77 @@
+{# templates/transaction/contrat.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% if transaction.type == 'vente' %}
+            Contrat de Vente
+        {% else %}
+            Contrat de Location
+        {% endif %}
+    </title>
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; margin: 40px; }
+        h1 { text-align: center; margin-bottom: 40px; }
+        .info { margin: 20px 0; }
+        .info p { line-height: 1.6; }
+        .clauses { margin-top: 30px; }
+        .signature { margin-top: 50px; text-align: center; }
+        .signature p { display: inline-block; width: 45%; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>
+        {% if transaction.type == 'vente' %}
+            Contrat de Vente de Terrain Agricole
+        {% else %}
+            Contrat de Location de Terrain Agricole
+        {% endif %}
+    </h1>
+
+    <div class="info">
+        <p><strong>Client :</strong> {{ transaction.client.firstname }} {{ transaction.client.lastname }}</p>
+        <p><strong>Agriculteur :</strong> {{ transaction.agriculteur.firstname }} {{ transaction.agriculteur.lastname }}</p>
+        <p><strong>Date de transaction :</strong> {{ transaction.dateTransaction|date('d/m/Y') }}</p>
+        <p><strong>Montant :</strong> {{ transaction.montant }} TND</p>
+        <p><strong>Terrain :</strong> {{ transaction.terrain.adresse }}</p>
+        <p><strong>Surface :</strong> {{ transaction.terrain.surface }} m²</p>
+    </div>
+
+    <div class="clauses">
+        <h2>Clauses du contrat</h2>
+
+        <h3>1. Objet du contrat</h3>
+        <p>
+            {% if transaction.type == 'vente' %}
+                L'agriculteur, {{ transaction.agriculteur.firstname }} {{ transaction.agriculteur.lastname }}, vend au client, {{ transaction.client.firstname }} {{ transaction.client.lastname }}, le terrain situé à {{ transaction.terrain.adresse }}, d’une surface de {{ transaction.terrain.surface }} m², pour un montant de {{ transaction.montant }} TND.
+            {% else %}
+                L'agriculteur, {{ transaction.agriculteur.firstname }} {{ transaction.agriculteur.lastname }}, loue au client, {{ transaction.client.firstname }} {{ transaction.client.lastname }}, le terrain situé à {{ transaction.terrain.adresse }}, d’une surface de {{ transaction.terrain.surface }} m², pour un montant de {{ transaction.montant }} TND par mois.
+            {% endif %}
+        </p>
+
+        <h3>2. Engagements des parties</h3>
+        <p>
+            - L'agriculteur garantit que le terrain est libre de toute hypothèque ou litige.<br>
+            - Le client s'engage à utiliser le terrain conformément à la réglementation en vigueur.<br>
+            - Toute modification du présent contrat doit être acceptée par écrit par les deux parties.
+        </p>
+
+       
+
+        <h3>4. Litiges</h3>
+        <p>
+            En cas de litige, les parties conviennent de saisir les tribunaux compétents de **(ville de juridiction)**.
+        </p>
+    </div>
+
+    <div class="signature">
+        <p><strong>L'Agriculteur</strong><br>Signature : ___________</p>
+        <p><strong>Le Client</strong><br>Signature : ___________</p>
+    </div>
+
+    <p style="text-align: center; margin-top: 30px;">
+        Fait à **(lieu de signature)**, le {{ transaction.dateTransaction|date('d/m/Y') }}.
+    </p>
+</body>
+</html>
