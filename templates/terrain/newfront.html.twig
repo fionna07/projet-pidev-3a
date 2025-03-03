@@ -30,6 +30,19 @@
             background-color: #f8f9fa; /* Couleur de fond pour le champ prix estimé */
             cursor: not-allowed; /* Curseur pour indiquer que le champ est en lecture seule */
         }
+        .loading-spinner {
+            display: none; /* Masquer le spinner par défaut */
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 {% endblock %}
 
@@ -183,6 +196,7 @@
                             <button type="button" id="predictPriceButton" class="btn btn-info">
                                 <i class="fas fa-chart-line mr-2"></i>Estimer le prix
                             </button>
+                            <div id="loadingSpinner" class="loading-spinner"></div>
                         </div>
                     </div>
 
@@ -233,51 +247,67 @@
             crossorigin=""></script>
     <script>
         // Gestion de la prédiction du prix
-       document.addEventListener('DOMContentLoaded', function() {
-    const predictButton = document.getElementById('predictPriceButton');
-    const prixEstimeField = document.getElementById('prixEstime');
+        document.addEventListener('DOMContentLoaded', function() {
+            const predictButton = document.getElementById('predictPriceButton');
+            const prixEstimeField = document.getElementById('prixEstime');
+            const loadingSpinner = document.getElementById('loadingSpinner');
 
-    predictButton.addEventListener('click', function() {
-        const surface = document.getElementById('{{ form.surface.vars.id }}').value;
-        const typeSol = document.getElementById('{{ form.typeSol.vars.id }}').value;
-        const adresse = document.getElementById('{{ form.adresse.vars.id }}').value;
+            predictButton.addEventListener('click', function() {
+                const surface = document.getElementById('{{ form.surface.vars.id }}').value;
+                const typeSol = document.getElementById('{{ form.typeSol.vars.id }}').value;
+                const adresse = document.getElementById('{{ form.adresse.vars.id }}').value;
 
-        if (!surface || !typeSol || !adresse) {
-            alert('Veuillez remplir les champs Surface, Type de Sol et Adresse pour prédire le prix.');
-            return;
-        }
+                if (!surface || !typeSol || !adresse) {
+                    alert('Veuillez remplir les champs Surface, Type de Sol et Adresse pour prédire le prix.');
+                    return;
+                }
 
-        // Préparer les données dans le format attendu par Flask
-        const data = {
-            surface: parseFloat(surface), // Convertir en nombre
-            typeSol: typeSol,
-            adresse: adresse  // Utiliser "adresse" au lieu de "localisation"
-        };
+                // Afficher le spinner de chargement
+                loadingSpinner.style.display = 'inline-block';
 
-        fetch('{{ path('app_terrain_predict_price') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data); // Afficher la réponse dans la console
-            if (data.predictedPrice) {
-                prixEstimeField.value = data.predictedPrice;
-            } else if (data.error) {
-                alert('Erreur: ' + data.error);
-            } else {
-                alert('Erreur inconnue lors de la prédiction du prix.');
-            }
-        })
-        .catch(error => {
-            console.error('Erreur:', error);
-            alert('Erreur de communication avec le serveur. Veuillez réessayer plus tard.');
+                // Préparer les données dans le format attendu par Symfony
+                const data = {
+                    terrain: {
+                        surface: parseFloat(surface), // Convertir en nombre
+                        typeSol: typeSol,
+                        adresse: adresse
+                    }
+                };
+
+                // Envoyer la requête à Symfony
+                fetch('{{ path('app_terrain_predict_price') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur lors de la requête.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.predictedPrice) {
+                        // Afficher le prix prédit
+                        prixEstimeField.value = data.predictedPrice.toLocaleString('fr-FR') + ' DT'; // Formater le prix
+                    } else if (data.error) {
+                        alert('Erreur: ' + data.error);
+                    } else {
+                        alert('Erreur inconnue lors de la prédiction du prix.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur de communication avec le serveur. Veuillez réessayer plus tard.');
+                })
+                .finally(() => {
+                    // Masquer le spinner de chargement
+                    loadingSpinner.style.display = 'none';
+                });
+            });
         });
-    });
-});
 
         // Aperçu de l'image
         function previewFile(input) {

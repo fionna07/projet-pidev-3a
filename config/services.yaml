@@ -27,6 +27,8 @@ services:
 
 
     #prediction prix        
+    
+
     App\Service\predictService:
-        autowire: true
-        autoconfigure: true
+        arguments:
+            $flaskApiUrl: 'http://127.0.0.1:5000'  # URL de votre API Flask

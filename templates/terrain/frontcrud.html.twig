@@ -6,16 +6,18 @@
 <div class="container my-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="text-center">Nos Terrains</h1>
+        
         <!-- Bouton pour ajouter un terrain -->
         <a href="{{ path('app_terrain_newfront') }}" class="btn btn-primary">
             <i class="fas fa-plus-circle mr-2"></i>Ajouter un terrain
         </a>
 
-        <!-- Bouton icône de chat qui redirige vers l'interface de conversation -->
-            <a href="{{ path('conversations_list') }}" class="btn btn-info">
-                <i class="fas fa-comments"></i> Chat
-            </a>
+        <!-- Bouton Chat avec une couleur personnalisée et une icône -->
+        <a href="{{ path('conversations_list') }}" class="btn btn-success">
+            <i class="fas fa-comments mr-2"></i> Chat
+        </a>
     </div>
+    
     <div class="row">
         {% for terrain in terrains %}
             <div class="col-md-4 mb-4">
@@ -45,14 +47,13 @@
                                 {{ terrain.typeSol }}
                             </span><br>
                             <strong>Statut :</strong>
-<span class="badge badge-{{
-    terrain.status == 'disponible' ?  :
-    terrain.status == 'vendu' ?  :
-    terrain.status == 'reserve' 
-}}">
-    {{ terrain.status }}
-</span>
-
+                            <span class="badge 
+                                {% if terrain.status == 'disponible' %}badge-success
+                                {% elseif terrain.status == 'vendu' %}badge-danger
+                                {% elseif terrain.status == 'reserve' %}badge-warning
+                                {% else %}badge-secondary{% endif %}">
+                                {{ terrain.status }}
+                            </span>
                         </p>
                     </div>
                     <div class="card-footer text-center">
@@ -65,7 +66,8 @@
                         </form>
                         <!-- Bouton pour rediriger vers la page de transaction -->
                         <a href="{{ path('app_transaction_create', {'id': terrain.id}) }}" class="btn btn-success btn-sm">
-                       créer transaction </a>
+                            Créer transaction
+                        </a>
                     </div>
                 </div>
             </div>
@@ -76,4 +78,40 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- Chatbase Script -->
+<script>
+    (function() {
+        if (!window.chatbase || window.chatbase("getState") !== "initialized") {
+            window.chatbase = (...arguments) => {
+                if (!window.chatbase.q) {
+                    window.chatbase.q = [];
+                }
+                window.chatbase.q.push(arguments);
+            };
+            window.chatbase = new Proxy(window.chatbase, {
+                get(target, prop) {
+                    if (prop === "q") {
+                        return target.q;
+                    }
+                    return (...args) => target(prop, ...args);
+                }
+            });
+        }
+
+        const onLoad = function() {
+            const script = document.createElement("script");
+            script.src = "https://www.chatbase.co/embed.min.js";
+            script.id = "PNNrUMwSB6-1ltecea9jJ";
+            script.domain = "www.chatbase.co";
+            document.body.appendChild(script);
+        };
+
+        if (document.readyState === "complete") {
+            onLoad();
+        } else {
+            window.addEventListener("load", onLoad);
+        }
+    })();
+</script>
 {% endblock %}

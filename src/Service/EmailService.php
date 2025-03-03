@@ -39,4 +39,33 @@ class EmailService
                 echo 'Erreur lors de l\'envoi de l\'email: ' . $e->getMessage();
             }
     }
+
+
+    public function sendTransactionNotification(string $clientEmail, string $terrainAdresse, string $transactionType, float $transactionAmount)
+    {
+        $emailContent = "
+            <html>
+                <body>
+                    <h2>Notification de Transaction</h2>
+                    <p>Nous vous informons que vous avez effectué une transaction pour le terrain situé à : <strong>{$terrainAdresse}</strong>.</p>
+                    <p>Type de la transaction : <strong>{$transactionType}</strong></p>
+                    <p>Montant : <strong>{$transactionAmount} TND</strong></p>
+                    <p>Merci pour votre confiance !</p>
+                </body>
+            </html>
+        ";
+
+        $email = (new Email())
+            ->from('wefarmapplication@gmail.com')
+            ->to($clientEmail)
+            ->subject('Notification de Transaction pour Terrain: ' . $terrainAdresse)
+            ->html($emailContent);
+
+        try {
+            $this->mailer->send($email);
+            echo 'Email de notification de transaction envoyé avec succès !';
+        } catch (\Exception $e) {
+            echo 'Erreur lors de l\'envoi de l\'email de notification de transaction: ' . $e->getMessage();
+        }
+    }
 }

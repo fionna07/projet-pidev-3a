@@ -25,6 +25,8 @@ class TerrainController extends AbstractController
         $this->predictService = $predictService;
     }
 
+    
+
     // Afficher la liste des terrains (Back-office)
     #[Route('/affich', name: 'app_terrain_index', methods: ['GET'])]
     public function index(TerrainRepository $terrainRepository): Response
@@ -283,7 +285,7 @@ class TerrainController extends AbstractController
 
         $surface = (float) $data['terrain']['surface'];
         $typeSol = $data['terrain']['typeSol'];
-        $adresse = $data['terrain']['adresse']; 
+        $adresse = $data['terrain']['adresse'];
 
         try {
             $predictedPrice = $this->predictService->predict($surface, $typeSol, $adresse);
@@ -292,18 +294,9 @@ class TerrainController extends AbstractController
             return new JsonResponse(['error' => $e->getMessage()], 500);
         }
     }
-    //filtre
-    /*
-    #[Route('/filter', name: 'app_terrain_filter', methods: ['GET'])]
-    public function filter(Request $request, TerrainRepository $terrainRepository): Response
-    {
-        $status = $request->query->get('status', 'disponible'); // Valeur par défaut "disponible"
-        
-        $terrains = $terrainRepository->findBy(['status' => $status]);
+    
 
-        return $this->render('terrain/front.html.twig', [
-            'terrains' => $terrains,
-            'currentStatus' => $status,
-        ]);
-    }*/
+    
+
+        
 }
